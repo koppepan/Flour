@@ -54,17 +54,13 @@ namespace Flour.UI
 			return layers.LastOrDefault();
 		}
 
-		public AbstractSubLayer FirstOrDefault(Guid guid)
-		{
-			return layers.LastOrDefault(x => x.Identify == guid);
-		}
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)
 		{
 			return layers.LastOrDefault(x => x.LayerType == type);
 		}
-		public AbstractSubLayer FirstOrDefault(Guid guid, SubLayerType type)
+		public bool Remove(AbstractSubLayer subLayer)
 		{
-			return layers.LastOrDefault(x => x.Identify == guid && x.LayerType == type);
+			return layers.Remove(subLayer);
 		}
 	}
 }

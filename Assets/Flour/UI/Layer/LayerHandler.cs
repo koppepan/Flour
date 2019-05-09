@@ -54,6 +54,7 @@ namespace Flour.UI
 				current?.OnInactivate();
 
 				var sub = GameObject.Instantiate(task.Result);
+				sub.Initialize(type, Remove);
 				sub.OnOpen();
 				layerStacks[layer].Push(sub);
 				return sub;
@@ -73,10 +74,18 @@ namespace Flour.UI
 			stack.Push(old);
 			return (T)old;
 		}
+
 		public void Remove(Layer layer)
 		{
 			layerStacks[layer].Pop()?.OnClose();
 			layerStacks[layer].Peek()?.OnActivate();
+		}
+		public void Remove(AbstractSubLayer subLayer)
+		{
+			foreach (var stack in layerStacks)
+			{
+				stack.Value.Remove(subLayer);
+			}
 		}
 	}
 }

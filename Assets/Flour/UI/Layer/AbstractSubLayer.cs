@@ -5,12 +5,18 @@ namespace Flour.UI
 {
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{
-		public Guid Identify { get; private set; }
-		public abstract SubLayerType LayerType { get; }
+		public SubLayerType LayerType { get; private set; }
 
-		public void Initialize(Guid guid)
+		Action<AbstractSubLayer> onDestroy;
+
+		public void Initialize(SubLayerType type, Action<AbstractSubLayer> onDestroy)
 		{
-			Identify = guid;
+			LayerType = type;
+			this.onDestroy = onDestroy;
+		}
+		private void OnDestroy()
+		{
+			onDestroy?.Invoke(this);
 		}
 
 		public abstract void OnOpen();
