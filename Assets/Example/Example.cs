@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using Flour.UI;
 
 public class Example : MonoBehaviour
@@ -17,8 +14,7 @@ public class Example : MonoBehaviour
 
     void Start()
     {
-		var paths = subLayerSetting.settings.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.typeName), v => v.srcPath);
-		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(paths));
+		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(subLayerSetting.GetPaths()));
     }
 
 	private void Update()

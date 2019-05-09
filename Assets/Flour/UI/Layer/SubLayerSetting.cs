@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Flour.UI
@@ -6,7 +8,7 @@ namespace Flour.UI
 	[CreateAssetMenu]
 	public class SubLayerSetting : ScriptableObject
 	{
-		[System.Serializable]
+		[Serializable]
 		public struct SubLayer
 		{
 			public string typeName;
@@ -15,5 +17,10 @@ namespace Flour.UI
 
 		public string exportPath;
 		public List<SubLayer> settings = new List<SubLayer>();
+
+		public Dictionary<SubLayerType, string> GetPaths()
+		{
+			return settings.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.typeName), v => v.srcPath);
+		}
 	}
 }
