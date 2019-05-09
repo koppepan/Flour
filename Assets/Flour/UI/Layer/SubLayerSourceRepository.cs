@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -7,6 +8,8 @@ namespace Flour.UI
 {
 	public class SubLayerSourceRepository
 	{
+		const int MaxCache = 10;
+
 		Dictionary<SubLayerType, string> srcPaths;
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
@@ -24,6 +27,9 @@ namespace Flour.UI
 			}
 			if (srcCaches.ContainsKey(type))
 			{
+				var cache = srcCaches[type];
+				srcCaches.Remove(type);
+				srcCaches.Add(type, cache);
 				return (T)srcCaches[type];
 			}
 
@@ -35,8 +41,17 @@ namespace Flour.UI
 				Debug.LogWarning(type.ToString() + " : not found resource.");
 				return null;
 			}
+			srcCaches.Add(type, ((GameObject)request.asset).GetComponent<AbstractSubLayer>());
 
-			srcCaches[type] = ((GameObject)request.asset).GetComponent<AbstractSubLayer>();
+			if (srcCaches.Count > MaxCache)
+			{
+				var remove = srcCaches.First();
+				srcCaches.Remove(remove.Key);
+
+				Resources.UnloadAsset(remove.Value);
+				remove = default;
+			}
+
 			return (T)srcCaches[type];
 		}
 	}
