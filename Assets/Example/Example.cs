@@ -1,5 +1,6 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Flour.UI;
 
@@ -9,18 +10,15 @@ public class Example : MonoBehaviour
 	Transform canvasRoot = default;
 	[SerializeField]
 	Vector2 referenceResolution = new Vector2(640, 1136);
+	[SerializeField]
+	SubLayerSetting subLayerSetting = default;
 
 	LayerHandler layerHandler;
 
-	Dictionary<SubLayerType, string> subLayerSourcePaths = new Dictionary<SubLayerType, string>
-	{
-		{ SubLayerType.Sample1, "Sample1" },
-		{ SubLayerType.Sample2, "Sample2" },
-	};
-
     void Start()
     {
-		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(subLayerSourcePaths));
+		var paths = subLayerSetting.settings.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.typeName), v => v.srcPath);
+		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(paths));
     }
 
 	private void Update()
