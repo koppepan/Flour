@@ -3,8 +3,6 @@ using Flour.UI;
 
 public class Sample1Layer : AbstractSubLayer
 {
-	public override SubLayerType LayerType { get { return SubLayerType.Sample1; } }
-
 	public override void OnOpen()
 	{
 		Debug.Log("sample1 open");
