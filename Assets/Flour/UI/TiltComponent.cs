@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-namespace Components.UI
+namespace Flour.UI
 {
 	public class TiltComponent : BaseMeshEffect
 	{

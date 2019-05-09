@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.Serialization;
 using UnityEngine.EventSystems;
 
-namespace Components.UI
+namespace Flour.UI
 {
 	[AddComponentMenu("UI/ButtonEx", 30)]
 	public class ButtonEx : Button

@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEditor.UI;
 
-namespace Components.UI
+namespace Flour.UI
 {
 	[CustomEditor(typeof(ButtonEx), true)]
 	[CanEditMultipleObjects]
