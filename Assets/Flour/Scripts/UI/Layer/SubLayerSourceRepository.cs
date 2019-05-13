@@ -8,14 +8,15 @@ namespace Flour.UI
 {
 	public class SubLayerSourceRepository
 	{
-		const int MaxCache = 10;
-
 		Dictionary<SubLayerType, string> srcPaths;
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
-		public SubLayerSourceRepository(Dictionary<SubLayerType, string> srcPaths)
+		int maxCache;
+
+		public SubLayerSourceRepository(Dictionary<SubLayerType, string> srcPaths, int maxCache)
 		{
 			this.srcPaths = srcPaths;
+			this.maxCache = maxCache == 0 ? 1 : maxCache;
 		}
 
 		public async Task<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
@@ -43,7 +44,7 @@ namespace Flour.UI
 			}
 			srcCaches.Add(type, ((GameObject)request.asset).GetComponent<AbstractSubLayer>());
 
-			if (srcCaches.Count > MaxCache)
+			if (srcCaches.Count > maxCache)
 			{
 				var remove = srcCaches.First();
 				srcCaches.Remove(remove.Key);

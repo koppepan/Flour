@@ -22,7 +22,7 @@ public class Example : MonoBehaviour
 
 		var ini = new IniFile(contents);
 		var paths = ini.GetContents("SubLayerType").ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
-		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(paths));
+		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(paths, 10));
     }
 
 	private void Update()
