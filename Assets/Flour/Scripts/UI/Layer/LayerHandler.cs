@@ -87,5 +87,22 @@ namespace Flour.UI
 				stack.Value.Remove(subLayer);
 			}
 		}
+
+		public AbstractSubLayer FirstOrDefault(Layer layer, SubLayerType type)
+		{
+			return layerStacks[layer].FirstOrDefault(type);
+		}
+		public AbstractSubLayer FirstOrDefault(SubLayerType type)
+		{
+			foreach (var stack in layerStacks.Values)
+			{
+				var ret = stack.FirstOrDefault(type);
+				if (ret != null)
+				{
+					return ret;
+				}
+			}
+			return null;
+		}
 	}
 }
