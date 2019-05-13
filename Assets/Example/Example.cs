@@ -35,6 +35,10 @@ public class Example : MonoBehaviour
 		{
 			RemoveLayer();
 		}
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			layerHandler.OnBack();
+		}
 	}
 
 	int hoge = 0;
