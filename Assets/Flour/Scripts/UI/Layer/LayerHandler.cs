@@ -93,12 +93,16 @@ namespace Flour.UI
 		{
 			foreach (var stack in layerStacks)
 			{
-				if (stack.Value.Peek() == subLayer)
+				var sub = stack.Value.Peek();
+				if (sub != subLayer)
 				{
-					stack.Value.Pop()?.OnClose();
-					return;
+					sub = null;
 				}
-				var sub = stack.Value.FirstOrDefault(subLayer);
+				if (sub == null)
+				{
+					sub = stack.Value.FirstOrDefault(subLayer);
+				}
+
 				if (sub != null)
 				{
 					stack.Value.Remove(sub);
