@@ -23,33 +23,22 @@ public class Example : MonoBehaviour
 		var ini = new IniFile(contents);
 		var paths = ini.GetContents("SubLayerType").ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
 		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(paths, 10));
+
+		AddFooter();
     }
+
+	async void AddFooter()
+	{
+		var task = layerHandler.AddAsync<Footer>(Layer.Front, SubLayerType.Footer);
+		await task;
+		task.Result.Setup(layerHandler);
+	}
 
 	private void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.A))
-		{
-			AddWindow();
-		}
-		if (Input.GetKeyDown(KeyCode.B))
-		{
-			RemoveLayer();
-		}
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{
 			layerHandler.OnBack();
 		}
-	}
-
-	int hoge = 0;
-	async void AddWindow()
-	{
-		var task = layerHandler.AddAsync<AbstractSubLayer>(Layer.Back, hoge % 2 == 0 ? SubLayerType.Sample1 : SubLayerType.Sample2);
-		hoge++;
-		await task;
-	}
-	void RemoveLayer()
-	{
-		layerHandler.Remove(Layer.Back);
 	}
 }
