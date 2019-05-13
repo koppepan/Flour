@@ -107,22 +107,5 @@ namespace Flour.UI
 				}
 			}
 		}
-
-		public AbstractSubLayer FirstOrDefault(Layer layer, SubLayerType type)
-		{
-			return layerStacks[layer].FirstOrDefault(type);
-		}
-		public AbstractSubLayer FirstOrDefault(SubLayerType type)
-		{
-			foreach (var layer in layerOrder)
-			{
-				var ret = FirstOrDefault(layer, type);
-				if (ret != null)
-				{
-					return ret;
-				}
-			}
-			return null;
-		}
 	}
 }
