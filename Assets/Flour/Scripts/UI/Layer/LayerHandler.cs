@@ -67,8 +67,6 @@ namespace Flour.UI
 			// 開こうとしたSubLayerが存在しないので新しく生成
 			if (old == null)
 			{
-				current?.OnInactivate();
-
 				var sub = GameObject.Instantiate(task.Result);
 				sub.Initialize(type, Remove);
 				sub.OnOpen();
@@ -84,10 +82,6 @@ namespace Flour.UI
 
 			// 開こうとしたSubLayerがすでに存在していて一番前にはない
 			stack.Push(old);
-			old = stack.Pop();
-			stack.Peek()?.OnInactivate();
-			old?.OnActivate();
-			stack.Push(old);
 			return (T)old;
 		}
 
@@ -95,14 +89,13 @@ namespace Flour.UI
 		{
 			layerStacks[layer].Peek()?.Close();
 		}
-		void Remove(AbstractSubLayer subLayer)
+		 void Remove(AbstractSubLayer subLayer)
 		{
 			foreach (var stack in layerStacks)
 			{
 				if (stack.Value.Peek() == subLayer)
 				{
 					stack.Value.Pop()?.OnClose();
-					stack.Value.Peek()?.OnActivate();
 					return;
 				}
 				var sub = stack.Value.FirstOrDefault(subLayer);

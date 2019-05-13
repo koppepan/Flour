@@ -29,6 +29,7 @@ namespace Flour.UI
 			for (int i = 0; i < layers.Count; i++)
 			{
 				layers[i].transform.SetSiblingIndex(i);
+				layers[i].OnChangeSiblingIndex(layers.Count - (i + 1));
 			}
 		}
 
@@ -58,7 +59,8 @@ namespace Flour.UI
 		public AbstractSubLayer Pop()
 		{
 			var layer = Peek();
-			layers.Remove(layer);
+			Remove(layer);
+			layer.transform.SetAsLastSibling();
 			return layer;
 		}
 		public AbstractSubLayer Peek()
@@ -68,7 +70,12 @@ namespace Flour.UI
 
 		public bool Remove(AbstractSubLayer subLayer)
 		{
-			return layers.Remove(subLayer);
+			var ret = layers.Remove(subLayer);
+			if (ret)
+			{
+				ResetSiblingIndex();
+			}
+			return ret;
 		}
 
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)

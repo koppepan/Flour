@@ -16,18 +16,19 @@ namespace Flour.UI
 			this.onDestroy = onDestroy;
 		}
 
+		public virtual void OnOpen() { }
+		public virtual void OnBack() { }
+		public virtual void OnChangeSiblingIndex(int index) { }
+
 		public virtual void Close()
 		{
 			onDestroy?.Invoke(this);
 		}
 
-		public abstract void OnOpen();
 		public virtual void OnClose()
 		{
 			Destroy(gameObject);
 		}
-		public abstract void OnActivate();
-		public abstract void OnInactivate();
-		public abstract void OnBack();
+
 	}
 }
