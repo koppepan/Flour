@@ -1,0 +1,3 @@
+[SubLayerType]
+Sample1 = Sample1
+Sample2 = Sample2
