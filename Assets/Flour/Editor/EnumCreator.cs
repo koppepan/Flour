@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace Flour
 	/// </summary>
 	public static class EnumCreator
 	{
-		public static void Create(string exportPath, string nameSpace, string summary, string enumName, string[] types)
+		public static void Create(string exportPath, string nameSpace, string summary, string enumName, IEnumerable<string> types)
 		{
 			if (string.IsNullOrEmpty(exportPath))
 			{
