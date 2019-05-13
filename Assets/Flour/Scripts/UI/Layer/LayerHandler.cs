@@ -89,7 +89,7 @@ namespace Flour.UI
 		{
 			layerStacks[layer].Peek()?.Close();
 		}
-		 void Remove(AbstractSubLayer subLayer)
+		void Remove(AbstractSubLayer subLayer)
 		{
 			foreach (var stack in layerStacks)
 			{
