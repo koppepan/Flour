@@ -17,13 +17,15 @@ namespace Flour.UI
 	{
 		SubLayerSourceRepository repository;
 
+		Layer[] layerOrder;
 		Dictionary<Layer, LayerStack> layerStacks = new Dictionary<Layer, LayerStack>();
 
 		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, SubLayerSourceRepository repository)
 		{
 			this.repository = repository;
 
-			foreach (var layer in Enum.GetValues(typeof(Layer)).Cast<Layer>())
+			var layers = Enum.GetValues(typeof(Layer)).Cast<Layer>();
+			foreach (var layer in layers)
 			{
 				var stack = new GameObject(layer.ToString(), typeof(LayerStack)).GetComponent<LayerStack>();
 				stack.transform.SetParent(canvasRoot);
@@ -31,6 +33,20 @@ namespace Flour.UI
 
 				layerStacks.Add(layer, stack);
 			}
+
+			layerOrder = layers.Reverse().ToArray();
+		}
+
+		public bool OnBack()
+		{
+			foreach (var layer in layerOrder)
+			{
+				if (layerStacks[layer].OnBack())
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public async Task<T> AddAsync<T>(Layer layer, SubLayerType type) where T : AbstractSubLayer
@@ -84,7 +100,18 @@ namespace Flour.UI
 		{
 			foreach (var stack in layerStacks)
 			{
-				stack.Value.Remove(subLayer);
+				if (stack.Value.Peek() == subLayer)
+				{
+					Remove(stack.Key);
+					return;
+				}
+				var sub = stack.Value.FirstOrDefault(subLayer);
+				if (sub != null)
+				{
+					stack.Value.Remove(sub);
+					sub.OnClose();
+					return;
+				}
 			}
 		}
 
@@ -94,9 +121,9 @@ namespace Flour.UI
 		}
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)
 		{
-			foreach (var stack in layerStacks.Values)
+			foreach (var layer in layerOrder)
 			{
-				var ret = stack.FirstOrDefault(type);
+				var ret = FirstOrDefault(layer, type);
 				if (ret != null)
 				{
 					return ret;

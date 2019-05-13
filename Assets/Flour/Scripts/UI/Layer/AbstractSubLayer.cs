@@ -6,6 +6,7 @@ namespace Flour.UI
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{
 		public SubLayerType LayerType { get; private set; }
+		public virtual bool IgnoreBack { get { return false; } }
 
 		Action<AbstractSubLayer> onDestroy;
 
@@ -14,15 +15,19 @@ namespace Flour.UI
 			LayerType = type;
 			this.onDestroy = onDestroy;
 		}
-		private void OnDestroy()
+
+		public virtual void Close()
 		{
 			onDestroy?.Invoke(this);
 		}
 
 		public abstract void OnOpen();
-		public abstract void OnClose();
+		public virtual void OnClose()
+		{
+			Destroy(gameObject);
+		}
 		public abstract void OnActivate();
 		public abstract void OnInactivate();
-		public abstract bool OnBackKey();
+		public abstract void OnBack();
 	}
 }

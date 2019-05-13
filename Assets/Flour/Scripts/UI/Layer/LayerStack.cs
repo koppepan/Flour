@@ -32,6 +32,18 @@ namespace Flour.UI
 			}
 		}
 
+		public bool OnBack()
+		{
+			var sub = layers.LastOrDefault(x => !x.IgnoreBack);
+
+			if (sub == null)
+			{
+				return false;
+			}
+			sub.OnBack();
+			return true;
+		}
+
 		public void Push(AbstractSubLayer layer)
 		{
 			if (layers.Any(x => x == layer))
@@ -54,13 +66,18 @@ namespace Flour.UI
 			return layers.LastOrDefault();
 		}
 
+		public bool Remove(AbstractSubLayer subLayer)
+		{
+			return layers.Remove(subLayer);
+		}
+
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)
 		{
 			return layers.LastOrDefault(x => x.LayerType == type);
 		}
-		public bool Remove(AbstractSubLayer subLayer)
+		public AbstractSubLayer FirstOrDefault(AbstractSubLayer subLayer)
 		{
-			return layers.Remove(subLayer);
+			return layers.LastOrDefault(x => x == subLayer);
 		}
 	}
 }
