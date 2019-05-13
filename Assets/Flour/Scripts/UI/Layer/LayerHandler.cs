@@ -93,16 +93,16 @@ namespace Flour.UI
 
 		public void Remove(Layer layer)
 		{
-			layerStacks[layer].Pop()?.OnClose();
-			layerStacks[layer].Peek()?.OnActivate();
+			layerStacks[layer].Peek()?.Close();
 		}
-		public void Remove(AbstractSubLayer subLayer)
+		void Remove(AbstractSubLayer subLayer)
 		{
 			foreach (var stack in layerStacks)
 			{
 				if (stack.Value.Peek() == subLayer)
 				{
-					Remove(stack.Key);
+					stack.Value.Pop()?.OnClose();
+					stack.Value.Peek()?.OnActivate();
 					return;
 				}
 				var sub = stack.Value.FirstOrDefault(subLayer);
