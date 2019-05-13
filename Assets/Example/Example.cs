@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Linq;
+using UnityEngine;
+using Flour;
 using Flour.UI;
 
 public class Example : MonoBehaviour
@@ -7,14 +11,18 @@ public class Example : MonoBehaviour
 	Transform canvasRoot = default;
 	[SerializeField]
 	Vector2 referenceResolution = new Vector2(640, 1136);
-	[SerializeField]
-	SubLayerSetting subLayerSetting = default;
 
 	LayerHandler layerHandler;
 
-    void Start()
+    IEnumerator Start()
     {
-		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(subLayerSetting.GetPaths()));
+		var req = Resources.LoadAsync<TextAsset>("Config/SubLayerType");
+		yield return req;
+		var contents = ((TextAsset)req.asset).text.Split('\n', '\r');
+
+		var ini = new IniFile(contents);
+		var paths = ini.GetContents("SubLayerType").ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
+		layerHandler = new LayerHandler(canvasRoot, referenceResolution, new SubLayerSourceRepository(paths));
     }
 
 	private void Update()
