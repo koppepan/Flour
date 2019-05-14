@@ -5,26 +5,26 @@ public class SampleLayer : AbstractSubLayer
 {
 	public override void Close()
 	{
-		Debug.Log("sample close");
+		Debug.Log(SubLayer.ToString() + " close");
 		base.Close();
 	}
 	public override void OnOpen()
 	{
-		Debug.Log("sample on open");
+		Debug.Log(SubLayer.ToString() + " on open");
 	}
 	public override void OnClose()
 	{
-		Debug.Log("sample on close");
+		Debug.Log(SubLayer.ToString() + " on close");
 		base.OnClose();
 	}
 	public override void OnBack()
 	{
-		Debug.Log("sample on back");
+		Debug.Log(SubLayer.ToString() + " on back");
 		Close();
 	}
 
 	public override void OnChangeSiblingIndex(int index)
 	{
-		Debug.Log("sample index " + index);
+		Debug.Log(SubLayer.ToString() + " index " + index);
 	}
 }

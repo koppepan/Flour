@@ -16,10 +16,10 @@ public class Footer : AbstractSubLayer
 	[SerializeField]
 	Button sample4Button = default;
 
-	LayerHandler layerHandler;
+	ILayerHandler layerHandler;
 	AbstractSubLayer currentLayer;
 
-	public void Setup(LayerHandler layerHandler)
+	public void Setup(ILayerHandler layerHandler)
 	{
 		this.layerHandler = layerHandler;
 	}
@@ -34,11 +34,12 @@ public class Footer : AbstractSubLayer
 
 	async void OnOpen(SubLayerType type)
 	{
-		var task = layerHandler.AddAsync<AbstractSubLayer>(Layer.Back, type);
-		await task;
-
+		if (currentLayer?.SubLayer == type)
+		{
+			return;
+		}
 		currentLayer?.Close();
-		currentLayer = task.Result;
+		currentLayer = await layerHandler.AddAsync<AbstractSubLayer>(Layer.Back, type);
 	}
 
 	public override void OnChangeSiblingIndex(int index)

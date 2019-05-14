@@ -29,9 +29,8 @@ public class Example : MonoBehaviour
 
 	async void AddFooter()
 	{
-		var task = layerHandler.AddAsync<Footer>(Layer.Front, SubLayerType.Footer);
-		await task;
-		task.Result.Setup(layerHandler);
+		var footer = await layerHandler.AddAsync<Footer>(Layer.Front, SubLayerType.Footer);
+		footer.Setup(layerHandler);
 	}
 
 	private void Update()
