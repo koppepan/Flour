@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,7 +14,12 @@ namespace Flour.UI
 		Front = 12,
 	}
 
-	public class LayerHandler
+	public interface ILayerHandler
+	{
+		UniTask<T> AddAsync<T>(Layer layer, SubLayerType subLayer) where T : AbstractSubLayer;
+	}
+
+	public class LayerHandler : ILayerHandler
 	{
 		SubLayerSourceRepository repository;
 
@@ -53,14 +57,14 @@ namespace Flour.UI
 
 		public async UniTask<T> AddAsync<T>(Layer layer, SubLayerType type) where T : AbstractSubLayer
 		{
-			var task = repository.LoadAsync<T>(type);
-			await task;
+			var prefab = await repository.LoadAsync<T>(type);
 
-			if (task.Result == null)
+			if (prefab == null)
 			{
 				return null;
 			}
-			return (T)Add(layer, type, task.Result);
+
+			return (T)Add(layer, type, prefab);
 		}
 
 		private AbstractSubLayer Add(Layer layer, SubLayerType type, AbstractSubLayer prefab)
