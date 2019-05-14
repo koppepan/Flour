@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 using UnityEngine;
+using UniRx;
+using UniRx.Async;
 
 namespace Flour.UI
 {
@@ -19,7 +19,7 @@ namespace Flour.UI
 			this.maxCache = maxCache == 0 ? 1 : maxCache;
 		}
 
-		public async Task<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
+		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
 		{
 			if (!srcPaths.ContainsKey(type))
 			{
@@ -34,15 +34,14 @@ namespace Flour.UI
 				return (T)srcCaches[type];
 			}
 
-			var request = Resources.LoadAsync<GameObject>(srcPaths[type]);
-			await request;
+			var prefab = await Resources.LoadAsync<GameObject>(srcPaths[type]);
 
-			if (request.asset == null)
+			if (prefab == null)
 			{
 				Debug.LogWarning(type.ToString() + " : not found resource.");
 				return null;
 			}
-			srcCaches.Add(type, ((GameObject)request.asset).GetComponent<AbstractSubLayer>());
+			srcCaches.Add(type, ((GameObject)prefab).GetComponent<AbstractSubLayer>());
 
 			if (srcCaches.Count > maxCache)
 			{
@@ -54,23 +53,6 @@ namespace Flour.UI
 			}
 
 			return (T)srcCaches[type];
-		}
-	}
-
-	static class ResourceRequestExtenion
-	{
-		// Resources.LoadAsyncの戻り値であるResourceRequestにGetAwaiter()を追加する
-		public static TaskAwaiter<Object> GetAwaiter(this ResourceRequest resourceRequest)
-		{
-			var tcs = new TaskCompletionSource<Object>();
-			resourceRequest.completed += operation =>
-			{
-				// ロードが終わった時点でTaskCompletionSource.TrySetResult
-				tcs.TrySetResult(resourceRequest.asset);
-			};
-
-			// TaskCompletionSource.Task.GetAwaiter()を返す
-			return tcs.Task.GetAwaiter();
 		}
 	}
 }

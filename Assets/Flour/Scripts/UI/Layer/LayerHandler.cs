@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
+using UniRx;
+using UniRx.Async;
 
 namespace Flour.UI
 {
@@ -49,7 +51,7 @@ namespace Flour.UI
 			return false;
 		}
 
-		public async Task<T> AddAsync<T>(Layer layer, SubLayerType type) where T : AbstractSubLayer
+		public async UniTask<T> AddAsync<T>(Layer layer, SubLayerType type) where T : AbstractSubLayer
 		{
 			var task = repository.LoadAsync<T>(type);
 			await task;
@@ -58,7 +60,11 @@ namespace Flour.UI
 			{
 				return null;
 			}
+			return (T)Add(layer, type, task.Result);
+		}
 
+		private AbstractSubLayer Add(Layer layer, SubLayerType type, AbstractSubLayer prefab)
+		{
 			var stack = layerStacks[layer];
 
 			var current = stack.Peek();
@@ -67,7 +73,7 @@ namespace Flour.UI
 			// 開こうとしたSubLayerが存在しないので新しく生成
 			if (old == null)
 			{
-				var sub = GameObject.Instantiate(task.Result);
+				var sub = GameObject.Instantiate(prefab);
 				sub.Initialize(type, Remove);
 				sub.OnOpen();
 				layerStacks[layer].Push(sub);
@@ -77,12 +83,12 @@ namespace Flour.UI
 			// 開こうとしたSubLayerがすでに存在していて一番前にある
 			if (current == old)
 			{
-				return (T)current;
+				return current;
 			}
 
 			// 開こうとしたSubLayerがすでに存在していて一番前にはない
 			stack.Push(old);
-			return (T)old;
+			return old;
 		}
 
 		public void Remove(Layer layer)
