@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Flour.UI;
 
@@ -26,20 +27,32 @@ public class Footer : AbstractSubLayer
 
 	public override void OnOpen()
 	{
-		sample1Button.onClick.AddListener(() => OnOpen(SubLayerType.Sample1));
-		sample2Button.onClick.AddListener(() => OnOpen(SubLayerType.Sample2));
-		sample3Button.onClick.AddListener(() => OnOpen(SubLayerType.Sample3));
-		sample4Button.onClick.AddListener(() => OnOpen(SubLayerType.Sample4));
+		sample1Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample1));
+		sample2Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample2));
+		sample3Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample3));
+		sample4Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample4));
 	}
 
-	async void OnOpen(SubLayerType type)
+	async void OnSubLayer(SubLayerType type)
 	{
 		if (currentLayer?.SubLayer == type)
 		{
 			return;
 		}
+
+		var eventSystem = EventSystem.current;
+		eventSystem.enabled = false;
+
+		var fade = await layerHandler.AddAsync<FadeLayer>(Layer.Middle, SubLayerType.Blackout);
+		await fade.FadeIn();
+
 		currentLayer?.Close();
 		currentLayer = await layerHandler.AddAsync<AbstractSubLayer>(Layer.Back, type);
+
+		await fade.FadeOut();
+		fade.Close();
+
+		eventSystem.enabled = true;
 	}
 
 	public override void OnChangeSiblingIndex(int index)
