@@ -5,14 +5,14 @@ namespace Flour.UI
 {
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{
-		public SubLayerType LayerType { get; private set; }
+		public SubLayerType SubLayer { get; private set; }
 		public virtual bool IgnoreBack { get { return false; } }
 
 		Action<AbstractSubLayer> onDestroy;
 
 		public void Initialize(SubLayerType type, Action<AbstractSubLayer> onDestroy)
 		{
-			LayerType = type;
+			SubLayer = type;
 			this.onDestroy = onDestroy;
 		}
 

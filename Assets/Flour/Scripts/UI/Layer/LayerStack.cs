@@ -80,7 +80,7 @@ namespace Flour.UI
 
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)
 		{
-			return layers.LastOrDefault(x => x.LayerType == type);
+			return layers.LastOrDefault(x => x.SubLayer == type);
 		}
 		public AbstractSubLayer FirstOrDefault(AbstractSubLayer subLayer)
 		{
