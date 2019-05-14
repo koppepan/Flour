@@ -61,11 +61,10 @@ namespace Flour.UI
 
 			if (srcCaches.Count > maxCache)
 			{
-				var remove = srcCaches.First();
+				var remove = srcCaches.FirstOrDefault(x => x.Key != type);
 				srcCaches.Remove(remove.Key);
-
-				Resources.UnloadAsset(remove.Value);
 				remove = default;
+				await Resources.UnloadUnusedAssets();
 			}
 
 			return (T)srcCaches[type];
