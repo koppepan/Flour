@@ -21,14 +21,14 @@ namespace Flour.UI
 
 	public class LayerHandler : ILayerHandler
 	{
-		SubLayerSourceRepository repository;
+		SubLayerSourceRepository[] repositories;
 
 		Layer[] layerOrder;
 		Dictionary<Layer, LayerStack> layerStacks = new Dictionary<Layer, LayerStack>();
 
-		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, SubLayerSourceRepository repository)
+		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, params SubLayerSourceRepository[] repositories)
 		{
-			this.repository = repository;
+			this.repositories = repositories;
 
 			var layers = Enum.GetValues(typeof(Layer)).Cast<Layer>();
 			foreach (var layer in layers)
@@ -55,9 +55,21 @@ namespace Flour.UI
 			return false;
 		}
 
+		private async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
+		{
+			for (int i = 0; i < repositories.Length; i++)
+			{
+				if (repositories[i].ContainsKey(type))
+				{
+					return await repositories[i].LoadAsync<T>(type);
+				}
+			}
+			return null;
+		}
+
 		public async UniTask<T> AddAsync<T>(Layer layer, SubLayerType type) where T : AbstractSubLayer
 		{
-			var prefab = await repository.LoadAsync<T>(type);
+			var prefab = await LoadAsync<T>(type);
 
 			if (prefab == null)
 			{

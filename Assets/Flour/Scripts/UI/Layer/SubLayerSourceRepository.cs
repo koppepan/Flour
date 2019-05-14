@@ -8,7 +8,7 @@ namespace Flour.UI
 {
 	public class SubLayerSourceRepository
 	{
-		Dictionary<SubLayerType, string> srcPaths;
+		Dictionary<SubLayerType, string> srcPaths = new Dictionary<SubLayerType, string>();
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
 		int maxCache;
@@ -17,6 +17,22 @@ namespace Flour.UI
 		{
 			this.srcPaths = srcPaths;
 			this.maxCache = maxCache == 0 ? 1 : maxCache;
+		}
+
+		public SubLayerSourceRepository(int maxCache)
+		{
+			this.maxCache = maxCache;
+			srcPaths.Clear();
+		}
+
+		public void AddSourcePath(SubLayerType key, string path)
+		{
+			srcPaths[key] = path;
+		}
+
+		public bool ContainsKey(SubLayerType type)
+		{
+			return srcPaths.ContainsKey(type);
 		}
 
 		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
