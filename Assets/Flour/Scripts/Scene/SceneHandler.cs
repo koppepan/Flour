@@ -8,6 +8,7 @@ namespace Flour.Scene
 	public class SceneHandler
 	{
 		AbstractScene currentScene;
+		const string EmptySceneName = "Empty";
 
 		private AbstractScene GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
 		{
@@ -30,8 +31,19 @@ namespace Flour.Scene
 
 		public async UniTask LoadScene(string sceneName, params object[] param)
 		{
-			await UnloadScene(sceneName);
+			var count = SceneManager.sceneCount;
+
+			if (count == 1)
+			{
+				await SceneManager.LoadSceneAsync(EmptySceneName);
+			}
+			await UnloadScene(currentScene?.SceneName);
 			await AddScene(sceneName, param);
+
+			if (count == 1)
+			{
+				await SceneManager.UnloadSceneAsync(EmptySceneName);
+			}
 		}
 
 		async UniTask UnloadScene(string sceneName)
