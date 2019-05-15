@@ -2,6 +2,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
+using Flour;
 using Flour.UI;
 
 public class Footer : AbstractSubLayer
@@ -43,11 +45,11 @@ public class Footer : AbstractSubLayer
 		var eventSystem = EventSystem.current;
 		eventSystem.enabled = false;
 
-		var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
+		var fade = await layerHandler.AddLayerAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
 		await fade.FadeIn();
 
 		currentLayer?.Close();
-		currentLayer = await layerHandler.AddAsync(LayerType.Back, type);
+		currentLayer = await layerHandler.AddLayerAsync(LayerType.Back, type);
 
 		await fade.FadeOut();
 		fade.Close();

@@ -8,7 +8,7 @@ using Flour;
 using Flour.UI;
 using Flour.Scene;
 
-public class ApplicationManager : MonoBehaviour
+public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandler, ILayerHandler
 {
 	[Header("UI")]
 	[SerializeField]
@@ -16,11 +16,14 @@ public class ApplicationManager : MonoBehaviour
 	[SerializeField]
 	Vector2 referenceResolution = new Vector2(750, 1334);
 
+	// 初期化時にPrefabをLoadしておくSubLayer一覧
+	readonly SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
+
 	SceneHandler sceneHandler;
 	LayerHandler layerHandler;
 
-	// 初期化時にPrefabをLoadしておくSubLayer一覧
-	SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
+	public ISceneHandler SceneHandler { get { return this; } }
+	public ILayerHandler LayerHandler { get { return this; } }
 
 	private void Awake()
 	{
@@ -59,11 +62,38 @@ public class ApplicationManager : MonoBehaviour
 		}
 
 		sceneHandler = new SceneHandler();
-		await sceneHandler.LoadScene("Title");
+		await LoadSceneAsync("Title");
 	}
 
 	private void OnApplicationQuit()
 	{
 		DontDestroyObjectList.Clear();
+	}
+
+
+	public async UniTask LoadSceneAsync(string sceneName, params object[] param)
+	{
+		var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
+		await fade.FadeIn();
+		await sceneHandler.LoadSceneAsync(sceneName, this, param);
+		await fade.FadeOut();
+		fade.Close();
+	}
+	public async UniTask AddSceneAsync(string sceneName, params object[] param)
+	{
+		await sceneHandler.AddSceneAsync(sceneName, this, param);
+	}
+	public async UniTask UnloadSceneAsync(string sceneName)
+	{
+		await sceneHandler.UnloadSceneAsync(sceneName);
+	}
+
+	public async UniTask<AbstractSubLayer> AddLayerAsync(LayerType layer, SubLayerType subLayer)
+	{
+		return await layerHandler.AddAsync(layer, subLayer);
+	}
+	public async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer
+	{
+		return await layerHandler.AddAsync<T>(layer, subLayer);
 	}
 }
