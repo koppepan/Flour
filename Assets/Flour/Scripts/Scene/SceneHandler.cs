@@ -28,7 +28,7 @@ namespace Flour.Scene
 			return null;
 		}
 
-		private async UniTask LoadSceneAsync(string sceneName, IOperationBundler operationBundler, LoadSceneMode mode, params object[] param)
+		private async UniTask LoadAsync(string sceneName, IOperationBundler operationBundler, LoadSceneMode mode, params object[] param)
 		{
 			currentScene?.Unload();
 			await SceneManager.LoadSceneAsync(sceneName, mode);
@@ -42,17 +42,17 @@ namespace Flour.Scene
 			}
 		}
 
-		public async UniTask LoadSceneAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
+		public async UniTask LoadAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
 		{
-			await LoadSceneAsync(sceneName, operationBundler, LoadSceneMode.Single, param);
+			await LoadAsync(sceneName, operationBundler, LoadSceneMode.Single, param);
 		}
 
-		public async UniTask AddSceneAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
+		public async UniTask AddAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
 		{
-			await LoadSceneAsync(sceneName, operationBundler, LoadSceneMode.Additive, param);
+			await LoadAsync(sceneName, operationBundler, LoadSceneMode.Additive, param);
 		}
 
-		public async UniTask UnloadSceneAsync(string sceneName)
+		public async UniTask UnloadAsync(string sceneName)
 		{
 			var abstractScene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
 			if (abstractScene != null)

@@ -79,7 +79,7 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 
 		var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
 		await fade.FadeIn();
-		await sceneHandler.LoadSceneAsync(sceneName, this, param);
+		await sceneHandler.LoadAsync(sceneName, this, param);
 		await fade.FadeOut();
 		fade.Close();
 
@@ -87,11 +87,11 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 	}
 	public async UniTask AddSceneAsync(string sceneName, params object[] param)
 	{
-		await sceneHandler.AddSceneAsync(sceneName, this, param);
+		await sceneHandler.AddAsync(sceneName, this, param);
 	}
 	public async UniTask UnloadSceneAsync(string sceneName)
 	{
-		await sceneHandler.UnloadSceneAsync(sceneName);
+		await sceneHandler.UnloadAsync(sceneName);
 	}
 
 	public async UniTask<AbstractSubLayer> AddLayerAsync(LayerType layer, SubLayerType subLayer)
