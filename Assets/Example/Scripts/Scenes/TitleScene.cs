@@ -16,4 +16,8 @@ public class TitleScene : AbstractScene
 	{
 		footer.Close();
 	}
+
+	public override void OnBack()
+	{
+	}
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Flour.UI;
 
-public class SampleLayer : AbstractSubLayer
+public class SampleLayer : FooterSubLayer
 {
 	public override void Close()
 	{
@@ -20,7 +20,7 @@ public class SampleLayer : AbstractSubLayer
 	public override void OnBack()
 	{
 		Debug.Log(SubLayer.ToString() + " on back");
-		Close();
+		base.OnBack();
 	}
 
 	public override void OnChangeSiblingIndex(int index)

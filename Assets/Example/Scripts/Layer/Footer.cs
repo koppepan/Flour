@@ -20,7 +20,7 @@ public class Footer : AbstractSubLayer
 	Button sample4Button = default;
 
 	ILayerHandler layerHandler;
-	AbstractSubLayer currentLayer;
+	FooterSubLayer currentLayer;
 
 	public void Setup(ILayerHandler layerHandler)
 	{
@@ -49,7 +49,24 @@ public class Footer : AbstractSubLayer
 		await fade.FadeIn();
 
 		currentLayer?.Close();
-		currentLayer = await layerHandler.AddLayerAsync(LayerType.Back, type);
+		currentLayer = await layerHandler.AddLayerAsync<FooterSubLayer>(LayerType.Back, type);
+		currentLayer.Setup(CloseSubLayer);
+
+		await fade.FadeOut();
+		fade.Close();
+
+		eventSystem.enabled = true;
+	}
+
+	async void CloseSubLayer()
+	{
+		var eventSystem = EventSystem.current;
+		eventSystem.enabled = false;
+
+		var fade = await layerHandler.AddLayerAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
+		await fade.FadeIn();
+
+		currentLayer?.Close();
 
 		await fade.FadeOut();
 		fade.Close();

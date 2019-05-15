@@ -24,5 +24,7 @@ namespace Flour.Scene
 		}
 
 		public virtual void Unload() { }
+
+		public virtual void OnBack() { }
 	}
 }

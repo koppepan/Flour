@@ -9,6 +9,16 @@ namespace Flour.Scene
 	{
 		AbstractScene currentScene;
 
+		public bool OnBack()
+		{
+			if (currentScene != null)
+			{
+				currentScene.OnBack();
+				return true;
+			}
+			return false;
+		}
+
 		private AbstractScene GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
 		{
 			if (scene == default)

@@ -71,6 +71,21 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 		DontDestroyObjectList.Clear();
 	}
 
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape))
+		{
+			if(layerHandler.OnBack())
+			{
+				return;
+			}
+			if (sceneHandler.OnBack())
+			{
+				return;
+			}
+		}
+	}
+
 
 	public async UniTask LoadSceneAsync(string sceneName, params object[] param)
 	{
