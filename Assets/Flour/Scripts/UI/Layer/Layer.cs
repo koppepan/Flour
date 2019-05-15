@@ -6,8 +6,6 @@ namespace Flour.UI
 	[RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
 	internal class Layer : MonoBehaviour
 	{
-		Transform subLayerParent;
-
 		public SubLayerStack Stack { get; private set; }
 
 		public void Initialize(LayerType layer, Vector2 referenceResolution, Rect safeArea, Vector2 screenSize)
