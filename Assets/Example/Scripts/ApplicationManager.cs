@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UniRx;
 using UniRx.Async;
 
@@ -73,11 +74,16 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 
 	public async UniTask LoadSceneAsync(string sceneName, params object[] param)
 	{
+		var eventSystem = EventSystem.current;
+		eventSystem.enabled = false;
+
 		var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
 		await fade.FadeIn();
 		await sceneHandler.LoadSceneAsync(sceneName, this, param);
 		await fade.FadeOut();
 		fade.Close();
+
+		eventSystem.enabled = true;
 	}
 	public async UniTask AddSceneAsync(string sceneName, params object[] param)
 	{
