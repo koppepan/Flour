@@ -47,7 +47,7 @@ public class Example : MonoBehaviour
 			await fixedRepo.LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
 		}
 
-		var footer = await layerHandler.AddAsync<Footer>(Layer.Front, SubLayerType.Footer);
+		var footer = await layerHandler.AddAsync<Footer>(LayerType.Front, SubLayerType.Footer);
 		footer.Setup(layerHandler);
     }
 
