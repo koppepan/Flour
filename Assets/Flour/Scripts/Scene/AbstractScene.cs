@@ -7,9 +7,19 @@ namespace Flour.Scene
 	{
 		public string SceneName { get; private set; }
 
-		public virtual async UniTask Load(string sceneName, params object[] param)
+		private IOperationBundler operationBundler;
+
+		protected ILayerHandler LayerHandler { get { return operationBundler.LayerHandler; } }
+		protected ISceneHandler SceneHandler { get { return operationBundler.SceneHandler; } }
+
+		public void Setup(string sceneName, IOperationBundler operationBundler)
 		{
 			SceneName = sceneName;
+			this.operationBundler = operationBundler;
+		}
+
+		public virtual async UniTask Load(params object[] param)
+		{
 			await UniTask.DelayFrame(1);
 		}
 

@@ -12,15 +12,10 @@ namespace Flour.UI
 		Back = 10,
 		Middle = 11,
 		Front = 12,
+		System = 13,
 	}
 
-	public interface ILayerHandler
-	{
-		UniTask<AbstractSubLayer> AddAsync(LayerType layer, SubLayerType subLayer);
-		UniTask<T> AddAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer;
-	}
-
-	public class LayerHandler : ILayerHandler
+	public class LayerHandler
 	{
 		SubLayerSourceRepository[] repositories;
 

@@ -8,7 +8,6 @@ namespace Flour.Scene
 	public class SceneHandler
 	{
 		AbstractScene currentScene;
-		const string EmptySceneName = "Empty";
 
 		private AbstractScene GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
 		{
@@ -29,24 +28,31 @@ namespace Flour.Scene
 			return null;
 		}
 
-		public async UniTask LoadScene(string sceneName, params object[] param)
+		private async UniTask LoadSceneAsync(string sceneName, IOperationBundler operationBundler, LoadSceneMode mode, params object[] param)
 		{
-			var count = SceneManager.sceneCount;
+			currentScene?.Unload();
+			await SceneManager.LoadSceneAsync(sceneName, mode);
 
-			if (count == 1)
+			var scene = SceneManager.GetSceneByName(sceneName);
+			currentScene = GetAbstractScene(scene);
+			if (currentScene != null)
 			{
-				await SceneManager.LoadSceneAsync(EmptySceneName);
-			}
-			await UnloadScene(currentScene?.SceneName);
-			await AddScene(sceneName, param);
-
-			if (count == 1)
-			{
-				await SceneManager.UnloadSceneAsync(EmptySceneName);
+				currentScene.Setup(sceneName, operationBundler);
+				await currentScene.Load(param);
 			}
 		}
 
-		async UniTask UnloadScene(string sceneName)
+		public async UniTask LoadSceneAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
+		{
+			await LoadSceneAsync(sceneName, operationBundler, LoadSceneMode.Single, param);
+		}
+
+		public async UniTask AddSceneAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
+		{
+			await LoadSceneAsync(sceneName, operationBundler, LoadSceneMode.Additive, param);
+		}
+
+		public async UniTask UnloadSceneAsync(string sceneName)
 		{
 			var abstractScene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
 			if (abstractScene != null)
@@ -57,24 +63,6 @@ namespace Flour.Scene
 					currentScene = null;
 				}
 				await SceneManager.UnloadSceneAsync(abstractScene.SceneName);
-			}
-		}
-		public async UniTask AddScene(string sceneName, params object[] param)
-		{
-			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-
-			var scene = SceneManager.GetSceneByName(sceneName);
-			if (scene == default)
-			{
-				return;
-			}
-			SceneManager.SetActiveScene(scene);
-
-			currentScene = GetAbstractScene(scene);
-
-			if (currentScene != null)
-			{
-				await currentScene.Load(sceneName, param);
 			}
 		}
 	}
