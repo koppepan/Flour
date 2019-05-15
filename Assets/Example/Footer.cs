@@ -47,7 +47,7 @@ public class Footer : AbstractSubLayer
 		await fade.FadeIn();
 
 		currentLayer?.Close();
-		currentLayer = await layerHandler.AddAsync<AbstractSubLayer>(LayerType.Back, type);
+		currentLayer = await layerHandler.AddAsync(LayerType.Back, type);
 
 		await fade.FadeOut();
 		fade.Close();

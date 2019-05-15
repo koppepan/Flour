@@ -16,6 +16,7 @@ namespace Flour.UI
 
 	public interface ILayerHandler
 	{
+		UniTask<AbstractSubLayer> AddAsync(LayerType layer, SubLayerType subLayer);
 		UniTask<T> AddAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer;
 	}
 
@@ -70,16 +71,21 @@ namespace Flour.UI
 			return null;
 		}
 
-		public async UniTask<T> AddAsync<T>(LayerType layer, SubLayerType type) where T : AbstractSubLayer
+		public async UniTask<AbstractSubLayer> AddAsync(LayerType layerType, SubLayerType subLayerType)
 		{
-			var prefab = await LoadAsync<T>(type);
+			return await AddAsync<AbstractSubLayer>(layerType, subLayerType);
+		}
+
+		public async UniTask<T> AddAsync<T>(LayerType layerType, SubLayerType subLayerType) where T : AbstractSubLayer
+		{
+			var prefab = await LoadAsync<T>(subLayerType);
 
 			if (prefab == null)
 			{
 				return null;
 			}
 
-			return (T)Add(layer, type, prefab);
+			return (T)Add(layerType, subLayerType, prefab);
 		}
 
 		private AbstractSubLayer Add(LayerType layerType, SubLayerType subLayerType, AbstractSubLayer prefab)
