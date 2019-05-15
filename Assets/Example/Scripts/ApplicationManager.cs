@@ -1,24 +1,35 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UniRx;
 using UniRx.Async;
+
 using Flour;
 using Flour.UI;
+using Flour.Scene;
 
-public class Example : MonoBehaviour
+public class ApplicationManager : MonoBehaviour
 {
+	[Header("UI")]
 	[SerializeField]
 	Transform canvasRoot = default;
 	[SerializeField]
-	Vector2 referenceResolution = new Vector2(640, 1136);
+	Vector2 referenceResolution = new Vector2(750, 1334);
 
+	SceneHandler sceneHandler;
 	LayerHandler layerHandler;
 
 	// 初期化時にPrefabをLoadしておくSubLayer一覧
 	SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
 
-    async void Start()
-    {
+	private void Awake()
+	{
+		DontDestroyObjectList.Add<ApplicationManager>(gameObject);
+		DontDestroyObjectList.Add<LayerHandler>(canvasRoot.gameObject);
+	}
+
+	async void Start()
+	{
 		var config = await Resources.LoadAsync<TextAsset>("Config/SubLayerType");
 		var contents = ((TextAsset)config).text.Split('\n', '\r');
 
@@ -47,15 +58,12 @@ public class Example : MonoBehaviour
 			await fixedRepo.LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
 		}
 
-		var footer = await layerHandler.AddAsync<Footer>(LayerType.Front, SubLayerType.Footer);
-		footer.Setup(layerHandler);
-    }
+		sceneHandler = new SceneHandler();
+		await sceneHandler.LoadScene("Title");
+	}
 
-	private void Update()
+	private void OnApplicationQuit()
 	{
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{
-			layerHandler.OnBack();
-		}
+		DontDestroyObjectList.Clear();
 	}
 }
