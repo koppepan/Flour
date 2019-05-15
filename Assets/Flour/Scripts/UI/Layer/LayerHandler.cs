@@ -7,7 +7,7 @@ using UniRx.Async;
 
 namespace Flour.UI
 {
-	public enum Layer
+	public enum LayerType
 	{
 		Back = 10,
 		Middle = 11,
@@ -16,38 +16,41 @@ namespace Flour.UI
 
 	public interface ILayerHandler
 	{
-		UniTask<T> AddAsync<T>(Layer layer, SubLayerType subLayer) where T : AbstractSubLayer;
+		UniTask<T> AddAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer;
 	}
 
 	public class LayerHandler : ILayerHandler
 	{
 		SubLayerSourceRepository[] repositories;
 
-		Layer[] layerOrder;
-		Dictionary<Layer, LayerStack> layerStacks = new Dictionary<Layer, LayerStack>();
+		LayerType[] layerOrder;
+		Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
 
 		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, params SubLayerSourceRepository[] repositories)
 		{
 			this.repositories = repositories;
 
-			var layers = Enum.GetValues(typeof(Layer)).Cast<Layer>();
-			foreach (var layer in layers)
-			{
-				var stack = new GameObject(layer.ToString(), typeof(LayerStack)).GetComponent<LayerStack>();
-				stack.transform.SetParent(canvasRoot);
-				stack.Initialize(layer, referenceResolution);
+			var screenSize = new Vector2(Screen.width, Screen.height);
+			var safeArea = Screen.safeArea;
 
-				layerStacks.Add(layer, stack);
+			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>();
+			foreach (var type in layerTypes)
+			{
+				var layer = new GameObject(type.ToString(), typeof(Layer)).GetComponent<Layer>();
+				layer.transform.SetParent(canvasRoot);
+				layer.Initialize(type, referenceResolution, safeArea, screenSize);
+
+				layers.Add(type, layer);
 			}
 
-			layerOrder = layers.Reverse().ToArray();
+			layerOrder = layerTypes.Reverse().ToArray();
 		}
 
 		public bool OnBack()
 		{
 			foreach (var layer in layerOrder)
 			{
-				if (layerStacks[layer].OnBack())
+				if (layers[layer].OnBack())
 				{
 					return true;
 				}
@@ -67,7 +70,7 @@ namespace Flour.UI
 			return null;
 		}
 
-		public async UniTask<T> AddAsync<T>(Layer layer, SubLayerType type) where T : AbstractSubLayer
+		public async UniTask<T> AddAsync<T>(LayerType layer, SubLayerType type) where T : AbstractSubLayer
 		{
 			var prefab = await LoadAsync<T>(type);
 
@@ -79,20 +82,20 @@ namespace Flour.UI
 			return (T)Add(layer, type, prefab);
 		}
 
-		private AbstractSubLayer Add(Layer layer, SubLayerType type, AbstractSubLayer prefab)
+		private AbstractSubLayer Add(LayerType layerType, SubLayerType subLayerType, AbstractSubLayer prefab)
 		{
-			var stack = layerStacks[layer];
+			var layer = layers[layerType];
 
-			var current = stack.Peek();
-			var old = stack.FirstOrDefault(type);
+			var current = layer.Stack.Peek();
+			var old = layer.Stack.FirstOrDefault(subLayerType);
 
 			// 開こうとしたSubLayerが存在しないので新しく生成
 			if (old == null)
 			{
 				var sub = GameObject.Instantiate(prefab);
-				sub.Initialize(type, Remove);
+				sub.Initialize(subLayerType, Remove);
 				sub.OnOpen();
-				layerStacks[layer].Push(sub);
+				layer.Stack.Push(sub);
 				return sub;
 			}
 
@@ -103,33 +106,33 @@ namespace Flour.UI
 			}
 
 			// 開こうとしたSubLayerがすでに存在していて一番前にはない
-			stack.Push(old);
+			layer.Stack.Push(old);
 			return old;
 		}
 
-		public void Remove(Layer layer)
+		public void Remove(LayerType layer)
 		{
-			layerStacks[layer].Peek()?.Close();
+			layers[layer].Stack.Peek()?.Close();
 		}
 		void Remove(AbstractSubLayer subLayer)
 		{
-			foreach (var stack in layerStacks)
+			foreach (var layer in layers.Values)
 			{
-				var sub = stack.Value.Peek();
-				if (sub != subLayer)
-				{
-					sub = null;
-				}
+				var sub = layer.Stack.FirstOrDefault(x => x == subLayer);
 				if (sub == null)
 				{
-					sub = stack.Value.FirstOrDefault(subLayer);
+					continue;
 				}
 
-				if (sub != null)
+				if (layer.Stack.Peek() == subLayer)
 				{
-					stack.Value.Remove(sub);
-					sub.OnClose();
+					layer.Stack.Pop().OnClose();
 					return;
+				}
+				else
+				{
+					layer.Stack.Remove(subLayer);
+					sub.OnClose();
 				}
 			}
 		}
