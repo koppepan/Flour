@@ -5,6 +5,7 @@ namespace Flour
 {
 	public interface IOperationBundler
 	{
+		void ApplicationQuit();
 		ISceneHandler SceneHandler { get; }
 		ILayerHandler LayerHandler { get; }
 	}

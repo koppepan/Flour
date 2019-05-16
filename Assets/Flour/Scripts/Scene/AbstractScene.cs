@@ -7,7 +7,7 @@ namespace Flour.Scene
 	{
 		public string SceneName { get; private set; }
 
-		private IOperationBundler operationBundler;
+		protected IOperationBundler operationBundler;
 
 		protected ILayerHandler LayerHandler { get { return operationBundler.LayerHandler; } }
 		protected ISceneHandler SceneHandler { get { return operationBundler.SceneHandler; } }

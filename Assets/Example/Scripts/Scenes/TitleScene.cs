@@ -19,5 +19,6 @@ public class TitleScene : AbstractScene
 
 	public override void OnBack()
 	{
+		operationBundler.ApplicationQuit();
 	}
 }

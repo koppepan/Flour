@@ -56,10 +56,18 @@ public class ApplicationManager : MonoBehaviour
 		}
 
 
-		appOperator = new ApplicationOperator(new SceneHandler(), new LayerHandler(canvasRoot, referenceResolution, fixedRepo, repo));
+		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler(), new LayerHandler(canvasRoot, referenceResolution, fixedRepo, repo));
 		await appOperator.LoadSceneAsync("Title");
 	}
 
+	private void ApplicationQuit()
+	{
+#if UNITY_EDITOR
+		UnityEditor.EditorApplication.ExitPlaymode();
+#else
+		Application.Quit(1);
+#endif
+	}
 	private void OnApplicationQuit()
 	{
 		DontDestroyObjectList.Clear();

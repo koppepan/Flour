@@ -7,16 +7,24 @@ using Flour.UI;
 
 public class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandler
 {
+	System.Action onApplicationQuit;
+
 	SceneHandler sceneHandler;
 	LayerHandler layerHandler;
 
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
 
-	public ApplicationOperator(SceneHandler sceneHandler, LayerHandler layerHandler)
+	public ApplicationOperator(System.Action onApplicationQuit, SceneHandler sceneHandler, LayerHandler layerHandler)
 	{
+		this.onApplicationQuit = onApplicationQuit;
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
+	}
+
+	public void ApplicationQuit()
+	{
+		onApplicationQuit?.Invoke();
 	}
 
 	public void OnBack()
