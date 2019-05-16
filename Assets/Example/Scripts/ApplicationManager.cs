@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UniRx;
 using UniRx.Async;
 
@@ -9,7 +8,7 @@ using Flour;
 using Flour.UI;
 using Flour.Scene;
 
-public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandler, ILayerHandler
+public class ApplicationManager : MonoBehaviour
 {
 	[Header("UI")]
 	[SerializeField]
@@ -20,11 +19,7 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 	// 初期化時にPrefabをLoadしておくSubLayer一覧
 	readonly SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
 
-	SceneHandler sceneHandler;
-	LayerHandler layerHandler;
-
-	public ISceneHandler SceneHandler { get { return this; } }
-	public ILayerHandler LayerHandler { get { return this; } }
+	private ApplicationOperator appOperator;
 
 	private void Awake()
 	{
@@ -55,15 +50,14 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 			}
 		}
 
-		layerHandler = new LayerHandler(canvasRoot, referenceResolution, fixedRepo, repo);
-
 		for (int i = 0; i < FixedSubLayers.Length; i++)
 		{
 			await fixedRepo.LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
 		}
 
-		sceneHandler = new SceneHandler();
-		await LoadSceneAsync("Title");
+
+		appOperator = new ApplicationOperator(new SceneHandler(), new LayerHandler(canvasRoot, referenceResolution, fixedRepo, repo));
+		await appOperator.LoadSceneAsync("Title");
 	}
 
 	private void OnApplicationQuit()
@@ -75,46 +69,7 @@ public class ApplicationManager : MonoBehaviour, IOperationBundler, ISceneHandle
 	{
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{
-			if(layerHandler.OnBack())
-			{
-				return;
-			}
-			if (sceneHandler.OnBack())
-			{
-				return;
-			}
+			appOperator.OnBack();
 		}
-	}
-
-
-	public async UniTask LoadSceneAsync(string sceneName, params object[] param)
-	{
-		var eventSystem = EventSystem.current;
-		eventSystem.enabled = false;
-
-		var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
-		await fade.FadeIn();
-		await sceneHandler.LoadAsync(sceneName, this, param);
-		await fade.FadeOut();
-		fade.Close();
-
-		eventSystem.enabled = true;
-	}
-	public async UniTask AddSceneAsync(string sceneName, params object[] param)
-	{
-		await sceneHandler.AddAsync(sceneName, this, param);
-	}
-	public async UniTask UnloadSceneAsync(string sceneName)
-	{
-		await sceneHandler.UnloadAsync(sceneName);
-	}
-
-	public async UniTask<AbstractSubLayer> AddLayerAsync(LayerType layer, SubLayerType subLayer)
-	{
-		return await layerHandler.AddAsync(layer, subLayer);
-	}
-	public async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer
-	{
-		return await layerHandler.AddAsync<T>(layer, subLayer);
 	}
 }

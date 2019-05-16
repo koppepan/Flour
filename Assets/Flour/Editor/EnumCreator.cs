@@ -45,7 +45,7 @@ namespace Flour
 			code += tab + "public enum " + enumName + "\n" + tab + "{\n";
 			tab += "\t";
 
-			foreach (var type in types.OrderBy(x => x))
+			foreach (var type in types)
 			{
 				code += tab + type + ",\n";
 			}

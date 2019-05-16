@@ -2,6 +2,7 @@
 {
 	public enum SubLayerType
 	{
+		None,
 		Blackout,
 		Footer,
 		Sample1,

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using UnityEditor;
 
 namespace Flour
@@ -16,7 +18,10 @@ namespace Flour
 			var asset = Resources.Load<TextAsset>("Config/SubLayerType");
 
 			var ini = new IniFile(asset.text.Split('\n', '\r'));
-			EnumCreator.Create(ExportPath, NamespaceName, "", TypeName, ini.GetKeys(TypeName));
+
+			var contetns = new List<string>(ini.GetKeys(TypeName).OrderBy(x => x));
+			contetns.Insert(0, "None");
+			EnumCreator.Create(ExportPath, NamespaceName, "", TypeName, contetns);
 		}
 	}
 }

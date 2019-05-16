@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UniRx.Async;
 
 using Flour;
 using Flour.UI;
@@ -29,49 +29,40 @@ public class Footer : AbstractSubLayer
 
 	public override void OnOpen()
 	{
-		sample1Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample1));
-		sample2Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample2));
-		sample3Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample3));
-		sample4Button.onClick.AddListener(() => OnSubLayer(SubLayerType.Sample4));
+		sample1Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample1));
+		sample2Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample2));
+		sample3Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample3));
+		sample4Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample4));
 	}
 
-	async void OnSubLayer(SubLayerType type)
+	async void OpenSubLayer(SubLayerType type)
 	{
 		if (currentLayer?.SubLayer == type)
 		{
 			return;
 		}
-
-		var eventSystem = EventSystem.current;
-		eventSystem.enabled = false;
-
-		var fade = await layerHandler.AddLayerAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
-		await fade.FadeIn();
-
-		currentLayer?.Close();
-		currentLayer = await layerHandler.AddLayerAsync<FooterSubLayer>(LayerType.Back, type);
-		currentLayer.Setup(CloseSubLayer);
-
-		await fade.FadeOut();
-		fade.Close();
-
-		eventSystem.enabled = true;
+		await ChangeSubLayer(type);
 	}
 
 	async void CloseSubLayer()
 	{
-		var eventSystem = EventSystem.current;
-		eventSystem.enabled = false;
+		await ChangeSubLayer(SubLayerType.None);
+	}
 
+	async UniTask ChangeSubLayer(SubLayerType subLayerType)
+	{
 		var fade = await layerHandler.AddLayerAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
 		await fade.FadeIn();
 
 		currentLayer?.Close();
+		if (subLayerType != SubLayerType.None)
+		{
+			currentLayer = await layerHandler.AddLayerAsync<FooterSubLayer>(LayerType.Back, subLayerType);
+			currentLayer?.Setup(CloseSubLayer);
+		}
 
 		await fade.FadeOut();
 		fade.Close();
-
-		eventSystem.enabled = true;
 	}
 
 	public override void OnChangeSiblingIndex(int index)
