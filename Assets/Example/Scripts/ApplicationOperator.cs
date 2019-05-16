@@ -67,6 +67,10 @@ public class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandl
 			var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
 			await fade.FadeIn();
 			await sceneHandler.LoadAsync(sceneName, this, param);
+
+			await UnityEngine.Resources.UnloadUnusedAssets();
+			await UniTask.Run(() => System.GC.Collect(0, System.GCCollectionMode.Optimized));
+
 			await fade.FadeOut();
 			fade.Close();
 		});
