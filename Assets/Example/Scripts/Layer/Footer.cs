@@ -19,11 +19,14 @@ public class Footer : AbstractSubLayer
 	[SerializeField]
 	Button sample4Button = default;
 
+	IInputBinder inputBinder;
 	ILayerHandler layerHandler;
+
 	FooterSubLayer currentLayer;
 
-	public void Setup(ILayerHandler layerHandler)
+	public void Setup(IInputBinder inputBinder, ILayerHandler layerHandler)
 	{
+		this.inputBinder = inputBinder;
 		this.layerHandler = layerHandler;
 	}
 
@@ -51,6 +54,12 @@ public class Footer : AbstractSubLayer
 
 	async UniTask ChangeSubLayer(SubLayerType subLayerType)
 	{
+		if (inputBinder.Binded)
+		{
+			return;
+		}
+		inputBinder.Bind();
+
 		var fade = await layerHandler.AddLayerAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
 		await fade.FadeIn();
 
@@ -63,6 +72,8 @@ public class Footer : AbstractSubLayer
 
 		await fade.FadeOut();
 		fade.Close();
+
+		inputBinder.Unbind();
 	}
 
 	public override void OnChangeSiblingIndex(int index)

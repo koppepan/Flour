@@ -9,6 +9,7 @@ namespace Flour.Scene
 
 		protected IOperationBundler operationBundler;
 
+		protected IInputBinder InputBinder { get { return operationBundler.InputBinder; } }
 		protected ILayerHandler LayerHandler { get { return operationBundler.LayerHandler; } }
 		protected ISceneHandler SceneHandler { get { return operationBundler.SceneHandler; } }
 

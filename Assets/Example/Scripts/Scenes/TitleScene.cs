@@ -10,7 +10,7 @@ public class TitleScene : AbstractScene
 	public override async UniTask Load(params object[] param)
 	{
 		footer = await LayerHandler.AddLayerAsync<Footer>(LayerType.Front, SubLayerType.Footer);
-		footer.Setup(LayerHandler);
+		footer.Setup(InputBinder, LayerHandler);
 	}
 	public override void Unload()
 	{

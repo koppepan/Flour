@@ -6,8 +6,16 @@ namespace Flour
 	public interface IOperationBundler
 	{
 		void ApplicationQuit();
+		IInputBinder InputBinder { get; }
 		ISceneHandler SceneHandler { get; }
 		ILayerHandler LayerHandler { get; }
+	}
+
+	public interface IInputBinder
+	{
+		bool Binded { get; }
+		void Bind();
+		void Unbind();
 	}
 
 	public interface ISceneHandler
