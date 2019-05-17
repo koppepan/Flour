@@ -7,13 +7,8 @@ namespace Flour.Scene
 	{
 		public string SceneName { get; private set; }
 
-		protected T param;
-
-		public void Setup(string sceneName, T param)
-		{
-			SceneName = sceneName;
-			this.param = param;
-		}
+		public void SetName(string sceneName) => SceneName = sceneName;
+		public abstract void SetParameter(T param);
 
 		public virtual async UniTask Load(params object[] args)
 		{

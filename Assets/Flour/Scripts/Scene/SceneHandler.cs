@@ -46,7 +46,8 @@ namespace Flour.Scene
 			currentScene = GetAbstractScene(scene);
 			if (currentScene != null)
 			{
-				currentScene.Setup(sceneName, param);
+				currentScene.SetName(sceneName);
+				currentScene.SetParameter(param);
 				await currentScene.Load(args);
 			}
 		}
