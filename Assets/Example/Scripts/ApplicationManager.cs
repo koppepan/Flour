@@ -30,33 +30,24 @@ public sealed class ApplicationManager : MonoBehaviour
 	async void Start()
 	{
 		var config = await Resources.LoadAsync<TextAsset>("Config/SubLayerType");
-		var contents = ((TextAsset)config).text.Split('\n', '\r');
+		var contents = new IniFile(((TextAsset)config).text.Split('\n', '\r')).GetContents("SubLayerType");
+		var subLayers = contents.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
 
-		var subLayers = new IniFile(contents).GetContents("SubLayerType");
 		Resources.UnloadAsset(config);
 
-		var fixedRepo = new SubLayerSourceRepository(FixedSubLayers.Length);
-		var repo = new SubLayerSourceRepository(10);
+		var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(FixedSubLayers.Length), new SubLayerSourceRepository(10) };
 
 		foreach (var set in subLayers)
 		{
-			if (FixedSubLayers.Any(x => x.ToString() == set.Key))
-			{
-				fixedRepo.AddSourcePath((SubLayerType)Enum.Parse(typeof(SubLayerType), set.Key), set.Value);
-			}
-			else
-			{
-				repo.AddSourcePath((SubLayerType)Enum.Parse(typeof(SubLayerType), set.Key), set.Value);
-			}
+			var index = FixedSubLayers.Contains(set.Key) ? 0 : 1;
+			repositories[index].AddSourcePath(set.Key, set.Value);
 		}
-
 		for (int i = 0; i < FixedSubLayers.Length; i++)
 		{
-			await fixedRepo.LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
+			await repositories[0].LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
 		}
 
-
-		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler<IOperationBundler>(), new LayerHandler(canvasRoot, referenceResolution, fixedRepo, repo));
+		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler<IOperationBundler>(), new LayerHandler(canvasRoot, referenceResolution, repositories));
 		await appOperator.LoadSceneAsync("Title");
 	}
 

@@ -56,14 +56,14 @@ public class Footer
 		await fade.FadeIn();
 
 		currentLayer?.Close();
+		currentLayer = null;
 		if (subLayerType != SubLayerType.None)
 		{
 			currentLayer = await layerHandler.AddLayerAsync<FooterSubLayer>(LayerType.Back, subLayerType);
 			currentLayer?.Setup(CloseSubLayer);
 		}
 
-		await fade.FadeOut();
-		fade.Close();
+		await fade.FadeOut(close: true);
 
 		inputBinder.Unbind();
 	}

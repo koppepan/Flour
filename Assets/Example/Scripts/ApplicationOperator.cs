@@ -68,8 +68,7 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 		await UnityEngine.Resources.UnloadUnusedAssets();
 		await UniTask.Run(() => System.GC.Collect(0, System.GCCollectionMode.Optimized));
 
-		await fade.FadeOut();
-		fade.Close();
+		await fade.FadeOut(close: true);
 
 		InputBinder.Unbind();
 	}

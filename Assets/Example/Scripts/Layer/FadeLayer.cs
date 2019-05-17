@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UniRx.Async;
 using Flour.Layer;
@@ -14,16 +13,23 @@ public class FadeLayer : AbstractSubLayer
 		panel = GetComponent<Image>();
 	}
 
-	public async UniTask FadeIn()
+	private async UniTask Fade(int milliseconds, Color befor, Color after)
 	{
-		panel.color = Color.clear;
-		LeanTween.color(panel.rectTransform, Color.black, 0.2f);
-		await UniTask.Delay(200);
+		panel.color = befor;
+		LeanTween.color(panel.rectTransform, after, milliseconds * 0.001f);
+		await UniTask.Delay(milliseconds);
 	}
-	public async UniTask FadeOut()
+
+	public async UniTask FadeIn(int milliseconds = 200)
 	{
-		panel.color = Color.clear;
-		LeanTween.color(panel.rectTransform, Color.clear, 0.2f);
-		await UniTask.Delay(200);
+		await Fade(milliseconds, Color.clear, Color.black);
+	}
+	public async UniTask FadeOut(int millisecondes = 200, bool close = false)
+	{
+		await Fade(millisecondes, Color.black, Color.clear);
+		if (close)
+		{
+			Close();
+		}
 	}
 }
