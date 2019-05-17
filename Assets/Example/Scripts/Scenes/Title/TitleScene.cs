@@ -1,22 +1,27 @@
 ﻿using UnityEngine;
 using UniRx.Async;
+using Flour.Layer;
 
 public class TitleScene : AbstractScene
 {
-	Footer footer;
-
+	TitleLayer titleLayer;
 	public override async UniTask Load(params object[] param)
 	{
-		footer = new Footer(InputBinder, LayerHandler);
-		await footer.Open();
+		titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
+		titleLayer.Setup(GotoOutGame);
 	}
 	public override void Unload()
 	{
-		footer.Close();
+		titleLayer.Close();
 	}
 
 	public override void OnBack()
 	{
 		AppOparator.ApplicationQuit();
+	}
+
+	private void GotoOutGame()
+	{
+		SceneHandler.LoadSceneAsync("OutGame");
 	}
 }

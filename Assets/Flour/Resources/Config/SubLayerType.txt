@@ -1,6 +1,8 @@
 [SubLayerType]
 Blackout = Blackout
 
+Title = Title
+
 Footer = Footer
 
 Sample1 = Sample1

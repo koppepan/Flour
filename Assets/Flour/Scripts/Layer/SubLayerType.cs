@@ -9,5 +9,6 @@
 		Sample2,
 		Sample3,
 		Sample4,
+		Title,
 	}
 }
