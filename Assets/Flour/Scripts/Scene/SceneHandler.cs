@@ -4,7 +4,7 @@ using UniRx.Async;
 
 namespace Flour.Scene
 {
-	public class SceneHandler<T>
+	public sealed class SceneHandler<T>
 	{
 		AbstractScene<T> currentScene;
 

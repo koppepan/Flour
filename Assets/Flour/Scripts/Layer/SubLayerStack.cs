@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Flour.Layer
 {
-	internal class SubLayerStack
+	internal sealed class SubLayerStack
 	{
 		List<AbstractSubLayer> subLayers = new List<AbstractSubLayer>();
 		UnityEngine.Transform subLayerParent;

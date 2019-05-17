@@ -15,7 +15,7 @@ namespace Flour.Layer
 		System = 13,
 	}
 
-	public class LayerHandler
+	public sealed class LayerHandler
 	{
 		SubLayerSourceRepository[] repositories;
 

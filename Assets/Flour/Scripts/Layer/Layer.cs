@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Flour.Layer
 {
 	[RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
-	internal class Layer : MonoBehaviour
+	sealed internal class Layer : MonoBehaviour
 	{
 		public SubLayerStack Stack { get; private set; }
 

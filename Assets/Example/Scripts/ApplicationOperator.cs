@@ -4,7 +4,7 @@ using UniRx.Async;
 using Flour.Scene;
 using Flour.Layer;
 
-public class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandler
+public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandler
 {
 	class UIInputBinder : IInputBinder
 	{

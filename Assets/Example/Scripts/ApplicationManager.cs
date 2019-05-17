@@ -8,7 +8,7 @@ using Flour;
 using Flour.Scene;
 using Flour.Layer;
 
-public class ApplicationManager : MonoBehaviour
+public sealed class ApplicationManager : MonoBehaviour
 {
 	[Header("UI")]
 	[SerializeField]

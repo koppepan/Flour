@@ -6,7 +6,7 @@ using UniRx.Async;
 
 namespace Flour.Layer
 {
-	public class SubLayerSourceRepository
+	public sealed class SubLayerSourceRepository
 	{
 		Dictionary<SubLayerType, string> srcPaths = new Dictionary<SubLayerType, string>();
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
