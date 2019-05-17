@@ -18,8 +18,8 @@ public interface IInputBinder
 
 public interface ISceneHandler
 {
-	UniTask LoadSceneAsync(string sceneName, params object[] param);
-	UniTask AddSceneAsync(string sceneName, params object[] param);
+	UniTask LoadSceneAsync(string sceneName, params object[] args);
+	UniTask AddSceneAsync(string sceneName, params object[] args);
 	UniTask UnloadSceneAsync(string sceneName);
 }
 

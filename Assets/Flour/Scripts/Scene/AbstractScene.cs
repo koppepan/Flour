@@ -15,7 +15,7 @@ namespace Flour.Scene
 			this.param = param;
 		}
 
-		public virtual async UniTask Load(params object[] param)
+		public virtual async UniTask Load(params object[] args)
 		{
 			await UniTask.DelayFrame(1);
 		}

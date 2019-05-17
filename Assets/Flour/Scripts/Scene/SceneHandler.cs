@@ -37,7 +37,7 @@ namespace Flour.Scene
 			return null;
 		}
 
-		private async UniTask LoadAsync(string sceneName, T param, LoadSceneMode mode, params object[] values)
+		private async UniTask LoadAsync(string sceneName, T param, LoadSceneMode mode, params object[] args)
 		{
 			currentScene?.Unload();
 			await SceneManager.LoadSceneAsync(sceneName, mode);
@@ -47,18 +47,18 @@ namespace Flour.Scene
 			if (currentScene != null)
 			{
 				currentScene.Setup(sceneName, param);
-				await currentScene.Load(values);
+				await currentScene.Load(args);
 			}
 		}
 
-		public async UniTask LoadAsync(string sceneName, T param, params object[] values)
+		public async UniTask LoadAsync(string sceneName, T param, params object[] args)
 		{
-			await LoadAsync(sceneName, param, LoadSceneMode.Single, values);
+			await LoadAsync(sceneName, param, LoadSceneMode.Single, args);
 		}
 
-		public async UniTask AddAsync(string sceneName, T param, params object[] values)
+		public async UniTask AddAsync(string sceneName, T param, params object[] args)
 		{
-			await LoadAsync(sceneName, param, LoadSceneMode.Additive, values);
+			await LoadAsync(sceneName, param, LoadSceneMode.Additive, args);
 		}
 
 		public async UniTask UnloadAsync(string sceneName)
