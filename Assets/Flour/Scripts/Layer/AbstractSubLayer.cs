@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Flour.UI
+namespace Flour.Layer
 {
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{

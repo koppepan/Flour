@@ -5,8 +5,8 @@ using UniRx;
 using UniRx.Async;
 
 using Flour;
-using Flour.UI;
 using Flour.Scene;
+using Flour.Layer;
 
 public class ApplicationManager : MonoBehaviour
 {

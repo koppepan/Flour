@@ -1,9 +1,8 @@
 ﻿using UnityEngine.EventSystems;
 using UniRx.Async;
 
-using Flour;
 using Flour.Scene;
-using Flour.UI;
+using Flour.Layer;
 
 public class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandler
 {

@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx.Async;
-using Flour.UI;
+using Flour.Layer;
 
 public class FadeLayer : AbstractSubLayer
 {

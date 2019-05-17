@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Flour.UI;
 
 public class SampleLayer : FooterSubLayer
 {

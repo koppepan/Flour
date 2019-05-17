@@ -5,7 +5,7 @@ using UnityEngine;
 using UniRx;
 using UniRx.Async;
 
-namespace Flour.UI
+namespace Flour.Layer
 {
 	public enum LayerType
 	{

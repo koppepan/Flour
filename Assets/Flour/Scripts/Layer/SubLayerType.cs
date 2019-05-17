@@ -1,4 +1,4 @@
-﻿namespace Flour.UI
+﻿namespace Flour.Layer
 {
 	public enum SubLayerType
 	{

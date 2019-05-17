@@ -9,7 +9,7 @@ namespace Flour
 	{
 		const string ExportPath = "Assets/Flour/Scripts/UI/Layer";
 
-		const string NamespaceName = "Flour.UI";
+		const string NamespaceName = "Flour.Layer";
 		const string TypeName = "SubLayerType";
 
 		[MenuItem("Flour/Create SubLayerType Enum")]

@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using UniRx.Async;
-using Flour;
-using Flour.UI;
+﻿using UniRx.Async;
+using Flour.Layer;
 
 public class Footer
 {

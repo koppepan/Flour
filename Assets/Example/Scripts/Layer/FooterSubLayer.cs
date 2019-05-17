@@ -1,4 +1,4 @@
-﻿using Flour.UI;
+﻿using Flour.Layer;
 
 public class FooterSubLayer : AbstractSubLayer
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Flour.UI
+namespace Flour.Layer
 {
 	internal class SubLayerStack
 	{
