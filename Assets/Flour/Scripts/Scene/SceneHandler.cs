@@ -1,4 +1,6 @@
-﻿using UnityEngine.SceneManagement;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.SceneManagement;
 using UniRx;
 using UniRx.Async;
 
@@ -7,6 +9,7 @@ namespace Flour.Scene
 	public sealed class SceneHandler<T>
 	{
 		AbstractScene<T> currentScene;
+		List<AbstractScene<T>> additiveScenes = new List<AbstractScene<T>>();
 
 		public bool OnBack()
 		{
@@ -16,6 +19,15 @@ namespace Flour.Scene
 				return true;
 			}
 			return false;
+		}
+
+		private AbstractScene<T> Find(string sceneName)
+		{
+			if (currentScene.SceneName == sceneName)
+			{
+				return currentScene;
+			}
+			return additiveScenes.FirstOrDefault(x => x.SceneName == sceneName);
 		}
 
 		private AbstractScene<T> GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
@@ -37,43 +49,49 @@ namespace Flour.Scene
 			return null;
 		}
 
-		private async UniTask LoadAsync(string sceneName, T param, LoadSceneMode mode, params object[] args)
-		{
-			currentScene?.Unload();
-			await SceneManager.LoadSceneAsync(sceneName, mode);
-
-			var scene = SceneManager.GetSceneByName(sceneName);
-			currentScene = GetAbstractScene(scene);
-			if (currentScene != null)
-			{
-				currentScene.SetName(sceneName);
-				currentScene.SetParameter(param);
-				await currentScene.Load(args);
-			}
-		}
-
 		public async UniTask LoadAsync(string sceneName, T param, params object[] args)
 		{
-			await LoadAsync(sceneName, param, LoadSceneMode.Single, args);
+			currentScene?.Unload();
+			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+
+			var scene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
+			currentScene = null;
+
+			if (scene != null)
+			{
+				currentScene = scene;
+				await LoadScene(currentScene, sceneName, param, args);
+			}
 		}
 
 		public async UniTask AddAsync(string sceneName, T param, params object[] args)
 		{
-			await LoadAsync(sceneName, param, LoadSceneMode.Additive, args);
+			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+
+			var scene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
+			if (scene != null)
+			{
+				additiveScenes.Add(scene);
+				await LoadScene(currentScene, sceneName, param, args);
+			}
+		}
+
+		private async UniTask LoadScene(AbstractScene<T> scene, string sceneName, T param, params object[] args)
+		{
+			scene.SetName(sceneName);
+			scene.SetParameter(param);
+			await scene.Load(args);
 		}
 
 		public async UniTask UnloadAsync(string sceneName)
 		{
-			var abstractScene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
-			if (abstractScene != null)
+			if (currentScene?.SceneName == sceneName)
 			{
-				abstractScene.Unload();
-				if (currentScene.SceneName == sceneName)
-				{
-					currentScene = null;
-				}
-				await SceneManager.UnloadSceneAsync(abstractScene.SceneName);
+				UnityEngine.Debug.LogWarning("can not unload current scene.");
+				return;
 			}
+			Find(sceneName)?.Unload();
+			await SceneManager.UnloadSceneAsync(sceneName);
 		}
 	}
 }
