@@ -3,20 +3,16 @@ using UniRx.Async;
 
 namespace Flour.Scene
 {
-	public abstract class AbstractScene : MonoBehaviour
+	public abstract class AbstractScene<T> : MonoBehaviour
 	{
 		public string SceneName { get; private set; }
 
-		protected IOperationBundler operationBundler;
+		protected T param;
 
-		protected IInputBinder InputBinder { get { return operationBundler.InputBinder; } }
-		protected ILayerHandler LayerHandler { get { return operationBundler.LayerHandler; } }
-		protected ISceneHandler SceneHandler { get { return operationBundler.SceneHandler; } }
-
-		public void Setup(string sceneName, IOperationBundler operationBundler)
+		public void Setup(string sceneName, T param)
 		{
 			SceneName = sceneName;
-			this.operationBundler = operationBundler;
+			this.param = param;
 		}
 
 		public virtual async UniTask Load(params object[] param)

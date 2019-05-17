@@ -24,7 +24,7 @@ public class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandl
 	System.Action onApplicationQuit;
 
 	UIInputBinder inputBinder = new UIInputBinder();
-	SceneHandler sceneHandler;
+	SceneHandler<IOperationBundler> sceneHandler;
 	LayerHandler layerHandler;
 
 	public IInputBinder InputBinder { get { return inputBinder; } }
@@ -32,7 +32,7 @@ public class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandl
 	public ILayerHandler LayerHandler { get { return this; } }
 
 
-	public ApplicationOperator(System.Action onApplicationQuit, SceneHandler sceneHandler, LayerHandler layerHandler)
+	public ApplicationOperator(System.Action onApplicationQuit, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
 	{
 		this.onApplicationQuit = onApplicationQuit;
 		this.sceneHandler = sceneHandler;

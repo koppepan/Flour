@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UniRx.Async;
-using Flour.Scene;
 
 public class TitleScene : AbstractScene
 {
@@ -18,6 +17,6 @@ public class TitleScene : AbstractScene
 
 	public override void OnBack()
 	{
-		operationBundler.ApplicationQuit();
+		AppOparator.ApplicationQuit();
 	}
 }

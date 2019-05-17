@@ -1,13 +1,12 @@
-﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine.SceneManagement;
 using UniRx;
 using UniRx.Async;
 
 namespace Flour.Scene
 {
-	public class SceneHandler
+	public class SceneHandler<T>
 	{
-		AbstractScene currentScene;
+		AbstractScene<T> currentScene;
 
 		public bool OnBack()
 		{
@@ -19,7 +18,7 @@ namespace Flour.Scene
 			return false;
 		}
 
-		private AbstractScene GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
+		private AbstractScene<T> GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
 		{
 			if (scene == default)
 			{
@@ -29,7 +28,7 @@ namespace Flour.Scene
 			var rootObjects = scene.GetRootGameObjects();
 			for (int i = 0; i < rootObjects.Length; i++)
 			{
-				var abstractScene = rootObjects[i].GetComponent<AbstractScene>();
+				var abstractScene = rootObjects[i].GetComponent<AbstractScene<T>>();
 				if (abstractScene != null)
 				{
 					return abstractScene;
@@ -38,7 +37,7 @@ namespace Flour.Scene
 			return null;
 		}
 
-		private async UniTask LoadAsync(string sceneName, IOperationBundler operationBundler, LoadSceneMode mode, params object[] param)
+		private async UniTask LoadAsync(string sceneName, T param, LoadSceneMode mode, params object[] values)
 		{
 			currentScene?.Unload();
 			await SceneManager.LoadSceneAsync(sceneName, mode);
@@ -47,19 +46,19 @@ namespace Flour.Scene
 			currentScene = GetAbstractScene(scene);
 			if (currentScene != null)
 			{
-				currentScene.Setup(sceneName, operationBundler);
-				await currentScene.Load(param);
+				currentScene.Setup(sceneName, param);
+				await currentScene.Load(values);
 			}
 		}
 
-		public async UniTask LoadAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
+		public async UniTask LoadAsync(string sceneName, T param, params object[] values)
 		{
-			await LoadAsync(sceneName, operationBundler, LoadSceneMode.Single, param);
+			await LoadAsync(sceneName, param, LoadSceneMode.Single, values);
 		}
 
-		public async UniTask AddAsync(string sceneName, IOperationBundler operationBundler, params object[] param)
+		public async UniTask AddAsync(string sceneName, T param, params object[] values)
 		{
-			await LoadAsync(sceneName, operationBundler, LoadSceneMode.Additive, param);
+			await LoadAsync(sceneName, param, LoadSceneMode.Additive, values);
 		}
 
 		public async UniTask UnloadAsync(string sceneName)
