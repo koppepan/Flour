@@ -7,7 +7,7 @@ namespace Flour
 {
 	public class SubLayerTypeCreator
 	{
-		const string ExportPath = "Assets/Flour/Scripts/UI/Layer";
+		const string ExportPath = "Assets/Flour/Scripts/Layer";
 
 		const string NamespaceName = "Flour.Layer";
 		const string TypeName = "SubLayerType";
