@@ -32,18 +32,20 @@ public sealed class ApplicationManager : MonoBehaviour
 		var r = await LoadLayerSourceRepositories("Config/SubLayerType", "SubLayerType");
 		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler<IOperationBundler>(), new LayerHandler(canvasRoot, referenceResolution, r));
 		await appOperator.LoadSceneAsync("Title");
-	}
 
+		// AndroidのBackKey対応
+		Observable.EveryUpdate()
+			.Where(_ => Input.GetKeyDown(KeyCode.Escape))
+			.ThrottleFirst(TimeSpan.FromMilliseconds(500))
+			.Subscribe(_ => appOperator.OnBack()).AddTo(this);
+
+		// EditorをPauseしたときにOnApplicationPauseと同じ挙動にする
 #if UNITY_EDITOR
-	private void OnEnable()
-	{
-		UnityEditor.EditorApplication.pauseStateChanged += PauseStateChanged;
-	}
-	private void OnDisable()
-	{
-		UnityEditor.EditorApplication.pauseStateChanged -= PauseStateChanged;
-	}
+		Observable.FromEvent<UnityEditor.PauseState>(
+			h => UnityEditor.EditorApplication.pauseStateChanged += h,
+			h => UnityEditor.EditorApplication.pauseStateChanged -= h).Subscribe(PauseStateChanged).AddTo(this);
 #endif
+	}
 
 #if !UNITY_EDITOR
 	private void OnApplicationPause(bool pause)
@@ -67,14 +69,6 @@ public sealed class ApplicationManager : MonoBehaviour
 	private void OnApplicationQuit()
 	{
 		DontDestroyObjectList.Clear();
-	}
-
-	void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{
-			appOperator.OnBack();
-		}
 	}
 
 	async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(string path, string typeName)
