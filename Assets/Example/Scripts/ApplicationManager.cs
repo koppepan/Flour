@@ -34,31 +34,25 @@ public sealed class ApplicationManager : MonoBehaviour
 		await appOperator.LoadSceneAsync("Title");
 	}
 
-	async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(string path, string typeName)
+#if UNITY_EDITOR
+	private void OnEnable()
 	{
-		var config = await Resources.LoadAsync<TextAsset>(path);
-		var contents = new IniFile(((TextAsset)config).text.Split('\n', '\r')).GetContents(typeName);
-		var subLayers = contents.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
-
-		Resources.UnloadAsset(config);
-
-		var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(FixedSubLayers.Length), new SubLayerSourceRepository(10) };
-
-		foreach (var set in subLayers)
-		{
-			var index = FixedSubLayers.Contains(set.Key) ? 0 : 1;
-			repositories[index].AddSourcePath(set.Key, set.Value);
-		}
-		for (int i = 0; i < FixedSubLayers.Length; i++)
-		{
-			await repositories[0].LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
-		}
-
-		return repositories;
+		UnityEditor.EditorApplication.pauseStateChanged += PauseStateChanged;
 	}
+	private void OnDisable()
+	{
+		UnityEditor.EditorApplication.pauseStateChanged -= PauseStateChanged;
+	}
+#endif
 
+#if !UNITY_EDITOR
 	private void OnApplicationPause(bool pause)
 	{
+#else
+	private void PauseStateChanged(UnityEditor.PauseState state)
+	{
+		var pause = state == UnityEditor.PauseState.Paused;
+#endif
 		appOperator?.ApplicationPause(pause);
 	}
 
@@ -81,5 +75,28 @@ public sealed class ApplicationManager : MonoBehaviour
 		{
 			appOperator.OnBack();
 		}
+	}
+
+	async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(string path, string typeName)
+	{
+		var config = await Resources.LoadAsync<TextAsset>(path);
+		var contents = new IniFile(((TextAsset)config).text.Split('\n', '\r')).GetContents(typeName);
+		var subLayers = contents.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
+
+		Resources.UnloadAsset(config);
+
+		var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(FixedSubLayers.Length), new SubLayerSourceRepository(10) };
+
+		foreach (var set in subLayers)
+		{
+			var index = FixedSubLayers.Contains(set.Key) ? 0 : 1;
+			repositories[index].AddSourcePath(set.Key, set.Value);
+		}
+		for (int i = 0; i < FixedSubLayers.Length; i++)
+		{
+			await repositories[0].LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
+		}
+
+		return repositories;
 	}
 }
