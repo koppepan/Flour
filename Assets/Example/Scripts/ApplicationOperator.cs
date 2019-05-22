@@ -22,11 +22,10 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 
 	System.Action onApplicationQuit;
 
-	UIInputBinder inputBinder = new UIInputBinder();
 	SceneHandler<IOperationBundler> sceneHandler;
 	LayerHandler layerHandler;
 
-	public IInputBinder InputBinder { get { return inputBinder; } }
+	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
 
