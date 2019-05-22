@@ -29,8 +29,15 @@ public sealed class ApplicationManager : MonoBehaviour
 
 	async void Start()
 	{
-		var config = await Resources.LoadAsync<TextAsset>("Config/SubLayerType");
-		var contents = new IniFile(((TextAsset)config).text.Split('\n', '\r')).GetContents("SubLayerType");
+		var r = await LoadLayerSourceRepositories("Config/SubLayerType", "SubLayerType");
+		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler<IOperationBundler>(), new LayerHandler(canvasRoot, referenceResolution, r));
+		await appOperator.LoadSceneAsync("Title");
+	}
+
+	async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(string path, string typeName)
+	{
+		var config = await Resources.LoadAsync<TextAsset>(path);
+		var contents = new IniFile(((TextAsset)config).text.Split('\n', '\r')).GetContents(typeName);
 		var subLayers = contents.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
 
 		Resources.UnloadAsset(config);
@@ -47,13 +54,12 @@ public sealed class ApplicationManager : MonoBehaviour
 			await repositories[0].LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
 		}
 
-		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler<IOperationBundler>(), new LayerHandler(canvasRoot, referenceResolution, repositories));
-		await appOperator.LoadSceneAsync("Title");
+		return repositories;
 	}
 
 	private void OnApplicationPause(bool pause)
 	{
-		appOperator.ApplicationPause(pause);
+		appOperator?.ApplicationPause(pause);
 	}
 
 	private void ApplicationQuit()
