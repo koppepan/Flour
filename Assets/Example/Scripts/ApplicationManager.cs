@@ -51,6 +51,11 @@ public sealed class ApplicationManager : MonoBehaviour
 		await appOperator.LoadSceneAsync("Title");
 	}
 
+	private void OnApplicationPause(bool pause)
+	{
+		appOperator.ApplicationPause(pause);
+	}
+
 	private void ApplicationQuit()
 	{
 #if UNITY_EDITOR

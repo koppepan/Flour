@@ -21,6 +21,12 @@ namespace Flour.Scene
 			return false;
 		}
 
+		public void ApplicationPause(bool pause)
+		{
+			currentScene?.ApplicationPause(pause);
+			additiveScenes.ForEach(x => x.ApplicationPause(pause));
+		}
+
 		private AbstractScene<T> Find(string sceneName)
 		{
 			if (currentScene.SceneName == sceneName)

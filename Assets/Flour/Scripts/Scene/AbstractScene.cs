@@ -18,5 +18,7 @@ namespace Flour.Scene
 		public virtual void Unload() { }
 
 		public virtual void OnBack() { }
+
+		public virtual void ApplicationPause(bool pause) { }
 	}
 }

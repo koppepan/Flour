@@ -37,6 +37,7 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 		this.layerHandler = layerHandler;
 	}
 
+	public void ApplicationPause(bool pause) => sceneHandler.ApplicationPause(pause);
 	public void ApplicationQuit() => onApplicationQuit?.Invoke();
 
 	public void OnBack()
