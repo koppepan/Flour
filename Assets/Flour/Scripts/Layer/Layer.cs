@@ -25,8 +25,6 @@ namespace Flour.Layer
 
 		Transform GetContentsArea(Rect safeArea, Vector2 screenSize)
 		{
-			safeArea = SafeAreaSimulateData.GetSafeArea(screenSize, safeArea);
-
 			if (safeArea.size == screenSize)
 			{
 				return transform;

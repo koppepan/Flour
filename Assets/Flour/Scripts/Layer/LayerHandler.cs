@@ -22,12 +22,18 @@ namespace Flour.Layer
 		LayerType[] layerOrder;
 		Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
 
+		Vector2 safeAreaOffsetMin;
+		Vector2 safeAreaOffsetMax;
+
 		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, params SubLayerSourceRepository[] repositories)
 		{
 			this.repositories = repositories;
 
 			var screenSize = new Vector2(Screen.width, Screen.height);
-			var safeArea = Screen.safeArea;
+			var safeArea = SafeAreaSimulateData.GetSafeArea(screenSize, Screen.safeArea);
+
+			safeAreaOffsetMin = new Vector2(safeArea.position.x + 2, safeArea.position.y + 2);
+			safeAreaOffsetMax = new Vector2(-(screenSize.x - (safeArea.position.x + safeArea.width - 2)), -(screenSize.y - (safeArea.position.y + safeArea.height - 2)));
 
 			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>();
 			foreach (var type in layerTypes)
@@ -40,6 +46,12 @@ namespace Flour.Layer
 			}
 
 			layerOrder = layerTypes.Reverse().ToArray();
+		}
+
+		private void SafeAreaExpansion(RectTransform rect)
+		{
+			rect.offsetMin = -safeAreaOffsetMin;
+			rect.offsetMax = -safeAreaOffsetMax;
 		}
 
 		public bool OnBack()
@@ -94,7 +106,7 @@ namespace Flour.Layer
 			if (old == null)
 			{
 				var sub = GameObject.Instantiate(prefab);
-				sub.Initialize(subLayerType, Remove);
+				sub.Initialize(subLayerType, SafeAreaExpansion, Remove);
 				sub.OnOpen();
 				layer.Stack.Push(sub);
 				return sub;

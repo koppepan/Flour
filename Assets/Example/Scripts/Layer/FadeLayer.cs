@@ -11,6 +11,8 @@ public class FadeLayer : AbstractSubLayer
 	{
 		base.OnOpen();
 		panel = GetComponent<Image>();
+
+		SafeAreaExpansion();
 	}
 
 	private async UniTask Fade(int milliseconds, Color befor, Color after)
