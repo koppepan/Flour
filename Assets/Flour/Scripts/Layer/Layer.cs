@@ -8,7 +8,7 @@ namespace Flour.Layer
 	{
 		public SubLayerStack Stack { get; private set; }
 
-		public void Initialize(LayerType layer, Vector2 referenceResolution, Rect safeArea, Vector2 screenSize)
+		public void Initialize(LayerType layer, Vector2 referenceResolution, System.Action<RectTransform> safeAreaReduction)
 		{
 			var canvas = GetComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -20,23 +20,18 @@ namespace Flour.Layer
 			scaler.referenceResolution = referenceResolution;
 			scaler.referencePixelsPerUnit = 100;
 
-			Stack = new SubLayerStack(GetContentsArea(safeArea, screenSize));
+			Stack = new SubLayerStack(GetContentsArea(safeAreaReduction));
 		}
 
-		Transform GetContentsArea(Rect safeArea, Vector2 screenSize)
+		Transform GetContentsArea(System.Action<RectTransform> safeAreaReduction)
 		{
-			if (safeArea.size == screenSize)
-			{
-				return transform;
-			}
-
 			var rect = new GameObject("ContentsArea", typeof(RectTransform)).GetComponent<RectTransform>();
 			rect.SetParent(this.transform, false);
 
 			rect.anchorMin = Vector2.zero;
 			rect.anchorMax = Vector2.one;
-			rect.offsetMin = new Vector2(safeArea.position.x, safeArea.position.y);
-			rect.offsetMax = new Vector2(-(screenSize.x - (safeArea.position.x + safeArea.width)), -(screenSize.y - (safeArea.position.y + safeArea.height)));
+
+			safeAreaReduction(rect);
 
 			return rect;
 		}

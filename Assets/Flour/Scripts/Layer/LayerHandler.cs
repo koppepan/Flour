@@ -22,36 +22,25 @@ namespace Flour.Layer
 		LayerType[] layerOrder;
 		Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
 
-		Vector2 safeAreaOffsetMin;
-		Vector2 safeAreaOffsetMax;
+		SafeAreaHandler safeAreaHandler;
 
 		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, params SubLayerSourceRepository[] repositories)
 		{
 			this.repositories = repositories;
 
-			var screenSize = new Vector2(Screen.width, Screen.height);
-			var safeArea = SafeAreaSimulateData.GetSafeArea(screenSize, Screen.safeArea);
-
-			safeAreaOffsetMin = new Vector2(safeArea.position.x + 2, safeArea.position.y + 2);
-			safeAreaOffsetMax = new Vector2(-(screenSize.x - (safeArea.position.x + safeArea.width - 2)), -(screenSize.y - (safeArea.position.y + safeArea.height - 2)));
+			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea);
 
 			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>();
 			foreach (var type in layerTypes)
 			{
 				var layer = new GameObject(type.ToString(), typeof(Layer)).GetComponent<Layer>();
 				layer.transform.SetParent(canvasRoot);
-				layer.Initialize(type, referenceResolution, safeArea, screenSize);
+				layer.Initialize(type, referenceResolution, safeAreaHandler.Reduction);
 
 				layers.Add(type, layer);
 			}
 
 			layerOrder = layerTypes.Reverse().ToArray();
-		}
-
-		private void SafeAreaExpansion(RectTransform rect)
-		{
-			rect.offsetMin = -safeAreaOffsetMin;
-			rect.offsetMax = -safeAreaOffsetMax;
 		}
 
 		public bool OnBack()
@@ -106,7 +95,7 @@ namespace Flour.Layer
 			if (old == null)
 			{
 				var sub = GameObject.Instantiate(prefab);
-				sub.Initialize(subLayerType, SafeAreaExpansion, Remove);
+				sub.Initialize(subLayerType, safeAreaHandler.Expansion, Remove);
 				sub.OnOpen();
 				layer.Stack.Push(sub);
 				return sub;
