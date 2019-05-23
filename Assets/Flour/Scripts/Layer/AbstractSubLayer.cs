@@ -11,7 +11,7 @@ namespace Flour.Layer
 		Action<RectTransform> safeAreaExpansion;
 		Action<AbstractSubLayer> onDestroy;
 
-		public void Initialize(SubLayerType type, Action<RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
+		internal void SetConstParameter(SubLayerType type, Action<RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
 		{
 			SubLayer = type;
 
@@ -19,21 +19,15 @@ namespace Flour.Layer
 			this.onDestroy = onDestroy;
 		}
 
-		protected void SafeAreaExpansion() => safeAreaExpansion?.Invoke(GetComponent<RectTransform>());
-		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion?.Invoke(rect);
+		public virtual void Close() => onDestroy?.Invoke(this);
 
 		public virtual void OnOpen() { }
+		public virtual void OnClose() => Destroy(gameObject);
+
 		public virtual void OnBack() { }
 		public virtual void OnChangeSiblingIndex(int index) { }
 
-		public virtual void Close()
-		{
-			onDestroy?.Invoke(this);
-		}
-
-		public virtual void OnClose()
-		{
-			Destroy(gameObject);
-		}
+		protected void SafeAreaExpansion() => safeAreaExpansion?.Invoke(GetComponent<RectTransform>());
+		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion?.Invoke(rect);
 	}
 }

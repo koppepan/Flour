@@ -95,7 +95,7 @@ namespace Flour.Layer
 			if (old == null)
 			{
 				var sub = GameObject.Instantiate(prefab);
-				sub.Initialize(subLayerType, safeAreaHandler.Expansion, Remove);
+				sub.SetConstParameter(subLayerType, safeAreaHandler.Expansion, Remove);
 				sub.OnOpen();
 				layer.Stack.Push(sub);
 				return sub;
