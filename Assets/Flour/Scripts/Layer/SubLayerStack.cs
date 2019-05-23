@@ -24,10 +24,6 @@ namespace Flour.Layer
 
 		public void Push(AbstractSubLayer layer)
 		{
-			if (subLayers.Any(x => x == layer))
-			{
-				subLayers.Remove(layer);
-			}
 			subLayers.Add(layer);
 			layer.transform.SetParent(subLayerParent, false);
 
@@ -47,21 +43,26 @@ namespace Flour.Layer
 
 		public bool Remove(AbstractSubLayer subLayer)
 		{
-			var ret = subLayers.Remove(subLayer);
-			if (ret)
+			if (subLayers.Remove(subLayer))
 			{
 				ResetSiblingIndex();
+				return true;
 			}
-			return ret;
+			return false;
+		}
+
+		public int FindIndex(AbstractSubLayer subLayer)
+		{
+			return subLayers.LastIndexOf(subLayer);
 		}
 
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)
 		{
-			return subLayers.LastOrDefault(x => x.SubLayer == type);
+			return FirstOrDefault(x => x.SubLayer == type);
 		}
 		public AbstractSubLayer FirstOrDefault(AbstractSubLayer subLayer)
 		{
-			return subLayers.LastOrDefault(x => x == subLayer);
+			return FirstOrDefault(x => x == subLayer);
 		}
 		public AbstractSubLayer FirstOrDefault(System.Func<AbstractSubLayer, bool> func)
 		{

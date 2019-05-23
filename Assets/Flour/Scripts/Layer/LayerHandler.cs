@@ -110,6 +110,7 @@ namespace Flour.Layer
 			}
 
 			// 開こうとしたSubLayerがすでに存在していて一番前にはない
+			layer.Stack.Remove(old);
 			layer.Stack.Push(old);
 			return old;
 		}
@@ -122,22 +123,22 @@ namespace Flour.Layer
 		{
 			foreach (var layer in layers.Values)
 			{
-				var sub = layer.Stack.FirstOrDefault(x => x == subLayer);
-				if (sub == null)
+				var index = layer.Stack.FindIndex(subLayer);
+				if (index == -1)
 				{
 					continue;
 				}
 
-				if (layer.Stack.Peek() == subLayer)
+				if (index == 0)
 				{
 					layer.Stack.Pop().OnClose();
-					return;
 				}
 				else
 				{
 					layer.Stack.Remove(subLayer);
-					sub.OnClose();
+					subLayer.OnClose();
 				}
+				return;
 			}
 		}
 	}
