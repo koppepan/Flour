@@ -24,11 +24,11 @@ namespace Flour.Layer
 
 		readonly SafeAreaHandler safeAreaHandler;
 
-		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, params SubLayerSourceRepository[] repositories)
+		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, SubLayerSourceRepository[] repositories, LayerType[] safeAreaLayers)
 		{
 			this.repositories = repositories;
 
-			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea);
+			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea, safeAreaLayers);
 
 			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>();
 			foreach (var type in layerTypes)
@@ -36,7 +36,7 @@ namespace Flour.Layer
 				var layer = new GameObject(type.ToString(), typeof(Layer)).GetComponent<Layer>();
 				layer.transform.SetParent(canvasRoot);
 
-				var reduction = type != LayerType.System ? safeAreaHandler.Reduction : (Action<RectTransform>)null;
+				var reduction = safeAreaLayers.Contains(type) ? safeAreaHandler.Reduction : (Action<LayerType, RectTransform>)null;
 				layer.Initialize(type, referenceResolution, reduction);
 
 				layers.Add(type, layer);

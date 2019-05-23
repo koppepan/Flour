@@ -15,6 +15,8 @@ public sealed class ApplicationManager : MonoBehaviour
 	Transform canvasRoot = default;
 	[SerializeField]
 	Vector2 referenceResolution = new Vector2(750, 1334);
+	[SerializeField]
+	LayerType[] safeAreaLayers = new LayerType[] { };
 
 	// 初期化時にPrefabをLoadしておくSubLayer一覧
 	readonly SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
@@ -29,8 +31,12 @@ public sealed class ApplicationManager : MonoBehaviour
 
 	async void Start()
 	{
-		var r = await LoadLayerSourceRepositories("Config/SubLayerType", "SubLayerType");
-		appOperator = new ApplicationOperator(ApplicationQuit, new SceneHandler<IOperationBundler>(), new LayerHandler(canvasRoot, referenceResolution, r));
+		var repositories = await LoadLayerSourceRepositories("Config/SubLayerType", "SubLayerType");
+
+		var sceneHandler = new SceneHandler<IOperationBundler>();
+		var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
+		appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
+
 		await appOperator.LoadSceneAsync("Title");
 
 		// AndroidのBackKey対応

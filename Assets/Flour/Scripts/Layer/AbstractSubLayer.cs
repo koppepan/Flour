@@ -9,10 +9,10 @@ namespace Flour.Layer
 		public SubLayerType SubLayer { get; private set; }
 		public virtual bool IgnoreBack { get { return false; } }
 
-		Action<RectTransform> safeAreaExpansion;
+		Action<LayerType, RectTransform> safeAreaExpansion;
 		Action<AbstractSubLayer> onDestroy;
 
-		internal void SetConstParameter(LayerType layer, SubLayerType subLayer, Action<RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
+		internal void SetConstParameter(LayerType layer, SubLayerType subLayer, Action<LayerType, RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
 		{
 			Layer = layer;
 			SubLayer = subLayer;
@@ -29,7 +29,7 @@ namespace Flour.Layer
 		public virtual void OnBack() { }
 		public virtual void OnChangeSiblingIndex(int index) { }
 
-		protected void SafeAreaExpansion() => safeAreaExpansion?.Invoke(GetComponent<RectTransform>());
-		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion?.Invoke(rect);
+		protected void SafeAreaExpansion() => safeAreaExpansion?.Invoke(Layer, GetComponent<RectTransform>());
+		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion?.Invoke(Layer, rect);
 	}
 }
