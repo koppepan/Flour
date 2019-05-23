@@ -391,6 +391,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canvasRoot: {fileID: 336812226}
   referenceResolution: {x: 750, y: 1334}
+  safeAreaLayers: 0a0000000b0000000c000000
 --- !u!4 &1083895642
 Transform:
   m_ObjectHideFlags: 0
