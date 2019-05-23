@@ -30,8 +30,9 @@ namespace Flour.Layer
 
 			rect.anchorMin = Vector2.zero;
 			rect.anchorMax = Vector2.one;
+			rect.offsetMin = rect.offsetMax = Vector2.zero;
 
-			safeAreaReduction(rect);
+			safeAreaReduction?.Invoke(rect);
 
 			return rect;
 		}

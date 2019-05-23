@@ -17,12 +17,12 @@ namespace Flour.Layer
 
 	public sealed class LayerHandler
 	{
-		SubLayerSourceRepository[] repositories;
+		readonly SubLayerSourceRepository[] repositories;
 
-		LayerType[] layerOrder;
-		Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
+		readonly LayerType[] layerOrder;
+		readonly Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
 
-		SafeAreaHandler safeAreaHandler;
+		readonly SafeAreaHandler safeAreaHandler;
 
 		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, params SubLayerSourceRepository[] repositories)
 		{
@@ -35,7 +35,9 @@ namespace Flour.Layer
 			{
 				var layer = new GameObject(type.ToString(), typeof(Layer)).GetComponent<Layer>();
 				layer.transform.SetParent(canvasRoot);
-				layer.Initialize(type, referenceResolution, safeAreaHandler.Reduction);
+
+				var reduction = type != LayerType.System ? safeAreaHandler.Reduction : (Action<RectTransform>)null;
+				layer.Initialize(type, referenceResolution, reduction);
 
 				layers.Add(type, layer);
 			}
@@ -95,7 +97,7 @@ namespace Flour.Layer
 			if (old == null)
 			{
 				var sub = GameObject.Instantiate(prefab);
-				sub.SetConstParameter(subLayerType, safeAreaHandler.Expansion, Remove);
+				sub.SetConstParameter(layerType, subLayerType, safeAreaHandler.Expansion, Remove);
 				sub.OnOpen();
 				layer.Stack.Push(sub);
 				return sub;

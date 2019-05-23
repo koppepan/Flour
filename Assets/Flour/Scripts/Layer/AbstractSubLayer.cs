@@ -5,15 +5,17 @@ namespace Flour.Layer
 {
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{
+		public LayerType Layer { get; private set; }
 		public SubLayerType SubLayer { get; private set; }
 		public virtual bool IgnoreBack { get { return false; } }
 
 		Action<RectTransform> safeAreaExpansion;
 		Action<AbstractSubLayer> onDestroy;
 
-		internal void SetConstParameter(SubLayerType type, Action<RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
+		internal void SetConstParameter(LayerType layer, SubLayerType subLayer, Action<RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
 		{
-			SubLayer = type;
+			Layer = layer;
+			SubLayer = subLayer;
 
 			this.safeAreaExpansion = safeAreaExpansion;
 			this.onDestroy = onDestroy;
