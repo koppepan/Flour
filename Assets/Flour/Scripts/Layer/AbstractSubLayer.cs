@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UniRx.Async;
 
 namespace Flour.Layer
 {
@@ -10,9 +11,9 @@ namespace Flour.Layer
 		public virtual bool IgnoreBack { get { return false; } }
 
 		Action<LayerType, RectTransform> safeAreaExpansion;
-		Action<AbstractSubLayer> onDestroy;
+		Func<AbstractSubLayer, UniTask> onDestroy;
 
-		internal void SetConstParameter(LayerType layer, SubLayerType subLayer, Action<LayerType, RectTransform> safeAreaExpansion, Action<AbstractSubLayer> onDestroy)
+		internal void SetConstParameter(LayerType layer, SubLayerType subLayer, Action<LayerType, RectTransform> safeAreaExpansion, Func<AbstractSubLayer, UniTask> onDestroy)
 		{
 			Layer = layer;
 			SubLayer = subLayer;
@@ -24,7 +25,11 @@ namespace Flour.Layer
 		public virtual void Close() => onDestroy?.Invoke(this);
 
 		public virtual void OnOpen() { }
-		public virtual void OnClose() => Destroy(gameObject);
+		public virtual async UniTask OnClose()
+		{
+			await UniTask.DelayFrame(1);
+			Destroy(gameObject);
+		}
 
 		public virtual void OnBack() { }
 		public virtual void OnChangeSiblingIndex(int index) { }

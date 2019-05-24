@@ -112,27 +112,20 @@ namespace Flour.Layer
 		{
 			layers[layer].Stack.Peek()?.Close();
 		}
-		void Remove(AbstractSubLayer subLayer)
+		async UniTask Remove(AbstractSubLayer subLayer)
 		{
-			foreach (var layer in layers.Values)
+			if (subLayer == null)
 			{
-				var index = layer.Stack.FindIndex(subLayer);
-				if (index == -1)
-				{
-					continue;
-				}
-
-				if (index == 0)
-				{
-					layer.Stack.Pop().OnClose();
-				}
-				else
-				{
-					layer.Stack.Remove(subLayer);
-					subLayer.OnClose();
-				}
 				return;
 			}
+			var layer = layers.Values.FirstOrDefault(x => x.Stack.FindIndex(subLayer) != -1);
+			if (layer == null)
+			{
+				return;
+			}
+
+			await subLayer.OnClose();
+			layer.Stack.Remove(subLayer);
 		}
 	}
 }

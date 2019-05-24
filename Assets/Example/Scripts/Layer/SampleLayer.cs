@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UniRx.Async;
 
 public class SampleLayer : FooterSubLayer
 {
@@ -11,10 +12,10 @@ public class SampleLayer : FooterSubLayer
 	{
 		Debug.Log(SubLayer.ToString() + " on open");
 	}
-	public override void OnClose()
+	public override async UniTask OnClose()
 	{
 		Debug.Log(SubLayer.ToString() + " on close");
-		base.OnClose();
+		await base.OnClose();
 	}
 	public override void OnBack()
 	{
