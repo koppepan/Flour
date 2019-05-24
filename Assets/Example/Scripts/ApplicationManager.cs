@@ -53,13 +53,13 @@ public sealed class ApplicationManager : MonoBehaviour
 #endif
 	}
 
-#if !UNITY_EDITOR
-	private void OnApplicationPause(bool pause)
-	{
-#else
+#if UNITY_EDITOR
 	private void PauseStateChanged(UnityEditor.PauseState state)
 	{
 		var pause = state == UnityEditor.PauseState.Paused;
+#else
+	private void OnApplicationPause(bool pause)
+	{
 #endif
 		appOperator?.ApplicationPause(pause);
 	}
