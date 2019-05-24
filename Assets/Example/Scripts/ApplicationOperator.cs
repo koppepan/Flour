@@ -20,10 +20,10 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 		public void Unbind() => eventSystem.enabled = (--bindCount) == 0;
 	}
 
-	System.Action onApplicationQuit;
+	readonly System.Action onApplicationQuit;
 
-	SceneHandler<IOperationBundler> sceneHandler;
-	LayerHandler layerHandler;
+	readonly SceneHandler<IOperationBundler> sceneHandler;
+	readonly LayerHandler layerHandler;
 
 	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
 	public ISceneHandler SceneHandler { get { return this; } }
