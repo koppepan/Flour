@@ -76,6 +76,24 @@ namespace Flour.Layer
 
 		public async UniTask<T> AddAsync<T>(LayerType layerType, SubLayerType subLayerType) where T : AbstractSubLayer
 		{
+			var layer = layers[layerType];
+			var old = layer.Stack.FirstOrDefault(subLayerType);
+
+			// 既に同じSubLayerが存在する
+			if (old != null)
+			{
+				// すでに存在していて一番前にある
+				if (layer.Stack.FindIndex(old) == 0)
+				{
+					return (T)old;
+				}
+
+				// 一番前に来るように詰めなおして返す
+				layer.Stack.Remove(old);
+				layer.Stack.Push(old);
+				return (T)old;
+			}
+
 			var prefab = await LoadAsync<T>(subLayerType);
 
 			if (prefab == null)
@@ -83,36 +101,11 @@ namespace Flour.Layer
 				return null;
 			}
 
-			return (T)Add(layerType, subLayerType, prefab);
-		}
-
-		private AbstractSubLayer Add(LayerType layerType, SubLayerType subLayerType, AbstractSubLayer prefab)
-		{
-			var layer = layers[layerType];
-
-			var current = layer.Stack.Peek();
-			var old = layer.Stack.FirstOrDefault(subLayerType);
-
-			// 開こうとしたSubLayerが存在しないので新しく生成
-			if (old == null)
-			{
-				var sub = GameObject.Instantiate(prefab);
-				sub.SetConstParameter(layerType, subLayerType, safeAreaHandler.Expansion, Remove);
-				sub.OnOpen();
-				layer.Stack.Push(sub);
-				return sub;
-			}
-
-			// 開こうとしたSubLayerがすでに存在していて一番前にある
-			if (current == old)
-			{
-				return current;
-			}
-
-			// 開こうとしたSubLayerがすでに存在していて一番前にはない
-			layer.Stack.Remove(old);
-			layer.Stack.Push(old);
-			return old;
+			var sub = GameObject.Instantiate(prefab);
+			sub.SetConstParameter(layerType, subLayerType, safeAreaHandler.Expansion, Remove);
+			sub.OnOpen();
+			layer.Stack.Push(sub);
+			return sub;
 		}
 
 		public void Remove(LayerType layer)
