@@ -1,10 +1,11 @@
-﻿using UnityEngine.EventSystems;
+﻿using System;
+using UnityEngine.EventSystems;
 using UniRx.Async;
 
 using Flour.Scene;
 using Flour.Layer;
 
-public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILayerHandler
+public sealed class ApplicationOperator : IDisposable, IOperationBundler, ISceneHandler, ILayerHandler
 {
 	class UIInputBinder : IInputBinder
 	{
@@ -20,7 +21,7 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 		public void Unbind() => eventSystem.enabled = (--bindCount) == 0;
 	}
 
-	readonly System.Action onApplicationQuit;
+	readonly Action onApplicationQuit;
 
 	readonly SceneHandler<IOperationBundler> sceneHandler;
 	readonly LayerHandler layerHandler;
@@ -31,12 +32,18 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 	public ILayerHandler LayerHandler { get { return this; } }
 
 
-	public ApplicationOperator(System.Action onApplicationQuit, SaveData saveData, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
+	public ApplicationOperator(Action onApplicationQuit, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
 	{
 		this.onApplicationQuit = onApplicationQuit;
-		this.SaveData = saveData;
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
+
+		SaveData = new SaveData();
+	}
+
+	public void Dispose()
+	{
+		SaveData.Dispose();
 	}
 
 	public void ApplicationPause(bool pause) => sceneHandler.ApplicationPause(pause);
