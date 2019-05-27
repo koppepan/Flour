@@ -31,11 +31,14 @@ public sealed class ApplicationManager : MonoBehaviour
 
 	async void Start()
 	{
-		var repositories = await LoadLayerSourceRepositories("Config/SubLayerType", "SubLayerType");
+		using (var configLoader = await new ConfigLoader().LoadAsync())
+		{
+			var repositories = await configLoader.LoadLayerSourceRepositories(FixedSubLayers);
 
-		var sceneHandler = new SceneHandler<IOperationBundler>();
-		var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
-		appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
+			var sceneHandler = new SceneHandler<IOperationBundler>();
+			var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
+			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
+		}
 
 		await appOperator.LoadSceneAsync("Title");
 
@@ -75,28 +78,5 @@ public sealed class ApplicationManager : MonoBehaviour
 	private void OnApplicationQuit()
 	{
 		DontDestroyObjectList.Clear();
-	}
-
-	async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(string path, string typeName)
-	{
-		var config = await Resources.LoadAsync<TextAsset>(path);
-		var contents = new IniFile(((TextAsset)config).text.Split('\n', '\r')).GetContents(typeName);
-		var subLayers = contents.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
-
-		Resources.UnloadAsset(config);
-
-		var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(FixedSubLayers.Length), new SubLayerSourceRepository(10) };
-
-		foreach (var set in subLayers)
-		{
-			var index = FixedSubLayers.Contains(set.Key) ? 0 : 1;
-			repositories[index].AddSourcePath(set.Key, set.Value);
-		}
-		for (int i = 0; i < FixedSubLayers.Length; i++)
-		{
-			await repositories[0].LoadAsync<AbstractSubLayer>(FixedSubLayers[i]);
-		}
-
-		return repositories;
 	}
 }
