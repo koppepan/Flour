@@ -17,7 +17,7 @@ public class TitleScene : AbstractScene
 
 	public override void OnBack()
 	{
-		AppOparator.ApplicationQuit();
+		AppOperator.ApplicationQuit();
 	}
 
 	private void GotoOutGame()
