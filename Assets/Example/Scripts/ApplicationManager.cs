@@ -22,6 +22,7 @@ public sealed class ApplicationManager : MonoBehaviour
 	readonly SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
 
 	private ApplicationOperator appOperator;
+	private UserPrefs userPrefs;
 
 	private void Awake()
 	{
@@ -37,7 +38,9 @@ public sealed class ApplicationManager : MonoBehaviour
 
 			var sceneHandler = new SceneHandler<IOperationBundler>();
 			var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
-			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
+
+			userPrefs = new UserPrefs();
+			appOperator = new ApplicationOperator(ApplicationQuit, userPrefs, sceneHandler, layerHandler);
 		}
 
 		await appOperator.LoadSceneAsync("Title");
@@ -77,6 +80,7 @@ public sealed class ApplicationManager : MonoBehaviour
 	}
 	private void OnApplicationQuit()
 	{
+		userPrefs.Dispose();
 		DontDestroyObjectList.Clear();
 	}
 }

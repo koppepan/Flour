@@ -1,6 +1,7 @@
 ﻿using UnityEngine.EventSystems;
 using UniRx.Async;
 
+using Flour;
 using Flour.Scene;
 using Flour.Layer;
 
@@ -25,14 +26,16 @@ public sealed class ApplicationOperator : IOperationBundler, ISceneHandler, ILay
 	readonly SceneHandler<IOperationBundler> sceneHandler;
 	readonly LayerHandler layerHandler;
 
+	public UserPrefs UserPrefs { get; private set; }
 	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
 
 
-	public ApplicationOperator(System.Action onApplicationQuit, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
+	public ApplicationOperator(System.Action onApplicationQuit, UserPrefs userPrefs, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
 	{
 		this.onApplicationQuit = onApplicationQuit;
+		this.UserPrefs = userPrefs;
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
 	}

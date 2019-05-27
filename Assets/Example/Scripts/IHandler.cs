@@ -4,6 +4,7 @@ using Flour.Layer;
 public interface IOperationBundler
 {
 	void ApplicationQuit();
+	Flour.UserPrefs UserPrefs { get; }
 	IInputBinder InputBinder { get; }
 	ISceneHandler SceneHandler { get; }
 	ILayerHandler LayerHandler { get; }
