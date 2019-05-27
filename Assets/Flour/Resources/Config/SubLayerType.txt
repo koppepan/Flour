@@ -1,4 +1,6 @@
 [SubLayerType]
+DebugDialog = Debug/DebugDialog
+
 Blackout = Blackout
 
 Title = Title

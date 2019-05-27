@@ -4,6 +4,7 @@
 	{
 		None,
 		Blackout,
+		DebugDialog,
 		Footer,
 		Sample1,
 		Sample2,

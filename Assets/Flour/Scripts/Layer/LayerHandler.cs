@@ -13,6 +13,8 @@ namespace Flour.Layer
 		Middle = 11,
 		Front = 12,
 		System = 13,
+
+		Debug = 100,
 	}
 
 	public sealed class LayerHandler
