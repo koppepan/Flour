@@ -23,6 +23,8 @@ public sealed class ApplicationManager : MonoBehaviour
 
 	private ApplicationOperator appOperator;
 
+	private DebugHandler debugHandler;
+
 	private void Awake()
 	{
 		DontDestroyObjectList.Add<ApplicationManager>(gameObject);
@@ -39,6 +41,7 @@ public sealed class ApplicationManager : MonoBehaviour
 			var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
 
 			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
+			debugHandler = new DebugHandler(this, sceneHandler, layerHandler);
 		}
 
 		await appOperator.LoadSceneAsync("Title");
