@@ -76,7 +76,7 @@ public sealed class ApplicationManager : MonoBehaviour
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.ExitPlaymode();
 #else
-		Application.Quit(1);
+		Application.Quit(0);
 #endif
 	}
 	private void OnApplicationQuit()
