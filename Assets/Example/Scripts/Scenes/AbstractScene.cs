@@ -8,4 +8,7 @@ public abstract class AbstractScene : Flour.Scene.AbstractScene<IOperationBundle
 	protected ILayerHandler LayerHandler { get { return AppOperator.LayerHandler; } }
 
 	public override void SetParameter(IOperationBundler param) => AppOperator = param;
+
+
+	public virtual void OpenDebugDialog(DebugDialog dialog) { }
 }

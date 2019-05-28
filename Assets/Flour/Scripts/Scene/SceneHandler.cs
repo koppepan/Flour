@@ -8,14 +8,16 @@ namespace Flour.Scene
 {
 	public sealed class SceneHandler<T>
 	{
-		AbstractScene<T> currentScene;
+		public AbstractScene<T> CurrentScene { get; private set; }
+
 		List<AbstractScene<T>> additiveScenes = new List<AbstractScene<T>>();
+		public IEnumerable<AbstractScene<T>> AdditiveScenes => additiveScenes;
 
 		public bool OnBack()
 		{
-			if (currentScene != null)
+			if (CurrentScene != null)
 			{
-				currentScene.OnBack();
+				CurrentScene.OnBack();
 				return true;
 			}
 			return false;
@@ -23,15 +25,15 @@ namespace Flour.Scene
 
 		public void ApplicationPause(bool pause)
 		{
-			currentScene?.ApplicationPause(pause);
+			CurrentScene?.ApplicationPause(pause);
 			additiveScenes.ForEach(x => x.ApplicationPause(pause));
 		}
 
 		private AbstractScene<T> Find(string sceneName)
 		{
-			if (currentScene.SceneName == sceneName)
+			if (CurrentScene.SceneName == sceneName)
 			{
-				return currentScene;
+				return CurrentScene;
 			}
 			return additiveScenes.FirstOrDefault(x => x.SceneName == sceneName);
 		}
@@ -57,16 +59,16 @@ namespace Flour.Scene
 
 		public async UniTask LoadAsync(string sceneName, T param, params object[] args)
 		{
-			currentScene?.Unload();
+			CurrentScene?.Unload();
 			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
 			var scene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
-			currentScene = null;
+			CurrentScene = null;
 
 			if (scene != null)
 			{
-				currentScene = scene;
-				await LoadScene(currentScene, sceneName, param, args);
+				CurrentScene = scene;
+				await LoadScene(CurrentScene, sceneName, param, args);
 			}
 		}
 
@@ -78,7 +80,7 @@ namespace Flour.Scene
 			if (scene != null)
 			{
 				additiveScenes.Add(scene);
-				await LoadScene(currentScene, sceneName, param, args);
+				await LoadScene(CurrentScene, sceneName, param, args);
 			}
 		}
 
@@ -91,7 +93,7 @@ namespace Flour.Scene
 
 		public async UniTask UnloadAsync(string sceneName)
 		{
-			if (currentScene?.SceneName == sceneName)
+			if (CurrentScene?.SceneName == sceneName)
 			{
 				UnityEngine.Debug.LogWarning("can not unload current scene.");
 				return;

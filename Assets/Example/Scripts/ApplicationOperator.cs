@@ -31,7 +31,6 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
 
-
 	public ApplicationOperator(Action onApplicationQuit, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
 	{
 		this.onApplicationQuit = onApplicationQuit;
@@ -69,7 +68,7 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	{
 		InputBinder.Bind();
 
-		var fade = await layerHandler.AddAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
+		var fade = await AddLayerAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
 		await fade.FadeIn();
 
 		await sceneHandler.LoadAsync(sceneName, this, args);
@@ -94,18 +93,19 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 		InputBinder.Unbind();
 	}
 
-	public async UniTask<AbstractSubLayer> AddLayerAsync(LayerType layer, SubLayerType subLayer)
+	private async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer, bool overlap) where T : AbstractSubLayer
 	{
 		InputBinder.Bind();
-		var sub = await layerHandler.AddAsync(layer, subLayer);
+		var sub = await layerHandler.AddAsync<T>(layer, subLayer, overlap);
 		InputBinder.Unbind();
 		return sub;
 	}
 	public async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer
 	{
-		InputBinder.Bind();
-		var sub = await layerHandler.AddAsync<T>(layer, subLayer);
-		InputBinder.Unbind();
-		return sub;
+		return await AddLayerAsync<T>(layer, subLayer, false);
+	}
+	public async UniTask<T> AddLayerOverlappingAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer
+	{
+		return await AddLayerAsync<T>(layer, subLayer, true);
 	}
 }

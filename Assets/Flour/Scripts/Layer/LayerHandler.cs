@@ -71,18 +71,13 @@ namespace Flour.Layer
 			return null;
 		}
 
-		public async UniTask<AbstractSubLayer> AddAsync(LayerType layerType, SubLayerType subLayerType)
-		{
-			return await AddAsync<AbstractSubLayer>(layerType, subLayerType);
-		}
-
-		public async UniTask<T> AddAsync<T>(LayerType layerType, SubLayerType subLayerType) where T : AbstractSubLayer
+		public async UniTask<T> AddAsync<T>(LayerType layerType, SubLayerType subLayerType, bool overlap) where T : AbstractSubLayer
 		{
 			var layer = layers[layerType];
 			var old = layer.Stack.FirstOrDefault(subLayerType);
 
 			// 既に同じSubLayerが存在する
-			if (old != null)
+			if (!overlap && old != null)
 			{
 				// すでに存在していて一番前にある
 				if (layer.Stack.FindIndex(old) == 0)
