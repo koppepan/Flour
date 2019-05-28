@@ -17,7 +17,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 	[SerializeField]
 	private DebugButton buttonPrefab = default;
 
-	Func<UniTask<DebugDialog>> openDialogFunc;
+	Func<string, UniTask<DebugDialog>> openDialogFunc;
 
 	bool dragging = false;
 	bool contentEnable = true;
@@ -25,7 +25,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 
 	bool Frontmost => transform.GetSiblingIndex() == transform.parent.childCount - 1;
 
-	public void Setup(string title, Func<UniTask<DebugDialog>> openDialogFunc)
+	public void Setup(string title, Func<string, UniTask<DebugDialog>> openDialogFunc)
 	{
 		titleText.text = title;
 		closeButton.onClick.AddListener(Close);
@@ -34,8 +34,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 	}
 	public async UniTask<DebugDialog> Duplicate(string title)
 	{
-		var dialog = await openDialogFunc();
-		dialog.Setup(title, openDialogFunc);
+		var dialog = await openDialogFunc(title);
 		dialog.transform.position = transform.position + new Vector3(40, -40);
 		return dialog;
 	}
