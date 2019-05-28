@@ -15,7 +15,6 @@ public class DebugHandler
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
 
-
 #if UNITY_EDITOR
 		var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
 		var mouseUpStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonUp(1));
@@ -43,7 +42,7 @@ public class DebugHandler
 		return dialog;
 	}
 
-	public async void OpenDialog(Vector2 position)
+	private async void OpenDialog(Vector2 position)
 	{
 		var dialog = await Open("debug");
 		dialog.transform.position = position;
