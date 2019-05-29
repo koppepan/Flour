@@ -28,7 +28,7 @@ public class FooterLayer : AbstractSubLayer
 		this.onSelect = onSelect;
 	}
 
-	public override void OnOpen()
+	protected override void OnOpen()
 	{
 		sample1Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample1));
 		sample2Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample2));
@@ -39,9 +39,5 @@ public class FooterLayer : AbstractSubLayer
 	void OpenSubLayer(SubLayerType type)
 	{
 		onSelect?.Invoke(type);
-	}
-
-	public override void OnChangeSiblingIndex(int index)
-	{
 	}
 }

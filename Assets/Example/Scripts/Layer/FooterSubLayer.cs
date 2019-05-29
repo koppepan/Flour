@@ -9,7 +9,7 @@ public class FooterSubLayer : AbstractSubLayer
 		this.onClose = onClose;
 	}
 
-	public override void OnBack()
+	protected override void OnBack()
 	{
 		onClose?.Invoke();
 	}

@@ -13,7 +13,7 @@ class TitleLayer : AbstractSubLayer
 	{
 		this.onClick = onClick;
 	}
-	public override void OnOpen()
+	protected override void OnOpen()
 	{
 		button.onClick.AddListener(() => onClick?.Invoke());
 	}

@@ -46,7 +46,7 @@ namespace Flour.Layer
 			{
 				return false;
 			}
-			sub.OnBack();
+			sub.OnBackInternal();
 			return true;
 		}
 	}

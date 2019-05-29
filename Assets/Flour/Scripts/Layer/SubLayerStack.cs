@@ -18,7 +18,7 @@ namespace Flour.Layer
 			for (int i = 0; i < subLayers.Count; i++)
 			{
 				subLayers[i].transform.SetSiblingIndex(i);
-				subLayers[i].OnChangeSiblingIndex(subLayers.Count - (i + 1));
+				subLayers[i].OnChangeSiblingIndexInternal(subLayers.Count - (i + 1));
 			}
 		}
 

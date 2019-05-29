@@ -7,7 +7,7 @@ public class FadeLayer : AbstractSubLayer
 {
 	Image panel;
 
-	public override void OnOpen()
+	protected override void OnOpen()
 	{
 		base.OnOpen();
 		panel = GetComponent<Image>();

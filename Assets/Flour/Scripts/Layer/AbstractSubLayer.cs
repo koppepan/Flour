@@ -24,15 +24,19 @@ namespace Flour.Layer
 
 		public virtual void Close() => onDestroy?.Invoke(this);
 
-		public virtual void OnOpen() { }
-		public virtual async UniTask OnClose()
+		internal void OnOpenInternal() => OnOpen();
+		internal async UniTask OnCloseInternal() => await OnClose();
+		internal void OnBackInternal() => OnBack();
+		internal void OnChangeSiblingIndexInternal(int index) => OnChangeSiblingIndex(index);
+
+		protected virtual void OnOpen() { }
+		protected virtual async UniTask OnClose()
 		{
 			await UniTask.DelayFrame(1);
 			Destroy(gameObject);
 		}
-
-		public virtual void OnBack() { }
-		public virtual void OnChangeSiblingIndex(int index) { }
+		protected virtual void OnBack() { }
+		protected virtual void OnChangeSiblingIndex(int index) { }
 
 		protected void SafeAreaExpansion() => safeAreaExpansion?.Invoke(Layer, GetComponent<RectTransform>());
 		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion?.Invoke(Layer, rect);
