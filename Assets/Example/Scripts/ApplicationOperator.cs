@@ -9,14 +9,10 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 {
 	class UIInputBinder : IInputBinder
 	{
-		int bindCount;
-		EventSystem eventSystem;
+		int bindCount = 0;
+		EventSystem eventSystem = EventSystem.current;
+
 		public bool Binded => bindCount != 0;
-		public UIInputBinder()
-		{
-			bindCount = 0;
-			eventSystem = EventSystem.current;
-		}
 		public void Bind() => eventSystem.enabled = (++bindCount) == 0;
 		public void Unbind() => eventSystem.enabled = (--bindCount) == 0;
 	}

@@ -16,6 +16,8 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 
 	[SerializeField]
 	private DebugButton buttonPrefab = default;
+	[SerializeField]
+	private DebugKeypad keypadPrefab = default;
 
 	Func<string, UniTask<DebugDialog>> openDialogFunc;
 
@@ -32,7 +34,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 
 		this.openDialogFunc = openDialogFunc;
 	}
-	public async UniTask<DebugDialog> Duplicate(string title)
+	public async UniTask<DebugDialog> CreateNewDialog(string title)
 	{
 		var dialog = await openDialogFunc(title);
 		dialog.transform.position = transform.position + new Vector3(40, -40);
@@ -72,18 +74,37 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 		}
 	}
 
-	public DebugDialog AddButton(string key, Action onClick)
+	private T AddContent<T>(string key, T prefab) where T : MonoBehaviour
 	{
 		if (contents.ContainsKey(key))
 		{
-			Debug.LogWarning($"already debug button key => {key}");
-			return this;
+			Debug.LogWarning($"already debug content key => {key}");
+			return null;
 		}
-		var button = Instantiate(buttonPrefab, transform, false);
-		button.Setup(key, onClick);
-		button.gameObject.SetActive(contentEnable);
-		contents.Add(key, button.gameObject);
 
+		var content = Instantiate(prefab, transform, false);
+		content.gameObject.SetActive(contentEnable);
+		contents.Add(key, content.gameObject);
+
+		return content;
+	}
+
+	public DebugDialog AddButton(string key, Action onClick)
+	{
+		var button = AddContent<DebugButton>(key, buttonPrefab);
+		button?.Setup(key, onClick);
+		return this;
+	}
+	public DebugDialog AddFloatKeypad(string key, Action<double> onRun)
+	{
+		var keypad = AddContent<DebugKeypad>(key, keypadPrefab);
+		keypad?.SetupFloat(onRun);
+		return this;
+	}
+	public DebugDialog AddIntegerKeypad(string key, Action<long> onRun)
+	{
+		var keypad = AddContent<DebugKeypad>(key, keypadPrefab);
+		keypad?.SetupInteger(onRun);
 		return this;
 	}
 }
