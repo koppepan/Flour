@@ -18,6 +18,8 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 	private DebugButton buttonPrefab = default;
 	[SerializeField]
 	private DebugKeypad keypadPrefab = default;
+	[SerializeField]
+	private DebugDropdown dropdownPrefab = default;
 
 	Func<string, UniTask<DebugDialog>> openDialogFunc;
 
@@ -105,6 +107,12 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 	{
 		var keypad = AddContent<DebugKeypad>(key, keypadPrefab);
 		keypad?.SetupInteger(onRun);
+		return this;
+	}
+	public DebugDialog AddDropdown(string key, string[] contents, string defaultValue, Action<int, string> onSelect)
+	{
+		var dropdown = AddContent<DebugDropdown>(key, dropdownPrefab);
+		dropdown?.Setup(contents, defaultValue, onSelect);
 		return this;
 	}
 }

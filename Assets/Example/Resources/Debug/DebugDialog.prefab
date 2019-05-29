@@ -214,6 +214,8 @@ MonoBehaviour:
     type: 3}
   keypadPrefab: {fileID: -3419872342467681746, guid: 0d3ef06375c4eaa42867f6869dbee8bf,
     type: 3}
+  dropdownPrefab: {fileID: -4357336715863283525, guid: 59dc9336eb86320458edb3dbcfb1add2,
+    type: 3}
 --- !u!1 &3536319883344778797
 GameObject:
   m_ObjectHideFlags: 0
