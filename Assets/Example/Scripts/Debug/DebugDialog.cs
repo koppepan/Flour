@@ -21,7 +21,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 	[SerializeField]
 	private DebugDropdown dropdownPrefab = default;
 
-	Func<string, UniTask<DebugDialog>> openDialogFunc;
+	Func<string, Vector2, UniTask<DebugDialog>> openDialogFunc;
 
 	bool dragging = false;
 	bool contentEnable = true;
@@ -29,7 +29,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 
 	bool Frontmost => transform.GetSiblingIndex() == transform.parent.childCount - 1;
 
-	public void Setup(string title, Func<string, UniTask<DebugDialog>> openDialogFunc)
+	public void Setup(string title, Func<string, Vector2, UniTask<DebugDialog>> openDialogFunc)
 	{
 		titleText.text = title;
 		closeButton.onClick.AddListener(Close);
@@ -38,9 +38,7 @@ public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IP
 	}
 	public async UniTask<DebugDialog> CreateNewDialog(string title)
 	{
-		var dialog = await openDialogFunc(title);
-		dialog.transform.position = transform.position + new Vector3(40, -40);
-		return dialog;
+		return await openDialogFunc(title, transform.position + new Vector3(40, -40));
 	}
 
 	public void OnPointerDown(PointerEventData eventData) { }

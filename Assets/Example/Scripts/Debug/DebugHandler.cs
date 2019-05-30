@@ -35,17 +35,20 @@ public class DebugHandler
 			.AddTo(root);
 	}
 
-	private async UniTask<DebugDialog> Open(string title)
+	private async UniTask<DebugDialog> Open(string title, Vector2 position)
 	{
 		var dialog = await layerHandler.AddAsync<DebugDialog>(LayerType.Debug, SubLayerType.DebugDialog, true);
-		dialog.Setup(title, Open);
+		if (dialog != null)
+		{
+			dialog.Setup(title, Open);
+			dialog.transform.position = position;
+		}
 		return dialog;
 	}
 
 	private async void OpenDialog(Vector2 position)
 	{
-		var dialog = await Open("debug");
-		dialog.transform.position = position;
+		var dialog = await Open("debug", position);
 
 		((AbstractScene)sceneHandler.CurrentScene).OpenDebugDialog(dialog);
 		foreach (var s in sceneHandler.AdditiveScenes)

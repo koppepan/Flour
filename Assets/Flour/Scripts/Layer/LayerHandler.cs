@@ -32,19 +32,28 @@ namespace Flour.Layer
 
 			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea, safeAreaLayers);
 
-			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>();
+			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>().Where(x => x != LayerType.Debug);
 			foreach (var type in layerTypes)
 			{
-				var layer = new GameObject(type.ToString(), typeof(Layer)).GetComponent<Layer>();
-				layer.transform.SetParent(canvasRoot);
-
-				var reduction = safeAreaLayers.Contains(type) ? safeAreaHandler.Reduction : (Action<LayerType, RectTransform>)null;
-				layer.Initialize(type, referenceResolution, reduction);
-
-				layers.Add(type, layer);
+				layers.Add(type, CreateLayer(type, canvasRoot, referenceResolution, safeAreaLayers.Contains(type)));
 			}
 
 			layerOrder = layerTypes.Reverse().ToArray();
+		}
+		public void AddDebugLayer(Transform canvasRoot, Vector2 referenceResolution)
+		{
+			layers.Add(LayerType.Debug, CreateLayer(LayerType.Debug, canvasRoot, referenceResolution, false));
+		}
+
+		private Layer CreateLayer(LayerType layerType, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
+		{
+			var layer = new GameObject(layerType.ToString(), typeof(Layer)).GetComponent<Layer>();
+			layer.transform.SetParent(canvasRoot);
+
+			var reduction = safeArea ? safeAreaHandler.Reduction : (Action<LayerType, RectTransform>)null;
+			layer.Initialize(layerType, referenceResolution, reduction);
+
+			return layer;
 		}
 
 		public bool OnBack()
@@ -73,6 +82,12 @@ namespace Flour.Layer
 
 		public async UniTask<T> AddAsync<T>(LayerType layerType, SubLayerType subLayerType, bool overlap) where T : AbstractSubLayer
 		{
+			if (!layers.ContainsKey(layerType))
+			{
+				Debug.LogError($"not found {layerType} layer canvas.");
+				return null;
+			}
+
 			var layer = layers[layerType];
 			var old = layer.Stack.FirstOrDefault(subLayerType);
 

@@ -39,6 +39,7 @@ public sealed class ApplicationManager : MonoBehaviour
 
 			var sceneHandler = new SceneHandler<IOperationBundler>();
 			var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
+			layerHandler.AddDebugLayer(canvasRoot, referenceResolution);
 
 			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
 			debugHandler = new DebugHandler(this, sceneHandler, layerHandler);
