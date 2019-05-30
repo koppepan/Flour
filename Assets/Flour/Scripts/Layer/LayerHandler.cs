@@ -105,9 +105,18 @@ namespace Flour.Layer
 			return sub;
 		}
 
-		public void Remove(LayerType layer)
+		public bool Remove(LayerType layer)
 		{
-			layers[layer].Stack.Peek()?.Close();
+			var sub = layers[layer].Stack.Peek();
+			sub?.Close();
+			return sub != null;
+		}
+		public void RemoveAll()
+		{
+			for (int i = 0; i < layerOrder.Length; i++)
+			{
+				while (Remove(layerOrder[i])) { }
+			}
 		}
 		async UniTask Remove(AbstractSubLayer subLayer)
 		{
