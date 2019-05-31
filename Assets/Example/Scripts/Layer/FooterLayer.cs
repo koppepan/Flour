@@ -16,11 +16,6 @@ public class FooterLayer : AbstractSubLayer
 	[SerializeField]
 	Button sample4Button = default;
 
-	IInputBinder inputBinder;
-	ILayerHandler layerHandler;
-
-	FooterSubLayer currentLayer;
-
 	Action<SubLayerType> onSelect;
 
 	public void Setup(Action<SubLayerType> onSelect)
