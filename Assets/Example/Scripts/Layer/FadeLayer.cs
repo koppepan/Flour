@@ -24,12 +24,9 @@ public class FadeLayer : AbstractSubLayer
 	{
 		await Fade(milliseconds, Color.clear, Color.black);
 	}
-	public async UniTask FadeOut(int millisecondes = 200, bool close = false)
+	public async UniTask FadeOut(int millisecondes = 200)
 	{
 		await Fade(millisecondes, Color.black, Color.clear);
-		if (close)
-		{
-			Close();
-		}
+		Close();
 	}
 }

@@ -72,7 +72,7 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 		await UnityEngine.Resources.UnloadUnusedAssets();
 		await UniTask.Run(() => System.GC.Collect(0, System.GCCollectionMode.Optimized));
 
-		await fade.FadeOut(close: true);
+		await fade.FadeOut();
 
 		InputBinder.Unbind();
 	}

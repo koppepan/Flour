@@ -63,7 +63,7 @@ public class Footer
 			currentLayer?.Setup(CloseSubLayer);
 		}
 
-		await fade.FadeOut(close: true);
+		await fade.FadeOut();
 
 		inputBinder.Unbind();
 	}
