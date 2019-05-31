@@ -89,20 +89,20 @@ namespace Flour.Layer
 			}
 
 			var layer = layers[layerType];
-			var old = layer.Stack.FirstOrDefault(subLayerType);
+			var old = layer.List.FirstOrDefault(subLayerType);
 
 			// 既に同じSubLayerが存在する
 			if (!overlap && old != null)
 			{
 				// すでに存在していて一番前にある
-				if (layer.Stack.FindIndex(old) == 0)
+				if (layer.List.FindIndex(old) == 0)
 				{
 					return (T)old;
 				}
 
 				// 一番前に来るように詰めなおして返す
-				layer.Stack.Remove(old);
-				layer.Stack.Push(old);
+				layer.List.Remove(old, false);
+				layer.List.Add(old);
 				return (T)old;
 			}
 
@@ -114,15 +114,21 @@ namespace Flour.Layer
 			}
 
 			var sub = GameObject.Instantiate(prefab);
-			sub.SetConstParameter(layerType, subLayerType, safeAreaHandler.Expansion, Remove);
+			sub.SetConstParameter(layerType, subLayerType, MoveFront, Remove, safeAreaHandler.Expansion);
 			sub.OnOpenInternal();
-			layer.Stack.Push(sub);
+			layer.List.Add(sub);
 			return sub;
+		}
+
+		void MoveFront(LayerType layer, AbstractSubLayer subLayer)
+		{
+			layers[layer].List.Remove(subLayer, false);
+			layers[layer].List.Add(subLayer);
 		}
 
 		public bool Remove(LayerType layer)
 		{
-			var sub = layers[layer].Stack.Peek();
+			var sub = layers[layer].List.FirstOrDefault();
 			sub?.Close();
 			return sub != null;
 		}
@@ -139,14 +145,14 @@ namespace Flour.Layer
 			{
 				return;
 			}
-			var layer = layers.Values.FirstOrDefault(x => x.Stack.FindIndex(subLayer) != -1);
+			var layer = layers.Values.FirstOrDefault(x => x.List.FindIndex(subLayer) != -1);
 			if (layer == null)
 			{
 				return;
 			}
 
 			await subLayer.OnCloseInternal();
-			layer.Stack.Remove(subLayer);
+			layer.List.Remove(subLayer, true);
 		}
 	}
 }

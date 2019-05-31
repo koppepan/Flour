@@ -3,12 +3,12 @@ using System.Linq;
 
 namespace Flour.Layer
 {
-	internal sealed class SubLayerStack
+	internal sealed class SubLayerList
 	{
 		List<AbstractSubLayer> subLayers = new List<AbstractSubLayer>();
 		UnityEngine.Transform subLayerParent;
 
-		public SubLayerStack(UnityEngine.Transform subLayerParent)
+		public SubLayerList(UnityEngine.Transform subLayerParent)
 		{
 			this.subLayerParent = subLayerParent;
 		}
@@ -22,30 +22,22 @@ namespace Flour.Layer
 			}
 		}
 
-		public void Push(AbstractSubLayer layer)
+		public void Add(AbstractSubLayer layer)
 		{
 			subLayers.Add(layer);
 			layer.transform.SetParent(subLayerParent, false);
 
 			ResetSiblingIndex();
 		}
-		public AbstractSubLayer Pop()
-		{
-			var layer = Peek();
-			Remove(layer);
-			layer.transform.SetAsLastSibling();
-			return layer;
-		}
-		public AbstractSubLayer Peek()
-		{
-			return subLayers.LastOrDefault();
-		}
 
-		public bool Remove(AbstractSubLayer subLayer)
+		public bool Remove(AbstractSubLayer subLayer, bool reorder)
 		{
 			if (subLayers.Remove(subLayer))
 			{
-				ResetSiblingIndex();
+				if (reorder)
+				{
+					ResetSiblingIndex();
+				}
 				return true;
 			}
 			return false;
@@ -56,6 +48,10 @@ namespace Flour.Layer
 			return subLayers.LastIndexOf(subLayer);
 		}
 
+		public AbstractSubLayer FirstOrDefault()
+		{
+			return subLayers.LastOrDefault();
+		}
 		public AbstractSubLayer FirstOrDefault(SubLayerType type)
 		{
 			return FirstOrDefault(x => x.SubLayer == type);

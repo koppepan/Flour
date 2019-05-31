@@ -3,11 +3,6 @@ using UniRx.Async;
 
 public class SampleLayer : FooterSubLayer
 {
-	public override void Close()
-	{
-		Debug.Log(SubLayer.ToString() + " close");
-		base.Close();
-	}
 	protected override void OnOpen()
 	{
 		Debug.Log(SubLayer.ToString() + " on open");

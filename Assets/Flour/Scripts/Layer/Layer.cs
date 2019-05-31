@@ -6,7 +6,7 @@ namespace Flour.Layer
 	[RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
 	sealed internal class Layer : MonoBehaviour
 	{
-		public SubLayerStack Stack { get; private set; }
+		public SubLayerList List { get; private set; }
 
 		public void Initialize(LayerType layer, Vector2 referenceResolution, System.Action<LayerType, RectTransform> safeAreaReduction)
 		{
@@ -23,7 +23,7 @@ namespace Flour.Layer
 			var parent = GetContentsArea();
 			safeAreaReduction?.Invoke(layer, parent);
 
-			Stack = new SubLayerStack(parent);
+			List = new SubLayerList(parent);
 		}
 
 		RectTransform GetContentsArea()
@@ -40,7 +40,7 @@ namespace Flour.Layer
 
 		public bool OnBack()
 		{
-			var sub = Stack.FirstOrDefault(x => !x.IgnoreBack);
+			var sub = List.FirstOrDefault(x => !x.IgnoreBack);
 
 			if (sub == null)
 			{
