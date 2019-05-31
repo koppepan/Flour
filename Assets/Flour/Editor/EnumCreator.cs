@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Text;
 using UnityEngine;
 using UnityEditor;
 
@@ -25,44 +23,55 @@ namespace Flour
 				return;
 			}
 
-			string code = "";
 			string tab = "";
 
-			if (!string.IsNullOrEmpty(nameSpace))
+			using (var sw = File.CreateText(Path.Combine(exportPath, enumName + ".cs")))
 			{
-				code += "namespace " + nameSpace + "\n{\n";
-				tab += "\t";
-			}
+				if (!string.IsNullOrEmpty(nameSpace))
+				{
+					sw.WriteLine($"namespace {nameSpace}");
+					sw.WriteLine("{");
 
-			if (!string.IsNullOrEmpty(summary))
-			{
-				code +=
-					tab + "/// <summary>\n" +
-					tab + "/// " + summary + "\n" +
-					tab + "/// </summary>\n";
-			}
+					AddTab(ref tab);
+				}
 
-			code += tab + "public enum " + enumName + "\n" + tab + "{\n";
-			tab += "\t";
+				if (!string.IsNullOrEmpty(summary))
+				{
+					sw.WriteLine(tab + "/// <summary>");
+					sw.WriteLine(tab + $"/// {summary}");
+					sw.WriteLine(tab + "/// </summary>");
+				}
 
-			foreach (var type in types)
-			{
-				code += tab + type + ",\n";
-			}
+				sw.WriteLine(tab + $"public enum {enumName}");
+				sw.WriteLine(tab + "{");
 
-			tab = tab.Remove(0, "\n".Length);
-			code += tab + "}\n";
+				AddTab(ref tab);
+				foreach (var type in types)
+				{
+					sw.WriteLine(tab + type + ",");
+				}
+				RemoveTab(ref tab);
+				sw.WriteLine(tab + "}");
 
-			if (!string.IsNullOrEmpty(nameSpace))
-			{
-				tab = tab.Remove(0, "\n".Length);
-				code += tab + "}\n";
+				if (!string.IsNullOrEmpty(nameSpace))
+				{
+					RemoveTab(ref tab);
+					sw.WriteLine(tab + "}");
+				}
 			}
 
 			var path = Path.Combine(exportPath, enumName + ".cs");
-			File.WriteAllText(path, code, Encoding.UTF8);
-			AssetDatabase.Refresh(ImportAssetOptions.ImportRecursive);
+			AssetDatabase.ImportAsset(path);
 			Debug.Log("created " + path);
+		}
+
+		static void AddTab(ref string tab)
+		{
+			tab += "\t";
+		}
+		static void RemoveTab(ref string tab)
+		{
+			tab = tab.Remove(0, "\t".Length);
 		}
 	}
 }
