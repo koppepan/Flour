@@ -23,7 +23,9 @@ public sealed class ApplicationManager : MonoBehaviour
 
 	private ApplicationOperator appOperator;
 
+#if DEBUG_BUILD
 	private DebugHandler debugHandler;
+#endif
 
 	private void Awake()
 	{
@@ -39,10 +41,13 @@ public sealed class ApplicationManager : MonoBehaviour
 
 			var sceneHandler = new SceneHandler<IOperationBundler>();
 			var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
+
+#if DEBUG_BUILD
 			layerHandler.AddDebugLayer(canvasRoot, referenceResolution);
+			debugHandler = new DebugHandler(this, sceneHandler, layerHandler);
+#endif
 
 			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
-			debugHandler = new DebugHandler(this, sceneHandler, layerHandler);
 		}
 
 		await appOperator.LoadSceneAsync("Title");
