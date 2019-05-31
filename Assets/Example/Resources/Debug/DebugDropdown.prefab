@@ -725,6 +725,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2515725719628420351}
   - component: {fileID: 433918193700753356}
+  - component: {fileID: 8938553576777325671}
   - component: {fileID: -4357336715863283525}
   m_Layer: 0
   m_Name: DebugDropdown
@@ -779,6 +780,18 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!225 &8938553576777325671
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5645493242801986499}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &-4357336715863283525
 MonoBehaviour:
   m_ObjectHideFlags: 0

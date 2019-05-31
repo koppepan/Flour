@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 4377157529500011032}
   - component: {fileID: 1942031539450733620}
   - component: {fileID: 1065776975069791671}
+  - component: {fileID: -513274022097655975}
   - component: {fileID: -179448918350077760}
   m_Layer: 5
   m_Name: DebugDialog
@@ -196,6 +197,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!225 &-513274022097655975
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2654701526219477949}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &-179448918350077760
 MonoBehaviour:
   m_ObjectHideFlags: 0

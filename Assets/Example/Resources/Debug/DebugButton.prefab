@@ -92,6 +92,7 @@ GameObject:
   - component: {fileID: 5230733299107591073}
   - component: {fileID: 9184741424667627569}
   - component: {fileID: 2617436589000341481}
+  - component: {fileID: -7052012363971486065}
   - component: {fileID: 3315757583626780465}
   m_Layer: 5
   m_Name: DebugButton
@@ -215,6 +216,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   titleText: {fileID: 4366317320188485527}
+--- !u!225 &-7052012363971486065
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7538994497910704569}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &3315757583626780465
 MonoBehaviour:
   m_ObjectHideFlags: 0

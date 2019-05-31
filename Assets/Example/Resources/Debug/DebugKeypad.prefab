@@ -2203,6 +2203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1811599649137035202}
   - component: {fileID: 2817217517261943033}
+  - component: {fileID: -1340584743000270613}
   - component: {fileID: -3419872342467681746}
   m_Layer: 5
   m_Name: DebugKeypad
@@ -2258,6 +2259,18 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!225 &-1340584743000270613
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7405376849056600393}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &-3419872342467681746
 MonoBehaviour:
   m_ObjectHideFlags: 0

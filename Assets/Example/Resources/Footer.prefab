@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 6934434774671335040}
   - component: {fileID: 323337076266768674}
   - component: {fileID: 5006609127604298435}
+  - component: {fileID: -5365141836855424941}
   - component: {fileID: 994905995576919174}
   m_Layer: 5
   m_Name: Footer
@@ -154,6 +155,18 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!225 &-5365141836855424941
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5227022153054023992}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!114 &994905995576919174
 MonoBehaviour:
   m_ObjectHideFlags: 0

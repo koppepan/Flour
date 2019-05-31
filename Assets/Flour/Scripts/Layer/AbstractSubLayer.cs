@@ -4,6 +4,7 @@ using UniRx.Async;
 
 namespace Flour.Layer
 {
+	[RequireComponent(typeof(CanvasGroup))]
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{
 		public LayerType Layer { get; private set; }
