@@ -22,6 +22,6 @@ public class TitleScene : AbstractScene
 
 	private void GotoOutGame()
 	{
-		SceneHandler.LoadSceneAsync("OutGame");
+		SceneHandler.LoadSceneAsync(SceneType.OutGame);
 	}
 }

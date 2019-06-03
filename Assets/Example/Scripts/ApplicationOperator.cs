@@ -60,14 +60,14 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 		}
 	}
 
-	public async UniTask LoadSceneAsync(string sceneName, params object[] args)
+	public async UniTask LoadSceneAsync(SceneType sceneType, params object[] args)
 	{
 		InputBinder.Bind();
 
 		var fade = await AddLayerAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
 		await fade.FadeIn();
 
-		await sceneHandler.LoadAsync(sceneName, this, args);
+		await sceneHandler.LoadAsync(SceneData.GetName(sceneType), this, args);
 
 		await UnityEngine.Resources.UnloadUnusedAssets();
 		await UniTask.Run(() => System.GC.Collect(0, System.GCCollectionMode.Optimized));

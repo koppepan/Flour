@@ -50,7 +50,7 @@ public sealed class ApplicationManager : MonoBehaviour
 			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
 		}
 
-		await appOperator.LoadSceneAsync("Title");
+		await appOperator.LoadSceneAsync(SceneType.Title);
 
 		// AndroidのBackKey対応
 		Observable.EveryUpdate()

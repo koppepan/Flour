@@ -16,6 +16,6 @@ public class OutGameScene : AbstractScene
 
 	public override void OnBack()
 	{
-		SceneHandler.LoadSceneAsync("Title");
+		SceneHandler.LoadSceneAsync(SceneType.Title);
 	}
 }
