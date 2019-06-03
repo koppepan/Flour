@@ -5,22 +5,18 @@ namespace Flour
 {
 	public class JapaneaseAttributeCache<T>
 	{
-		Dictionary<T, string> jpnCache;
+		readonly Dictionary<T, string> jpnCache;
+
+		public string this[T t] => jpnCache[t];
 
 		public JapaneaseAttributeCache()
 		{
 			var type = typeof(T);
-			var lookup = type.GetFields()
+
+			jpnCache = type.GetFields()
 				.Where(fi => fi.FieldType == type)
 				.SelectMany(fi => fi.GetCustomAttributes(false), (fi, Attribute) => new { Type = (T)fi.GetValue(null), Attribute })
-				.ToLookup(a => a.Attribute.GetType());
-
-			jpnCache = lookup[typeof(JapaneaseAttribute)].ToDictionary(a => a.Type, a => ((JapaneaseAttribute)a.Attribute).Value);
-		}
-
-		public string GetJpnName(T type)
-		{
-			return jpnCache[type];
+				.ToDictionary(k => k.Type, v => ((JapaneaseAttribute)v.Attribute).Value);
 		}
 	}
 }
