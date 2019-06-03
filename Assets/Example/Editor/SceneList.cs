@@ -3,36 +3,36 @@ using UnityEditor.SceneManagement;
 
 public class SceneList
 {
-	[MenuItem("CustomMenu/Scene/InGame", priority = 100)]
-	public static void OpenSceneInGame()
+	[MenuItem("CustomMenu/Scene/00_Start", priority = 100)]
+	public static void OpenScene00_Start()
 	{
 		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/InGame.unity");
+			EditorSceneManager.OpenScene("Assets/Example/Scenes/00_Start.unity");
 		}
 	}
-	[MenuItem("CustomMenu/Scene/OutGame", priority = 100)]
-	public static void OpenSceneOutGame()
+	[MenuItem("CustomMenu/Scene/01_Title", priority = 100)]
+	public static void OpenScene01_Title()
 	{
 		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/OutGame.unity");
+			EditorSceneManager.OpenScene("Assets/Example/Scenes/01_Title.unity");
 		}
 	}
-	[MenuItem("CustomMenu/Scene/Start", priority = 100)]
-	public static void OpenSceneStart()
+	[MenuItem("CustomMenu/Scene/10_OutGame", priority = 100)]
+	public static void OpenScene10_OutGame()
 	{
 		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/Start.unity");
+			EditorSceneManager.OpenScene("Assets/Example/Scenes/10_OutGame.unity");
 		}
 	}
-	[MenuItem("CustomMenu/Scene/Title", priority = 100)]
-	public static void OpenSceneTitle()
+	[MenuItem("CustomMenu/Scene/20_InGame", priority = 100)]
+	public static void OpenScene20_InGame()
 	{
 		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/Title.unity");
+			EditorSceneManager.OpenScene("Assets/Example/Scenes/20_InGame.unity");
 		}
 	}
 }
