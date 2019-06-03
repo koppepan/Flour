@@ -15,13 +15,16 @@ namespace Flour
 		[MenuItem("Flour/Create SubLayerType Enum")]
 		static void Create()
 		{
-			var asset = Resources.Load<TextAsset>("Config/SubLayerType");
+			var asset = (TextAsset)AssetDatabase.LoadAssetAtPath("Assets/Flour/Config/SubLayerType.txt", typeof(TextAsset));
 
 			var ini = new IniFile(asset.text.Split('\n', '\r'));
 
-			var contetns = new List<string>(ini.GetKeys(TypeName).OrderBy(x => x));
-			contetns.Insert(0, "None");
-			EnumCreator.Create(ExportPath, NamespaceName, "", TypeName, contetns);
+			var contents = new Dictionary<string, string>() { { "None", "" } };
+			foreach (var key in ini.GetKeys(TypeName).OrderBy(x => x))
+			{
+				contents.Add(key, ini.GetValue(TypeName, key));
+			}
+			EnumCreator.Create(ExportPath, NamespaceName, "", TypeName, contents);
 		}
 	}
 }

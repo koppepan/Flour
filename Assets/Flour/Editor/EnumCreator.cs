@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -11,6 +12,11 @@ namespace Flour
 	public static class EnumCreator
 	{
 		public static void Create(string exportPath, string nameSpace, string summary, string enumName, IEnumerable<string> types)
+		{
+			Create(exportPath, nameSpace, summary, enumName, types.ToDictionary(k => k, v => ""));
+		}
+
+		public static void Create(string exportPath, string nameSpace, string summary, string enumName, IDictionary<string, string> types)
 		{
 			if (string.IsNullOrEmpty(exportPath))
 			{
@@ -48,7 +54,11 @@ namespace Flour
 				AddTab(ref tab);
 				foreach (var type in types)
 				{
-					sw.WriteLine(tab + type + ",");
+					if (!string.IsNullOrEmpty(type.Value))
+					{
+						sw.WriteLine(tab + $"[Japanease(\"{type.Value}\")]");
+					}
+					sw.WriteLine(tab + type.Key + ",");
 				}
 				RemoveTab(ref tab);
 				sw.WriteLine(tab + "}");
