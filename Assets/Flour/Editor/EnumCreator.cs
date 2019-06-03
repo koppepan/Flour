@@ -13,11 +13,6 @@ namespace Flour
 	{
 		public static void Create(string exportPath, string nameSpace, string summary, string enumName, IEnumerable<string> types)
 		{
-			Create(exportPath, nameSpace, summary, enumName, types.ToDictionary(k => k, v => ""));
-		}
-
-		public static void Create(string exportPath, string nameSpace, string summary, string enumName, IDictionary<string, string> types)
-		{
 			if (string.IsNullOrEmpty(exportPath))
 			{
 				Debug.LogError("export path empty.");
@@ -54,11 +49,7 @@ namespace Flour
 				AddTab(ref tab);
 				foreach (var type in types)
 				{
-					if (!string.IsNullOrEmpty(type.Value))
-					{
-						sw.WriteLine(tab + $"[Japanease(\"{type.Value}\")]");
-					}
-					sw.WriteLine(tab + type.Key + ",");
+					sw.WriteLine(tab + type + ",");
 				}
 				RemoveTab(ref tab);
 				sw.WriteLine(tab + "}");

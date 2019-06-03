@@ -19,10 +19,11 @@ namespace Flour
 
 			var ini = new IniFile(asset.text.Split('\n', '\r'));
 
-			var contents = new Dictionary<string, string>() { { "None", "" } };
+			var contents = new List<string>() { "[Japanease(\"\")] None" };
 			foreach (var key in ini.GetKeys(TypeName).OrderBy(x => x))
 			{
-				contents.Add(key, ini.GetValue(TypeName, key));
+				var valeu = ini.GetValue(TypeName, key);
+				contents.Add($"[Japanease(\"{valeu}\")] {key}");
 			}
 			EnumCreator.Create(ExportPath, NamespaceName, "", TypeName, contents);
 		}
