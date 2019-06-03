@@ -13,7 +13,7 @@ class ConfigLoader
 		foreach (var type in subLayers)
 		{
 			var index = fixedLayers.Contains(type) ? 0 : 1;
-			repositories[index].AddSourcePath(type, type.ToJpnName());
+			repositories[index].AddType(type);
 		}
 		for (int i = 0; i < fixedLayers.Length; i++)
 		{

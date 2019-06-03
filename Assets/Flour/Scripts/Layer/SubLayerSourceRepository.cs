@@ -8,36 +8,33 @@ namespace Flour.Layer
 {
 	public sealed class SubLayerSourceRepository
 	{
-		Dictionary<SubLayerType, string> srcPaths = new Dictionary<SubLayerType, string>();
+		List<SubLayerType> keys = new List<SubLayerType>();
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
 		int maxCache;
 
-		public SubLayerSourceRepository(Dictionary<SubLayerType, string> srcPaths, int maxCache)
-		{
-			this.srcPaths = srcPaths;
-			this.maxCache = maxCache == 0 ? 1 : maxCache;
-		}
-
 		public SubLayerSourceRepository(int maxCache)
 		{
-			this.maxCache = maxCache;
-			srcPaths.Clear();
+			this.maxCache = maxCache == 0 ? 1 : maxCache;
+			keys.Clear();
 		}
 
-		public void AddSourcePath(SubLayerType key, string path)
+		public void AddType(SubLayerType key)
 		{
-			srcPaths[key] = path;
+			if (!keys.Contains(key))
+			{
+				keys.Add(key);
+			}
 		}
 
 		public bool ContainsKey(SubLayerType type)
 		{
-			return srcPaths.ContainsKey(type);
+			return keys.Contains(type);
 		}
 
 		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
 		{
-			if (!srcPaths.ContainsKey(type))
+			if (!keys.Contains(type))
 			{
 				Debug.LogWarning(type.ToString() + " : missing source path.");
 				return null;
@@ -50,7 +47,7 @@ namespace Flour.Layer
 				return (T)srcCaches[type];
 			}
 
-			var prefab = await Resources.LoadAsync<GameObject>(srcPaths[type]);
+			var prefab = await Resources.LoadAsync<GameObject>(type.ToJpnName());
 
 			if (prefab == null)
 			{
