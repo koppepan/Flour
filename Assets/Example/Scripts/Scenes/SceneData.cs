@@ -1,20 +1,29 @@
-﻿
+﻿using Flour;
+
 public enum SceneType
 {
-	Start = 0,
-	Title = 1,
+	[Japanease("00_Start")]
+	Start,
+	[Japanease("01_Title")]
+	Title,
 
-	OutGame = 10,
+	[Japanease("10_OutGame")]
+	OutGame,
 
-	InGame = 20,
+	[Japanease("20_InGame")]
+	InGame,
 }
 
-public static class SceneData
+public static class SceneTypeExtention
 {
-	static readonly string Format = "{0:00}_{1}";
+	static JapaneaseAttributeCache<SceneType> jpnCache;
 
-	public static string GetName(SceneType type)
+	static SceneTypeExtention()
 	{
-		return string.Format(Format, (int)type, type.ToString());
+		jpnCache = new JapaneaseAttributeCache<SceneType>();
+	}
+	public static string ToJpnName(this SceneType type)
+	{
+		return jpnCache.GetJpnName(type);
 	}
 }

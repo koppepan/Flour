@@ -1,39 +1,19 @@
 ﻿using System;
 using System.Linq;
-using UnityEngine;
 using UniRx.Async;
-using Flour;
 using Flour.Layer;
 
-class ConfigLoader : IDisposable
+class ConfigLoader
 {
-	static readonly string SubLayerConfigPath = "Config/SubLayerType";
-	static readonly string SubLayerSection = "SubLayerType";
-
-	TextAsset subLayerResourceAsset;
-
-	public async UniTask<ConfigLoader> LoadAsync()
-	{
-		subLayerResourceAsset = (TextAsset)await Resources.LoadAsync<TextAsset>(SubLayerConfigPath);
-		return this;
-	}
-
-	public void Dispose()
-	{
-		Resources.UnloadAsset(subLayerResourceAsset);
-	}
-
 	public async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(SubLayerType[] fixedLayers)
 	{
-		var contents = new IniFile(subLayerResourceAsset.text.Split('\n', '\r')).GetContents(SubLayerSection);
-		var subLayers = contents.ToDictionary(k => (SubLayerType)Enum.Parse(typeof(SubLayerType), k.Key), v => v.Value);
-
+		var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>();
 		var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(fixedLayers.Length), new SubLayerSourceRepository(10) };
 
-		foreach (var set in subLayers)
+		foreach (var type in subLayers)
 		{
-			var index = fixedLayers.Contains(set.Key) ? 0 : 1;
-			repositories[index].AddSourcePath(set.Key, set.Value);
+			var index = fixedLayers.Contains(type) ? 0 : 1;
+			repositories[index].AddSourcePath(type, type.ToJpnName());
 		}
 		for (int i = 0; i < fixedLayers.Length; i++)
 		{
