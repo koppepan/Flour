@@ -45,11 +45,11 @@ public sealed class ApplicationManager : MonoBehaviour
 		var types = new LayerType[] { LayerType.Back, LayerType.Middle, LayerType.Front, LayerType.System };
 		for (int i = 0; i < types.Length; i++)
 		{
-			layerHandler.AddLayer(types[i], (int)types[i], canvasRoot, referenceResolution, safeAreaLayers.Contains(types[i]));
+			layerHandler.AddLayer(types[i], types[i].ToOrder(), canvasRoot, referenceResolution, safeAreaLayers.Contains(types[i]));
 		}
 
 #if DEBUG_BUILD
-		layerHandler.AddLayer(LayerType.Debug, (int)LayerType.Debug, canvasRoot, referenceResolution, false);
+		layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
 		debugHandler = new DebugHandler(this, sceneHandler, layerHandler, configLoader.CreateDebugSorceRepository());
 #endif
 

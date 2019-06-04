@@ -16,8 +16,8 @@ public enum SceneType
 
 public static class SceneTypeExtention
 {
-	static readonly JapaneaseAttributeCache<SceneType> jpnCache;
+	static readonly AttributeCache<SceneType, string> cache;
 
-	static SceneTypeExtention() => jpnCache = new JapaneaseAttributeCache<SceneType>();
-	public static string ToJpnName(this SceneType type) => jpnCache[type];
+	static SceneTypeExtention() => cache = new AttributeCache<SceneType, string>();
+	public static string ToJpnName(this SceneType type) => cache[type];
 }

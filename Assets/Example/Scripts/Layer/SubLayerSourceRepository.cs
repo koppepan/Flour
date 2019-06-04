@@ -45,7 +45,7 @@ public sealed class SubLayerSourceRepository
 			return (T)srcCaches[type];
 		}
 
-		var prefab = await Resources.LoadAsync<GameObject>(type.ToJpnName());
+		var prefab = await Resources.LoadAsync<GameObject>(type.ToResourcePath());
 
 		if (prefab == null)
 		{

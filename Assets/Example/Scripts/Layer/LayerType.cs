@@ -2,12 +2,20 @@ using Flour;
 
 public enum LayerType
 {
-	Back = 10,
-	Middle = 11,
-	Front = 12,
-	System = 13,
+	[Int(10)] Back = 10,
+	[Int(11)] Middle = 11,
+	[Int(12)] Front = 12,
+	[Int(13)] System = 13,
 
-	Debug = 100,
+	[Int(100)] Debug = 100,
+}
+
+public static class LayerTypeExtention
+{
+	static readonly AttributeCache<LayerType, int> cache;
+
+	static LayerTypeExtention() => cache = new AttributeCache<LayerType, int>();
+	public static int ToOrder(this LayerType type) => cache[type];
 }
 
 public enum SubLayerType
@@ -29,8 +37,8 @@ public enum SubLayerType
 
 public static class SubLayerTypeExtention
 {
-	static readonly JapaneaseAttributeCache<SubLayerType> jpnCache;
+	static readonly AttributeCache<SubLayerType, string> cache;
 
-	static SubLayerTypeExtention() => jpnCache = new JapaneaseAttributeCache<SubLayerType>();
-	public static string ToJpnName(this SubLayerType type) => jpnCache[type];
+	static SubLayerTypeExtention() => cache = new AttributeCache<SubLayerType, string>();
+	public static string ToResourcePath(this SubLayerType type) => cache[type];
 }
