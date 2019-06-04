@@ -1,5 +1,7 @@
 using Flour;
 
+public abstract class AbstractSubLayer : Flour.Layer.AbstractSubLayer<LayerType, SubLayerType> { }
+
 public enum LayerType
 {
 	[Int(10)] Back = 10,
