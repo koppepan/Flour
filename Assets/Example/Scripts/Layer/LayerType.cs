@@ -14,9 +14,7 @@ public enum LayerType
 
 public static class LayerTypeExtention
 {
-	static readonly AttributeCache<LayerType, int> cache;
-
-	static LayerTypeExtention() => cache = new AttributeCache<LayerType, int>();
+	static readonly AttributeCache<LayerType, int> cache = new AttributeCache<LayerType, int>();
 	public static int ToOrder(this LayerType type) => cache[type];
 }
 
@@ -39,8 +37,6 @@ public enum SubLayerType
 
 public static class SubLayerTypeExtention
 {
-	static readonly AttributeCache<SubLayerType, string> cache;
-
-	static SubLayerTypeExtention() => cache = new AttributeCache<SubLayerType, string>();
+	static readonly AttributeCache<SubLayerType, string> cache = new AttributeCache<SubLayerType, string>();
 	public static string ToResourcePath(this SubLayerType type) => cache[type];
 }

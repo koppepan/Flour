@@ -30,8 +30,6 @@ public enum SceneType
 
 public static class SceneTypeExtention
 {
-	static readonly AttributeCache<SceneType, string> cache;
-
-	static SceneTypeExtention() => cache = new AttributeCache<SceneType, string>();
+	static readonly AttributeCache<SceneType, string> cache = new AttributeCache<SceneType, string>();
 	public static string ToJpnName(this SceneType type) => cache[type];
 }
