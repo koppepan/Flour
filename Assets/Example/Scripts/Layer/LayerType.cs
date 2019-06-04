@@ -23,6 +23,7 @@ public enum SubLayerType
 	[Japanease("")] None,
 	[Japanease("Blackout")] Blackout,
 
+	[Japanease("Splash")] Splash,
 	[Japanease("Title")] Title,
 
 	[Japanease("Footer")] Footer,
