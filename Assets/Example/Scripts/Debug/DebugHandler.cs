@@ -35,7 +35,7 @@ public class DebugHandler
 #if UNITY_EDITOR
 			.Subscribe(_ => OpenDialog(Input.mousePosition))
 #else
-			.Subscribe(_ => debugHandler.OpenDialog(Input.GetTouch(0).position))
+			.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
 #endif
 			.AddTo(root);
 	}
