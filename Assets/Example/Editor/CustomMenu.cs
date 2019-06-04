@@ -4,10 +4,10 @@ using UnityEditor;
 public class CustomMenu
 {
 	#region Scenes
-	[MenuItem("CustomMenu/Scene/Create Scene List", priority = 0)]
+	[MenuItem("CustomMenu/Scene/Create Scene List", priority = 30)]
 	static void CreateSceneList()
 	{
-		SceneListCreator.Create();
+		SceneListCreator.Create(0);
 	}
 	#endregion
 
