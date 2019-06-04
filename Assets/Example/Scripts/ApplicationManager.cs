@@ -30,7 +30,7 @@ public sealed class ApplicationManager : MonoBehaviour
 	private void Awake()
 	{
 		DontDestroyObjectList.Add<ApplicationManager>(gameObject);
-		DontDestroyObjectList.Add<LayerHandler>(canvasRoot.gameObject);
+		DontDestroyObjectList.Add<LayerHandler<SubLayerType>>(canvasRoot.gameObject);
 	}
 
 	async void Start()
@@ -39,7 +39,7 @@ public sealed class ApplicationManager : MonoBehaviour
 		var repositories = await configLoader.LoadLayerSourceRepositories(FixedSubLayers);
 
 		var sceneHandler = new SceneHandler<IOperationBundler>();
-		var layerHandler = new LayerHandler(canvasRoot, referenceResolution, safeAreaLayers);
+		var layerHandler = new LayerHandler<SubLayerType>(canvasRoot, referenceResolution, safeAreaLayers);
 
 #if DEBUG_BUILD
 		layerHandler.AddDebugLayer(canvasRoot, referenceResolution);

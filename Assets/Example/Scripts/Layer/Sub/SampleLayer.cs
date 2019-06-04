@@ -5,21 +5,21 @@ public class SampleLayer : FooterSubLayer
 {
 	protected override void OnOpen()
 	{
-		Debug.Log(SubLayer.ToString() + " on open");
+		Debug.Log(Key + " on open");
 	}
 	protected override async UniTask OnClose()
 	{
-		Debug.Log(SubLayer.ToString() + " on close");
+		Debug.Log(Key + " on close");
 		await base.OnClose();
 	}
 	protected override void OnBack()
 	{
-		Debug.Log(SubLayer.ToString() + " on back");
+		Debug.Log(Key + " on back");
 		base.OnBack();
 	}
 
 	protected override void OnChangeSiblingIndex(int index)
 	{
-		Debug.Log(SubLayer.ToString() + " index " + index);
+		Debug.Log(Key + " index " + index);
 	}
 }

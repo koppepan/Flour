@@ -8,11 +8,11 @@ using Flour.Layer;
 public class DebugHandler
 {
 	readonly SceneHandler<IOperationBundler> sceneHandler;
-	readonly LayerHandler layerHandler;
+	readonly LayerHandler<SubLayerType> layerHandler;
 
 	readonly SubLayerSourceRepository repository;
 
-	public DebugHandler(MonoBehaviour root, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
+	public DebugHandler(MonoBehaviour root, SceneHandler<IOperationBundler> sceneHandler, LayerHandler<SubLayerType> layerHandler, SubLayerSourceRepository repository)
 	{
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
@@ -43,7 +43,7 @@ public class DebugHandler
 	{
 		var prefab = await repository.LoadAsync<DebugDialog>(SubLayerType.DebugDialog);
 
-		var dialog = layerHandler.Add(LayerType.Debug, (int)SubLayerType.DebugDialog, prefab, true);
+		var dialog = layerHandler.Add(LayerType.Debug, SubLayerType.DebugDialog, prefab, true);
 		if (dialog != null)
 		{
 			dialog.Setup(title, Open);

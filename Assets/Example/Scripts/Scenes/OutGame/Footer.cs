@@ -29,7 +29,7 @@ public class Footer
 
 	async void OpenSubLayer(SubLayerType subLayerType)
 	{
-		if (currentLayer?.SubLayer == subLayerType)
+		if (currentLayer?.Key == subLayerType)
 		{
 			return;
 		}

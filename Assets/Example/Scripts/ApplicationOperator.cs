@@ -22,7 +22,7 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	readonly SubLayerSourceRepository[] subLayerRepositories;
 
 	readonly SceneHandler<IOperationBundler> sceneHandler;
-	readonly LayerHandler layerHandler;
+	readonly LayerHandler<SubLayerType> layerHandler;
 
 	public SaveData SaveData { get; private set; }
 	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
@@ -32,7 +32,7 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	public ApplicationOperator(
 		Action onApplicationQuit,
 		SceneHandler<IOperationBundler> sceneHandler,
-		LayerHandler layerHandler,
+		LayerHandler<SubLayerType> layerHandler,
 		SubLayerSourceRepository[] subLayerRepositories
 		)
 	{
@@ -115,12 +115,12 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	{
 		InputBinder.Bind();
 
-		T sub = !overlap ? layerHandler.Get<T>(layer, (int)subLayer) : null;
+		T sub = !overlap ? layerHandler.Get<T>(layer, subLayer) : null;
 
 		if (sub == null)
 		{
 			var prefab = await SubLayerPrefabLoadAsync<T>(subLayer);
-			sub = layerHandler.Add(layer, (int)subLayer, prefab, overlap);
+			sub = layerHandler.Add(layer, subLayer, prefab, overlap);
 		}
 
 		InputBinder.Unbind();
