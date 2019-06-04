@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
-using Flour.Layer;
 
 public class FooterLayer : AbstractSubLayer
 {

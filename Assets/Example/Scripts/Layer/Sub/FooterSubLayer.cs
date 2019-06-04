@@ -1,5 +1,4 @@
-﻿using Flour.Layer;
-
+﻿
 public class FooterSubLayer : AbstractSubLayer
 {
 	System.Action onClose;

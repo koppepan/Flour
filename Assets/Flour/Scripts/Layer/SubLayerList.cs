@@ -52,9 +52,9 @@ namespace Flour.Layer
 		{
 			return subLayers.LastOrDefault();
 		}
-		public AbstractSubLayer FirstOrDefault(SubLayerType type)
+		public AbstractSubLayer FirstOrDefault(int id)
 		{
-			return FirstOrDefault(x => x.SubLayer == type);
+			return FirstOrDefault(x => x.SubLayerId == id);
 		}
 		public AbstractSubLayer FirstOrDefault(AbstractSubLayer subLayer)
 		{

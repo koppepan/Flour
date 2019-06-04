@@ -35,17 +35,18 @@ public sealed class ApplicationManager : MonoBehaviour
 
 	async void Start()
 	{
-		var repositories = await new ConfigLoader().LoadLayerSourceRepositories(FixedSubLayers);
+		var configLoader = new ConfigLoader();
+		var repositories = await configLoader.LoadLayerSourceRepositories(FixedSubLayers);
 
 		var sceneHandler = new SceneHandler<IOperationBundler>();
-		var layerHandler = new LayerHandler(canvasRoot, referenceResolution, repositories, safeAreaLayers);
+		var layerHandler = new LayerHandler(canvasRoot, referenceResolution, safeAreaLayers);
 
 #if DEBUG_BUILD
 		layerHandler.AddDebugLayer(canvasRoot, referenceResolution);
-		debugHandler = new DebugHandler(this, sceneHandler, layerHandler);
+		debugHandler = new DebugHandler(this, sceneHandler, layerHandler, configLoader.CreateDebugSorceRepository());
 #endif
 
-		appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler);
+		appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler, repositories);
 
 		await appOperator.LoadSceneAsync(SceneType.Title);
 

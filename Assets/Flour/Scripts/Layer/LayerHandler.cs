@@ -19,17 +19,13 @@ namespace Flour.Layer
 
 	public sealed class LayerHandler
 	{
-		readonly SubLayerSourceRepository[] repositories;
-
 		readonly LayerType[] layerOrder;
 		readonly Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
 
 		readonly SafeAreaHandler safeAreaHandler;
 
-		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, SubLayerSourceRepository[] repositories, LayerType[] safeAreaLayers)
+		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, LayerType[] safeAreaLayers)
 		{
-			this.repositories = repositories;
-
 			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea, safeAreaLayers);
 
 			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>().Where(x => x != LayerType.Debug);
@@ -68,67 +64,65 @@ namespace Flour.Layer
 			return false;
 		}
 
-		private async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
-		{
-			for (int i = 0; i < repositories.Length; i++)
-			{
-				if (repositories[i].ContainsKey(type))
-				{
-					return await repositories[i].LoadAsync<T>(type);
-				}
-			}
-			return null;
-		}
-
-		public async UniTask<T> AddAsync<T>(LayerType layerType, SubLayerType subLayerType, bool overlap) where T : AbstractSubLayer
+		private Layer GetLayer(LayerType layerType)
 		{
 			if (!layers.ContainsKey(layerType))
 			{
-				Debug.LogError($"not found {layerType} layer canvas.");
+				throw new NullReferenceException($"not found {layerType} layer canvas.");
+			}
+			return layers[layerType];
+		}
+
+		public T Get<T>(LayerType layerType, int subLayerId) where T : AbstractSubLayer
+		{
+			var layer = GetLayer(layerType);
+			var old = layer.List.FirstOrDefault(subLayerId);
+
+			if (old == null)
+			{
 				return null;
 			}
 
-			var layer = layers[layerType];
-			var old = layer.List.FirstOrDefault(subLayerType);
-
 			// 既に同じSubLayerが存在する
-			if (!overlap && old != null)
+			// すでに存在していて一番前にある
+			if (layer.List.FindIndex(old) == 0)
 			{
-				// すでに存在していて一番前にある
-				if (layer.List.FindIndex(old) == 0)
-				{
-					return (T)old;
-				}
-
-				// 一番前に来るように詰めなおして返す
-				layer.List.Remove(old, false);
-				layer.List.Add(old);
 				return (T)old;
 			}
 
-			var prefab = await LoadAsync<T>(subLayerType);
+			// 一番前に来るように詰めなおして返す
+			layer.List.Remove(old, false);
+			layer.List.Add(old);
+			return (T)old;
+		}
 
-			if (prefab == null)
+		public T Add<T>(LayerType layerType, int subLayerId, T prefab, bool overlap) where T : AbstractSubLayer
+		{
+			var layer = GetLayer(layerType);
+			var old = layer.List.FirstOrDefault(subLayerId);
+
+			if (!overlap && old != null)
 			{
-				return null;
+				throw new ArgumentException($"same SubLayer already exists. ID => {subLayerId}");
 			}
 
 			var sub = GameObject.Instantiate(prefab);
-			sub.SetConstParameter(layerType, subLayerType, MoveFront, Remove, safeAreaHandler.Expansion);
+			sub.SetConstParameter(layerType, subLayerId, MoveFront, Remove, safeAreaHandler.Expansion);
 			sub.OnOpenInternal();
 			layer.List.Add(sub);
 			return sub;
 		}
 
-		void MoveFront(LayerType layer, AbstractSubLayer subLayer)
+		void MoveFront(LayerType layerType, AbstractSubLayer subLayer)
 		{
-			layers[layer].List.Remove(subLayer, false);
-			layers[layer].List.Add(subLayer);
+			var layer = GetLayer(layerType);
+			layer.List.Remove(subLayer, false);
+			layer.List.Add(subLayer);
 		}
 
 		public bool Remove(LayerType layer)
 		{
-			var sub = layers[layer].List.FirstOrDefault();
+			var sub = GetLayer(layer).List.FirstOrDefault();
 			sub?.Close();
 			return sub != null;
 		}

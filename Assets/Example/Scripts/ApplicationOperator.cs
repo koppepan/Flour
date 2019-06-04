@@ -19,6 +19,8 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 
 	readonly Action onApplicationQuit;
 
+	readonly SubLayerSourceRepository[] subLayerRepositories;
+
 	readonly SceneHandler<IOperationBundler> sceneHandler;
 	readonly LayerHandler layerHandler;
 
@@ -27,9 +29,17 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
 
-	public ApplicationOperator(Action onApplicationQuit, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
+	public ApplicationOperator(
+		Action onApplicationQuit,
+		SceneHandler<IOperationBundler> sceneHandler,
+		LayerHandler layerHandler,
+		SubLayerSourceRepository[] subLayerRepositories
+		)
 	{
 		this.onApplicationQuit = onApplicationQuit;
+
+		this.subLayerRepositories = subLayerRepositories;
+
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
 
@@ -89,11 +99,32 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 		InputBinder.Unbind();
 	}
 
+	private async UniTask<T> SubLayerPrefabLoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
+	{
+		for (int i = 0; i < subLayerRepositories.Length; i++)
+		{
+			if (subLayerRepositories[i].ContainsKey(type))
+			{
+				return await subLayerRepositories[i].LoadAsync<T>(type);
+			}
+		}
+		return null;
+	}
+
 	private async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer, bool overlap) where T : AbstractSubLayer
 	{
 		InputBinder.Bind();
-		var sub = await layerHandler.AddAsync<T>(layer, subLayer, overlap);
+
+		T sub = !overlap ? layerHandler.Get<T>(layer, (int)subLayer) : null;
+
+		if (sub == null)
+		{
+			var prefab = await SubLayerPrefabLoadAsync<T>(subLayer);
+			sub = layerHandler.Add(layer, (int)subLayer, prefab, overlap);
+		}
+
 		InputBinder.Unbind();
+
 		return sub;
 	}
 	public async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer

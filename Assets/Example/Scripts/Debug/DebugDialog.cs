@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UniRx.Async;
 
-public class DebugDialog : Flour.Layer.AbstractSubLayer, IPointerDownHandler, IPointerUpHandler,  IDragHandler
+public class DebugDialog : AbstractSubLayer, IPointerDownHandler, IPointerUpHandler,  IDragHandler
 {
 	public override bool IgnoreBack => true;
 

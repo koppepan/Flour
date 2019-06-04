@@ -7,7 +7,7 @@ class ConfigLoader
 {
 	public async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(SubLayerType[] fixedLayers)
 	{
-		var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>();
+		var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>().Where(x => !x.ToString().StartsWith("Debug"));
 		var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(fixedLayers.Length), new SubLayerSourceRepository(10) };
 
 		foreach (var type in subLayers)
@@ -21,5 +21,16 @@ class ConfigLoader
 		}
 
 		return repositories;
+	}
+
+	public SubLayerSourceRepository CreateDebugSorceRepository()
+	{
+		var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>().Where(x => x.ToString().StartsWith("Debug"));
+		var repo = new SubLayerSourceRepository(subLayers.Count());
+		foreach (var type in subLayers)
+		{
+			repo.AddType(type);
+		}
+		return repo;
 	}
 }

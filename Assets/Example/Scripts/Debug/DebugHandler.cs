@@ -7,13 +7,17 @@ using Flour.Layer;
 
 public class DebugHandler
 {
-	SceneHandler<IOperationBundler> sceneHandler;
-	LayerHandler layerHandler;
+	readonly SceneHandler<IOperationBundler> sceneHandler;
+	readonly LayerHandler layerHandler;
 
-	public DebugHandler(MonoBehaviour root, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler)
+	readonly SubLayerSourceRepository repository;
+
+	public DebugHandler(MonoBehaviour root, SceneHandler<IOperationBundler> sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
 	{
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
+
+		this.repository = repository;
 
 #if UNITY_EDITOR
 		var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
@@ -37,7 +41,9 @@ public class DebugHandler
 
 	private async UniTask<DebugDialog> Open(string title, Vector2 position)
 	{
-		var dialog = await layerHandler.AddAsync<DebugDialog>(LayerType.Debug, SubLayerType.DebugDialog, true);
+		var prefab = await repository.LoadAsync<DebugDialog>(SubLayerType.DebugDialog);
+
+		var dialog = layerHandler.Add(LayerType.Debug, (int)SubLayerType.DebugDialog, prefab, true);
 		if (dialog != null)
 		{
 			dialog.Setup(title, Open);

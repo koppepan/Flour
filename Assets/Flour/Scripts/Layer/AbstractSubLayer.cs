@@ -4,24 +4,10 @@ using UniRx.Async;
 
 namespace Flour.Layer
 {
-	[RequireComponent(typeof(CanvasGroup))]
 	public abstract class AbstractSubLayer : MonoBehaviour
 	{
-		public SubLayerType SubLayer { get; private set; }
+		public int SubLayerId { get; private set; }
 		public virtual bool IgnoreBack { get { return false; } }
-
-		private CanvasGroup _canvasGroup;
-		protected CanvasGroup CanvasGroup
-		{
-			get
-			{
-				if (_canvasGroup == null)
-				{
-					_canvasGroup = GetComponent<CanvasGroup>();
-				}
-				return _canvasGroup;
-			}
-		}
 
 		private LayerType currentLayer;
 
@@ -32,13 +18,13 @@ namespace Flour.Layer
 
 		internal void SetConstParameter(
 			LayerType layer,
-			SubLayerType subLayer,
+			int subLayerId,
 			Action<LayerType, AbstractSubLayer> moveFront,
 			Func<AbstractSubLayer, UniTask> onDestroy,
 			Action<LayerType, RectTransform> safeAreaExpansion)
 		{
 			currentLayer = layer;
-			SubLayer = subLayer;
+			SubLayerId = subLayerId;
 
 			this.moveFront = moveFront;
 			this.onDestroy = onDestroy;
