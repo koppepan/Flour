@@ -2,8 +2,8 @@
 using UnityEngine.EventSystems;
 using UniRx.Async;
 
-using Flour.Scene;
-using Flour.Layer;
+using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
+using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
 public sealed class ApplicationOperator : IDisposable, IOperationBundler, ISceneHandler, ILayerHandler
 {
@@ -21,8 +21,8 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 
 	readonly SubLayerSourceRepository[] subLayerRepositories;
 
-	readonly SceneHandler<IOperationBundler> sceneHandler;
-	readonly LayerHandler<SubLayerType> layerHandler;
+	readonly SceneHandler sceneHandler;
+	readonly LayerHandler layerHandler;
 
 	public SaveData SaveData { get; private set; }
 	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
@@ -31,8 +31,8 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 
 	public ApplicationOperator(
 		Action onApplicationQuit,
-		SceneHandler<IOperationBundler> sceneHandler,
-		LayerHandler<SubLayerType> layerHandler,
+		SceneHandler sceneHandler,
+		LayerHandler layerHandler,
 		SubLayerSourceRepository[] subLayerRepositories
 		)
 	{

@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Flour.Layer
 {
-	internal class SafeAreaHandler
+	internal class SafeAreaHandler<TLayerKey> where TLayerKey : struct
 	{
 		readonly Vector2 offsetMin;
 		readonly Vector2 offsetMax;
 
-		readonly List<LayerType> safeAreaLayers = new List<LayerType>();
+		readonly List<TLayerKey> safeAreaLayers = new List<TLayerKey>();
 
 		public SafeAreaHandler(Vector2 screenSize, Rect safeArea)
 		{
@@ -18,12 +18,12 @@ namespace Flour.Layer
 			offsetMax = new Vector2(-(screenSize.x - (safeArea.position.x + safeArea.width)), -(screenSize.y - (safeArea.position.y + safeArea.height)));
 		}
 
-		public void AddSafeLayer(LayerType layerType)
+		public void AddSafeLayer(TLayerKey layerType)
 		{
 			safeAreaLayers.Add(layerType);
 		}
 
-		public void Expansion(LayerType layerType, RectTransform rect)
+		public void Expansion(TLayerKey layerType, RectTransform rect)
 		{
 			if (!safeAreaLayers.Contains(layerType))
 			{
@@ -33,7 +33,7 @@ namespace Flour.Layer
 			rect.offsetMax = -offsetMax;
 		}
 
-		public void Reduction(LayerType layerType, RectTransform rect)
+		public void Reduction(TLayerKey layerType, RectTransform rect)
 		{
 			if (!safeAreaLayers.Contains(layerType))
 			{

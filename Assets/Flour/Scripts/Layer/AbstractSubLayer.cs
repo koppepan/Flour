@@ -5,14 +5,14 @@ using UniRx.Async;
 namespace Flour.Layer
 {
 	[RequireComponent(typeof(CanvasGroup))]
-	public abstract class AbstractSubLayer<TKey> : MonoBehaviour where TKey : struct
+	public abstract class AbstractSubLayer<TLayerKey, TSubKey> : MonoBehaviour where TLayerKey : struct where TSubKey : struct
 	{
-		public TKey Key { get; private set; }
-		private LayerType currentLayer;
+		public TSubKey Key { get; private set; }
+		private TLayerKey layerKey;
 
-		private Action<LayerType, AbstractSubLayer<TKey>> moveFront;
-		private Action<LayerType, RectTransform> safeAreaExpansion;
-		private Func<AbstractSubLayer<TKey>, UniTask> onDestroy;
+		private Action<TLayerKey, AbstractSubLayer<TLayerKey, TSubKey>> moveFront;
+		private Action<TLayerKey, RectTransform> safeAreaExpansion;
+		private Func<AbstractSubLayer<TLayerKey, TSubKey>, UniTask> onDestroy;
 
 		public virtual bool IgnoreBack { get { return false; } }
 
@@ -29,21 +29,21 @@ namespace Flour.Layer
 			}
 		}
 
-		internal void SetConstParameter(LayerType layerType, TKey key,
-			Action<LayerType, AbstractSubLayer<TKey>> moveFront,
-			Action<LayerType, RectTransform> safeAreaExpansion,
-			Func<AbstractSubLayer<TKey>, UniTask> onDestroy
+		internal void SetConstParameter(TLayerKey layerKey, TSubKey key,
+			Action<TLayerKey, AbstractSubLayer<TLayerKey, TSubKey>> moveFront,
+			Action<TLayerKey, RectTransform> safeAreaExpansion,
+			Func<AbstractSubLayer<TLayerKey, TSubKey>, UniTask> onDestroy
 			)
 		{
-			currentLayer = layerType;
 			Key = key;
+			this.layerKey = layerKey;
 
 			this.moveFront = moveFront;
 			this.safeAreaExpansion = safeAreaExpansion;
 			this.onDestroy = onDestroy;
 		}
 
-		public void MoveFront() => moveFront(currentLayer, this);
+		public void MoveFront() => moveFront(layerKey, this);
 		public void Close() => onDestroy(this);
 
 		internal void OnOpenInternal() => OnOpen();
@@ -61,6 +61,6 @@ namespace Flour.Layer
 		protected virtual void OnChangeSiblingIndex(int index) { }
 
 		protected void SafeAreaExpansion() => SafeAreaExpansion(GetComponent<RectTransform>());
-		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion(currentLayer, rect);
+		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion(layerKey, rect);
 	}
 }

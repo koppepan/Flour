@@ -5,8 +5,9 @@ using UniRx;
 using UniRx.Async;
 
 using Flour;
-using Flour.Scene;
-using Flour.Layer;
+
+using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
+using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
 public sealed class ApplicationManager : MonoBehaviour
 {
@@ -30,7 +31,7 @@ public sealed class ApplicationManager : MonoBehaviour
 	private void Awake()
 	{
 		DontDestroyObjectList.Add<ApplicationManager>(gameObject);
-		DontDestroyObjectList.Add<LayerHandler<SubLayerType>>(canvasRoot.gameObject);
+		DontDestroyObjectList.Add<LayerHandler>(canvasRoot.gameObject);
 	}
 
 	async void Start()
@@ -38,8 +39,8 @@ public sealed class ApplicationManager : MonoBehaviour
 		var configLoader = new ConfigLoader();
 		var repositories = await configLoader.LoadLayerSourceRepositories(FixedSubLayers);
 
-		var sceneHandler = new SceneHandler<IOperationBundler>();
-		var layerHandler = new LayerHandler<SubLayerType>();
+		var sceneHandler = new SceneHandler();
+		var layerHandler = new LayerHandler();
 
 		var types = new LayerType[] { LayerType.Back, LayerType.Middle, LayerType.Front, LayerType.System };
 		for (int i = 0; i < types.Length; i++)

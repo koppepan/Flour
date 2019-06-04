@@ -1,5 +1,4 @@
 ﻿using UniRx.Async;
-using Flour.Layer;
 
 public interface IOperationBundler
 {

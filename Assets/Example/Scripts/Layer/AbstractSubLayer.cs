@@ -1,2 +1,2 @@
 ﻿
-public abstract class AbstractSubLayer : Flour.Layer.AbstractSubLayer<SubLayerType> { }
+public abstract class AbstractSubLayer : Flour.Layer.AbstractSubLayer<LayerType, SubLayerType> { }

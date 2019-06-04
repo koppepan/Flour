@@ -7,29 +7,19 @@ using UniRx.Async;
 
 namespace Flour.Layer
 {
-	public enum LayerType
+	public sealed class LayerHandler<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
-		Back = 10,
-		Middle = 11,
-		Front = 12,
-		System = 13,
+		SortedList<int, TLayerKey> layerOrder = new SortedList<int, TLayerKey>();
+		readonly Dictionary<TLayerKey, Layer<TLayerKey, TSubKey>> layers = new Dictionary<TLayerKey, Layer<TLayerKey, TSubKey>>();
 
-		Debug = 100,
-	}
-
-	public sealed class LayerHandler<TKey> where TKey : struct
-	{
-		SortedList<int, LayerType> layerOrder = new SortedList<int, LayerType>();
-		readonly Dictionary<LayerType, Layer<TKey>> layers = new Dictionary<LayerType, Layer<TKey>>();
-
-		readonly SafeAreaHandler safeAreaHandler;
+		readonly SafeAreaHandler<TLayerKey> safeAreaHandler;
 
 		public LayerHandler()
 		{
-			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea);
+			safeAreaHandler = new SafeAreaHandler<TLayerKey>(new Vector2(Screen.width, Screen.height), Screen.safeArea);
 		}
 
-		public void AddLayer(LayerType layerType, int sortingOrder, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
+		public void AddLayer(TLayerKey layerType, int sortingOrder, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
 		{
 			if (safeArea)
 			{
@@ -40,8 +30,8 @@ namespace Flour.Layer
 				throw new ArgumentException($"same key already exists. key => {layerType}");
 			}
 
-			var reduction = safeArea ? safeAreaHandler.Reduction : (Action<LayerType, RectTransform>)null;
-			var layer = new Layer<TKey>(canvasRoot, layerType, sortingOrder, referenceResolution, reduction);
+			var reduction = safeArea ? safeAreaHandler.Reduction : (Action<TLayerKey, RectTransform>)null;
+			var layer = new Layer<TLayerKey, TSubKey>(canvasRoot, layerType, sortingOrder, referenceResolution, reduction);
 
 			layers.Add(layerType, layer);
 
@@ -60,7 +50,7 @@ namespace Flour.Layer
 			return false;
 		}
 
-		private Layer<TKey> GetLayer(LayerType layerType)
+		private Layer<TLayerKey, TSubKey> GetLayer(TLayerKey layerType)
 		{
 			if (!layers.ContainsKey(layerType))
 			{
@@ -69,7 +59,7 @@ namespace Flour.Layer
 			return layers[layerType];
 		}
 
-		public T Get<T>(LayerType layerType, TKey key) where T : AbstractSubLayer<TKey>
+		public T Get<T>(TLayerKey layerType, TSubKey key) where T : AbstractSubLayer<TLayerKey, TSubKey>
 		{
 			var layer = GetLayer(layerType);
 			var old = layer.List.FirstOrDefault(key);
@@ -92,7 +82,7 @@ namespace Flour.Layer
 			return (T)old;
 		}
 
-		public T Add<T>(LayerType layerType, TKey key, T prefab, bool overlap) where T : AbstractSubLayer<TKey>
+		public T Add<T>(TLayerKey layerType, TSubKey key, T prefab, bool overlap) where T : AbstractSubLayer<TLayerKey, TSubKey>
 		{
 			var layer = GetLayer(layerType);
 			var old = layer.List.FirstOrDefault(key);
@@ -109,14 +99,14 @@ namespace Flour.Layer
 			return sub;
 		}
 
-		void MoveFront(LayerType layerType, AbstractSubLayer<TKey> subLayer)
+		void MoveFront(TLayerKey layerType, AbstractSubLayer<TLayerKey, TSubKey> subLayer)
 		{
 			var layer = GetLayer(layerType);
 			layer.List.Remove(subLayer, false);
 			layer.List.Add(subLayer);
 		}
 
-		public bool Remove(LayerType layer)
+		public bool Remove(TLayerKey layer)
 		{
 			var sub = GetLayer(layer).List.FirstOrDefault();
 			sub?.Close();
@@ -129,7 +119,7 @@ namespace Flour.Layer
 				while (Remove(layer)) { }
 			}
 		}
-		async UniTask Remove(AbstractSubLayer<TKey> subLayer)
+		async UniTask Remove(AbstractSubLayer<TLayerKey, TSubKey> subLayer)
 		{
 			if (subLayer == null)
 			{

@@ -3,11 +3,11 @@ using UnityEngine.UI;
 
 namespace Flour.Layer
 {
-	sealed internal class Layer<TKey> where TKey : struct
+	sealed internal class Layer<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
-		public SubLayerList<TKey> List { get; private set; }
+		public SubLayerList<TLayerKey, TSubKey> List { get; private set; }
 
-		public Layer(Transform canvasRoot, LayerType layer, int sortingOrder, Vector2 referenceResolution, System.Action<LayerType, RectTransform> safeAreaReduction)
+		public Layer(Transform canvasRoot, TLayerKey layer, int sortingOrder, Vector2 referenceResolution, System.Action<TLayerKey, RectTransform> safeAreaReduction)
 		{
 			var obj = new GameObject(layer.ToString(), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
 			obj.transform.SetParent(canvasRoot, false);
@@ -25,7 +25,7 @@ namespace Flour.Layer
 			var parent = GetContentsArea(obj.transform);
 			safeAreaReduction?.Invoke(layer, parent);
 
-			List = new SubLayerList<TKey>(parent);
+			List = new SubLayerList<TLayerKey, TSubKey>(parent);
 		}
 
 		RectTransform GetContentsArea(Transform parent)

@@ -2,17 +2,18 @@
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
-using Flour.Scene;
-using Flour.Layer;
+
+using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
+using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
 public class DebugHandler
 {
-	readonly SceneHandler<IOperationBundler> sceneHandler;
-	readonly LayerHandler<SubLayerType> layerHandler;
+	readonly SceneHandler sceneHandler;
+	readonly LayerHandler layerHandler;
 
 	readonly SubLayerSourceRepository repository;
 
-	public DebugHandler(MonoBehaviour root, SceneHandler<IOperationBundler> sceneHandler, LayerHandler<SubLayerType> layerHandler, SubLayerSourceRepository repository)
+	public DebugHandler(MonoBehaviour root, SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
 	{
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;

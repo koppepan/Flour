@@ -1,5 +1,15 @@
 using Flour;
 
+public enum LayerType
+{
+	Back = 10,
+	Middle = 11,
+	Front = 12,
+	System = 13,
+
+	Debug = 100,
+}
+
 public enum SubLayerType
 {
 	[Japanease("")] None,

@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Flour.Layer
 {
-	internal sealed class SubLayerList<TKey> where TKey : struct
+	internal sealed class SubLayerList<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
-		List<AbstractSubLayer<TKey>> subLayers = new List<AbstractSubLayer<TKey>>();
+		List<AbstractSubLayer<TLayerKey, TSubKey>> subLayers = new List<AbstractSubLayer<TLayerKey, TSubKey>>();
 		UnityEngine.Transform subLayerParent;
 
 		public SubLayerList(UnityEngine.Transform subLayerParent)
@@ -22,7 +22,7 @@ namespace Flour.Layer
 			}
 		}
 
-		public void Add(AbstractSubLayer<TKey> layer)
+		public void Add(AbstractSubLayer<TLayerKey, TSubKey> layer)
 		{
 			subLayers.Add(layer);
 			layer.transform.SetParent(subLayerParent, false);
@@ -30,7 +30,7 @@ namespace Flour.Layer
 			ResetSiblingIndex();
 		}
 
-		public bool Remove(AbstractSubLayer<TKey> subLayer, bool reorder)
+		public bool Remove(AbstractSubLayer<TLayerKey, TSubKey> subLayer, bool reorder)
 		{
 			if (subLayers.Remove(subLayer))
 			{
@@ -43,24 +43,24 @@ namespace Flour.Layer
 			return false;
 		}
 
-		public int FindIndex(AbstractSubLayer<TKey> subLayer)
+		public int FindIndex(AbstractSubLayer<TLayerKey, TSubKey> subLayer)
 		{
 			return subLayers.LastIndexOf(subLayer);
 		}
 
-		public AbstractSubLayer<TKey> FirstOrDefault()
+		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault()
 		{
 			return subLayers.LastOrDefault();
 		}
-		public AbstractSubLayer<TKey> FirstOrDefault(TKey key)
+		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault(TSubKey key)
 		{
 			return FirstOrDefault(x => x.Key.Equals(key));
 		}
-		public AbstractSubLayer<TKey> FirstOrDefault(AbstractSubLayer<TKey> subLayer)
+		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault(AbstractSubLayer<TLayerKey, TSubKey> subLayer)
 		{
 			return FirstOrDefault(x => x == subLayer);
 		}
-		public AbstractSubLayer<TKey> FirstOrDefault(System.Func<AbstractSubLayer<TKey>, bool> func)
+		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault(System.Func<AbstractSubLayer<TLayerKey, TSubKey>, bool> func)
 		{
 			return subLayers.LastOrDefault(func);
 		}
