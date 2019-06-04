@@ -1,0 +1,17 @@
+{
+    "name": "Flour.Editor",
+    "references": [
+        "GUID:9635b7f1c95650e4b82251d99fb65b49"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
