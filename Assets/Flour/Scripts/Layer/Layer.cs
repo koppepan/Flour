@@ -3,19 +3,18 @@ using UnityEngine.UI;
 
 namespace Flour.Layer
 {
-	[RequireComponent(typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster))]
-	sealed internal class Layer<TKey>
+	sealed internal class Layer<TKey> where TKey : struct
 	{
 		public SubLayerList<TKey> List { get; private set; }
 
-		public Layer(Transform canvasRoot, LayerType layer, Vector2 referenceResolution, System.Action<LayerType, RectTransform> safeAreaReduction)
+		public Layer(Transform canvasRoot, LayerType layer, int sortingOrder, Vector2 referenceResolution, System.Action<LayerType, RectTransform> safeAreaReduction)
 		{
 			var obj = new GameObject(layer.ToString(), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
 			obj.transform.SetParent(canvasRoot, false);
 
 			var canvas = obj.GetComponent<Canvas>();
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			canvas.sortingOrder = (int)layer;
+			canvas.sortingOrder = sortingOrder;
 
 			var scaler = obj.GetComponent<CanvasScaler>();
 			scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;

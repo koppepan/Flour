@@ -5,7 +5,7 @@ using UniRx.Async;
 namespace Flour.Layer
 {
 	[RequireComponent(typeof(CanvasGroup))]
-	public abstract class AbstractSubLayer<TKey> : MonoBehaviour
+	public abstract class AbstractSubLayer<TKey> : MonoBehaviour where TKey : struct
 	{
 		public TKey Key { get; private set; }
 		private LayerType currentLayer;

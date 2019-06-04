@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Flour.Layer
 {
-	internal sealed class SubLayerList<TKey>
+	internal sealed class SubLayerList<TKey> where TKey : struct
 	{
 		List<AbstractSubLayer<TKey>> subLayers = new List<AbstractSubLayer<TKey>>();
 		UnityEngine.Transform subLayerParent;

@@ -19,37 +19,38 @@ namespace Flour.Layer
 
 	public sealed class LayerHandler<TKey> where TKey : struct
 	{
-		readonly LayerType[] layerOrder;
+		SortedList<int, LayerType> layerOrder = new SortedList<int, LayerType>();
 		readonly Dictionary<LayerType, Layer<TKey>> layers = new Dictionary<LayerType, Layer<TKey>>();
 
 		readonly SafeAreaHandler safeAreaHandler;
 
-		public LayerHandler(Transform canvasRoot, Vector2 referenceResolution, LayerType[] safeAreaLayers)
+		public LayerHandler()
 		{
-			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea, safeAreaLayers);
+			safeAreaHandler = new SafeAreaHandler(new Vector2(Screen.width, Screen.height), Screen.safeArea);
+		}
 
-			var layerTypes = Enum.GetValues(typeof(LayerType)).Cast<LayerType>().Where(x => x != LayerType.Debug);
-			foreach (var type in layerTypes)
+		public void AddLayer(LayerType layerType, int sortingOrder, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
+		{
+			if (safeArea)
 			{
-				layers.Add(type, CreateLayer(type, canvasRoot, referenceResolution, safeAreaLayers.Contains(type)));
+				safeAreaHandler.AddSafeLayer(layerType);
+			}
+			if (layers.ContainsKey(layerType))
+			{
+				throw new ArgumentException($"same key already exists. key => {layerType}");
 			}
 
-			layerOrder = layerTypes.Reverse().ToArray();
-		}
-		public void AddDebugLayer(Transform canvasRoot, Vector2 referenceResolution)
-		{
-			layers.Add(LayerType.Debug, CreateLayer(LayerType.Debug, canvasRoot, referenceResolution, false));
-		}
-
-		private Layer<TKey> CreateLayer(LayerType layerType, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
-		{
 			var reduction = safeArea ? safeAreaHandler.Reduction : (Action<LayerType, RectTransform>)null;
-			return new Layer<TKey>(canvasRoot, layerType, referenceResolution, reduction);
+			var layer = new Layer<TKey>(canvasRoot, layerType, sortingOrder, referenceResolution, reduction);
+
+			layers.Add(layerType, layer);
+
+			layerOrder.Add(sortingOrder, layerType);
 		}
 
 		public bool OnBack()
 		{
-			foreach (var layer in layerOrder)
+			foreach (var layer in layerOrder.Values.Reverse())
 			{
 				if (layers[layer].OnBack())
 				{
@@ -123,9 +124,9 @@ namespace Flour.Layer
 		}
 		public void RemoveAll()
 		{
-			for (int i = 0; i < layerOrder.Length; i++)
+			foreach (var layer in layerOrder.Values.Reverse())
 			{
-				while (Remove(layerOrder[i])) { }
+				while (Remove(layer)) { }
 			}
 		}
 		async UniTask Remove(AbstractSubLayer<TKey> subLayer)
