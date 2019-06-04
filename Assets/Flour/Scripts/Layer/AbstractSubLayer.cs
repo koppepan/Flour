@@ -4,36 +4,47 @@ using UniRx.Async;
 
 namespace Flour.Layer
 {
-	public abstract class AbstractSubLayer : MonoBehaviour
+	[RequireComponent(typeof(CanvasGroup))]
+	public abstract class AbstractSubLayer<TKey> : MonoBehaviour
 	{
-		public int SubLayerId { get; private set; }
-		public virtual bool IgnoreBack { get { return false; } }
-
+		public TKey Key { get; private set; }
 		private LayerType currentLayer;
 
-		private Action<LayerType, AbstractSubLayer> moveFront;
-		private Func<AbstractSubLayer, UniTask> onDestroy;
-
+		private Action<LayerType, AbstractSubLayer<TKey>> moveFront;
 		private Action<LayerType, RectTransform> safeAreaExpansion;
+		private Func<AbstractSubLayer<TKey>, UniTask> onDestroy;
 
-		internal void SetConstParameter(
-			LayerType layer,
-			int subLayerId,
-			Action<LayerType, AbstractSubLayer> moveFront,
-			Func<AbstractSubLayer, UniTask> onDestroy,
-			Action<LayerType, RectTransform> safeAreaExpansion)
+		public virtual bool IgnoreBack { get { return false; } }
+
+		private CanvasGroup _canvasGroup;
+		protected CanvasGroup CanvasGroup
 		{
-			currentLayer = layer;
-			SubLayerId = subLayerId;
-
-			this.moveFront = moveFront;
-			this.onDestroy = onDestroy;
-
-			this.safeAreaExpansion = safeAreaExpansion;
+			get
+			{
+				if (_canvasGroup == null)
+				{
+					_canvasGroup = GetComponent<CanvasGroup>();
+				}
+				return _canvasGroup;
+			}
 		}
 
-		public void MoveFront() => moveFront?.Invoke(currentLayer, this);
-		public void Close() => onDestroy?.Invoke(this);
+		internal void SetConstParameter(LayerType layerType, TKey key,
+			Action<LayerType, AbstractSubLayer<TKey>> moveFront,
+			Action<LayerType, RectTransform> safeAreaExpansion,
+			Func<AbstractSubLayer<TKey>, UniTask> onDestroy
+			)
+		{
+			currentLayer = layerType;
+			Key = key;
+
+			this.moveFront = moveFront;
+			this.safeAreaExpansion = safeAreaExpansion;
+			this.onDestroy = onDestroy;
+		}
+
+		public void MoveFront() => moveFront(currentLayer, this);
+		public void Close() => onDestroy(this);
 
 		internal void OnOpenInternal() => OnOpen();
 		internal async UniTask OnCloseInternal() => await OnClose();
@@ -49,7 +60,7 @@ namespace Flour.Layer
 		protected virtual void OnBack() { }
 		protected virtual void OnChangeSiblingIndex(int index) { }
 
-		protected void SafeAreaExpansion() => safeAreaExpansion?.Invoke(currentLayer, GetComponent<RectTransform>());
-		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion?.Invoke(currentLayer, rect);
+		protected void SafeAreaExpansion() => SafeAreaExpansion(GetComponent<RectTransform>());
+		protected void SafeAreaExpansion(RectTransform rect) => safeAreaExpansion(currentLayer, rect);
 	}
 }

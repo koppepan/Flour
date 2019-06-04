@@ -17,10 +17,10 @@ namespace Flour.Layer
 		Debug = 100,
 	}
 
-	public sealed class LayerHandler
+	public sealed class LayerHandler<TKey> where TKey : struct
 	{
 		readonly LayerType[] layerOrder;
-		readonly Dictionary<LayerType, Layer> layers = new Dictionary<LayerType, Layer>();
+		readonly Dictionary<LayerType, Layer<TKey>> layers = new Dictionary<LayerType, Layer<TKey>>();
 
 		readonly SafeAreaHandler safeAreaHandler;
 
@@ -41,15 +41,10 @@ namespace Flour.Layer
 			layers.Add(LayerType.Debug, CreateLayer(LayerType.Debug, canvasRoot, referenceResolution, false));
 		}
 
-		private Layer CreateLayer(LayerType layerType, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
+		private Layer<TKey> CreateLayer(LayerType layerType, Transform canvasRoot, Vector2 referenceResolution, bool safeArea)
 		{
-			var layer = new GameObject(layerType.ToString(), typeof(Layer)).GetComponent<Layer>();
-			layer.transform.SetParent(canvasRoot);
-
 			var reduction = safeArea ? safeAreaHandler.Reduction : (Action<LayerType, RectTransform>)null;
-			layer.Initialize(layerType, referenceResolution, reduction);
-
-			return layer;
+			return new Layer<TKey>(canvasRoot, layerType, referenceResolution, reduction);
 		}
 
 		public bool OnBack()
@@ -64,7 +59,7 @@ namespace Flour.Layer
 			return false;
 		}
 
-		private Layer GetLayer(LayerType layerType)
+		private Layer<TKey> GetLayer(LayerType layerType)
 		{
 			if (!layers.ContainsKey(layerType))
 			{
@@ -73,10 +68,10 @@ namespace Flour.Layer
 			return layers[layerType];
 		}
 
-		public T Get<T>(LayerType layerType, int subLayerId) where T : AbstractSubLayer
+		public T Get<T>(LayerType layerType, TKey key) where T : AbstractSubLayer<TKey>
 		{
 			var layer = GetLayer(layerType);
-			var old = layer.List.FirstOrDefault(subLayerId);
+			var old = layer.List.FirstOrDefault(key);
 
 			if (old == null)
 			{
@@ -96,24 +91,24 @@ namespace Flour.Layer
 			return (T)old;
 		}
 
-		public T Add<T>(LayerType layerType, int subLayerId, T prefab, bool overlap) where T : AbstractSubLayer
+		public T Add<T>(LayerType layerType, TKey key, T prefab, bool overlap) where T : AbstractSubLayer<TKey>
 		{
 			var layer = GetLayer(layerType);
-			var old = layer.List.FirstOrDefault(subLayerId);
+			var old = layer.List.FirstOrDefault(key);
 
 			if (!overlap && old != null)
 			{
-				throw new ArgumentException($"same SubLayer already exists. ID => {subLayerId}");
+				throw new ArgumentException($"same key already exists. key => {key}");
 			}
 
 			var sub = GameObject.Instantiate(prefab);
-			sub.SetConstParameter(layerType, subLayerId, MoveFront, Remove, safeAreaHandler.Expansion);
+			sub.SetConstParameter(layerType, key, MoveFront, safeAreaHandler.Expansion, Remove);
 			sub.OnOpenInternal();
 			layer.List.Add(sub);
 			return sub;
 		}
 
-		void MoveFront(LayerType layerType, AbstractSubLayer subLayer)
+		void MoveFront(LayerType layerType, AbstractSubLayer<TKey> subLayer)
 		{
 			var layer = GetLayer(layerType);
 			layer.List.Remove(subLayer, false);
@@ -133,7 +128,7 @@ namespace Flour.Layer
 				while (Remove(layerOrder[i])) { }
 			}
 		}
-		async UniTask Remove(AbstractSubLayer subLayer)
+		async UniTask Remove(AbstractSubLayer<TKey> subLayer)
 		{
 			if (subLayer == null)
 			{

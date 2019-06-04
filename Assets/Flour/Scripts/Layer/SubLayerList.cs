@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Flour.Layer
 {
-	internal sealed class SubLayerList
+	internal sealed class SubLayerList<TKey>
 	{
-		List<AbstractSubLayer> subLayers = new List<AbstractSubLayer>();
+		List<AbstractSubLayer<TKey>> subLayers = new List<AbstractSubLayer<TKey>>();
 		UnityEngine.Transform subLayerParent;
 
 		public SubLayerList(UnityEngine.Transform subLayerParent)
@@ -22,7 +22,7 @@ namespace Flour.Layer
 			}
 		}
 
-		public void Add(AbstractSubLayer layer)
+		public void Add(AbstractSubLayer<TKey> layer)
 		{
 			subLayers.Add(layer);
 			layer.transform.SetParent(subLayerParent, false);
@@ -30,7 +30,7 @@ namespace Flour.Layer
 			ResetSiblingIndex();
 		}
 
-		public bool Remove(AbstractSubLayer subLayer, bool reorder)
+		public bool Remove(AbstractSubLayer<TKey> subLayer, bool reorder)
 		{
 			if (subLayers.Remove(subLayer))
 			{
@@ -43,24 +43,24 @@ namespace Flour.Layer
 			return false;
 		}
 
-		public int FindIndex(AbstractSubLayer subLayer)
+		public int FindIndex(AbstractSubLayer<TKey> subLayer)
 		{
 			return subLayers.LastIndexOf(subLayer);
 		}
 
-		public AbstractSubLayer FirstOrDefault()
+		public AbstractSubLayer<TKey> FirstOrDefault()
 		{
 			return subLayers.LastOrDefault();
 		}
-		public AbstractSubLayer FirstOrDefault(int id)
+		public AbstractSubLayer<TKey> FirstOrDefault(TKey key)
 		{
-			return FirstOrDefault(x => x.SubLayerId == id);
+			return FirstOrDefault(x => x.Key.Equals(key));
 		}
-		public AbstractSubLayer FirstOrDefault(AbstractSubLayer subLayer)
+		public AbstractSubLayer<TKey> FirstOrDefault(AbstractSubLayer<TKey> subLayer)
 		{
 			return FirstOrDefault(x => x == subLayer);
 		}
-		public AbstractSubLayer FirstOrDefault(System.Func<AbstractSubLayer, bool> func)
+		public AbstractSubLayer<TKey> FirstOrDefault(System.Func<AbstractSubLayer<TKey>, bool> func)
 		{
 			return subLayers.LastOrDefault(func);
 		}
