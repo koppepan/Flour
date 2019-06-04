@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UniRx.Async;
-using Flour.Layer;
 
 public class TitleScene : AbstractScene
 {

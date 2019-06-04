@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-public class SaveData : System.IDisposable
+public sealed class SaveData : System.IDisposable
 {
 	public enum Key
 	{

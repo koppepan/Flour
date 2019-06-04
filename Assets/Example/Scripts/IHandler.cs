@@ -3,7 +3,10 @@
 public interface IOperationBundler
 {
 	void ApplicationQuit();
+
 	SaveData SaveData { get; }
+	TemporaryData TemporaryData { get; }
+
 	IInputBinder InputBinder { get; }
 	ISceneHandler SceneHandler { get; }
 	ILayerHandler LayerHandler { get; }

@@ -24,7 +24,9 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	readonly SceneHandler sceneHandler;
 	readonly LayerHandler layerHandler;
 
-	public SaveData SaveData { get; private set; }
+	public SaveData SaveData { get; private set; } = new SaveData();
+	public TemporaryData TemporaryData { get; private set; } = new TemporaryData();
+
 	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
@@ -42,13 +44,12 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 
 		this.sceneHandler = sceneHandler;
 		this.layerHandler = layerHandler;
-
-		SaveData = new SaveData();
 	}
 
 	public void Dispose()
 	{
 		SaveData.Dispose();
+		TemporaryData.Dispose();
 	}
 
 	public void ApplicationPause(bool pause) => sceneHandler.ApplicationPause(pause);

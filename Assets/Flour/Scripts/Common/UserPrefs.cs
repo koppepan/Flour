@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
+
 using UnityEngine;
 
 namespace Flour
@@ -109,45 +107,6 @@ namespace Flour
 			}
 			var str = PlayerPrefs.GetString(GetKey(key), "");
 			return serializer.Deserialize<T>(str);
-		}
-
-
-		private class DataSerializer
-		{
-			readonly BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-			public string Serialize<T>(T obj)
-			{
-				using (var stream = new MemoryStream())
-				{
-					try
-					{
-						binaryFormatter.Serialize(stream, obj);
-						return Convert.ToBase64String(stream.GetBuffer());
-					}
-					catch (SerializationException e)
-					{
-						Debug.LogError($"Failed to serialize. Reason: {e.Message}");
-						return string.Empty;
-					}
-				}
-			}
-
-			public T Deserialize<T>(string str)
-			{
-				using (var memory = new MemoryStream(Convert.FromBase64String(str)))
-				{
-					try
-					{
-						return (T)binaryFormatter.Deserialize(memory);
-					}
-					catch (SerializationException e)
-					{
-						Debug.LogError($"Failed to deserialize. Reason: {e.Message}");
-						return default(T);
-					}
-				}
-			}
 		}
 	}
 }
