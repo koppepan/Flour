@@ -46,7 +46,7 @@ namespace Flour
 		}
 		public void DeleteUser(string userKey)
 		{
-			foreach (var key in Enum.GetValues(typeof(TKey)).Cast<TKey>())
+			foreach (var key in EnumExtension.ToEnumerable<TKey>())
 			{
 				DeleteKey(key);
 			}
