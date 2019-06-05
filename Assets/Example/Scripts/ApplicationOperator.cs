@@ -130,9 +130,13 @@ namespace Example
 		{
 			InputBinder.Bind();
 
-			T sub = !overlap ? layerHandler.Get<T>(layer, subLayer) : null;
+			T sub = !overlap ? layerHandler.GetFirst<T>(layer, subLayer) : null;
 
-			if (sub == null)
+			if (sub != null)
+			{
+				sub.MoveFront();
+			}
+			else
 			{
 				var prefab = await SubLayerPrefabLoadAsync<T>(subLayer);
 				sub = layerHandler.Add(layer, subLayer, prefab, overlap);

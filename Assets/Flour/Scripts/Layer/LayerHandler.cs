@@ -59,27 +59,16 @@ namespace Flour.Layer
 			return layers[layerType];
 		}
 
-		public T Get<T>(TLayerKey layerType, TSubKey key) where T : AbstractSubLayer<TLayerKey, TSubKey>
+		public T GetFirst<T>(TLayerKey layerKey, TSubKey subKey) where T : AbstractSubLayer<TLayerKey, TSubKey>
+		{
+			var layer = GetLayer(layerKey);
+			return (T)layer.List.FirstOrDefault(subKey);
+		}
+
+		public IEnumerable<T> Get<T>(TLayerKey layerType, TSubKey key) where T : AbstractSubLayer<TLayerKey, TSubKey>
 		{
 			var layer = GetLayer(layerType);
-			var old = layer.List.FirstOrDefault(key);
-
-			if (old == null)
-			{
-				return null;
-			}
-
-			// 既に同じSubLayerが存在する
-			// すでに存在していて一番前にある
-			if (layer.List.FindIndex(old) == 0)
-			{
-				return (T)old;
-			}
-
-			// 一番前に来るように詰めなおして返す
-			layer.List.Remove(old, false);
-			layer.List.Add(old);
-			return (T)old;
+			return layer.List.Find(key).Select(x => (T)x);
 		}
 
 		public T Add<T>(TLayerKey layerType, TSubKey key, T prefab, bool overlap) where T : AbstractSubLayer<TLayerKey, TSubKey>
@@ -102,6 +91,12 @@ namespace Flour.Layer
 		void MoveFront(TLayerKey layerType, AbstractSubLayer<TLayerKey, TSubKey> subLayer)
 		{
 			var layer = GetLayer(layerType);
+
+			if (layer.List.FindIndex(subLayer) == 0)
+			{
+				return;
+			}
+
 			layer.List.Remove(subLayer, false);
 			layer.List.Add(subLayer);
 		}

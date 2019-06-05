@@ -48,6 +48,17 @@ namespace Flour.Layer
 			return subLayers.LastIndexOf(subLayer);
 		}
 
+		public IEnumerable<AbstractSubLayer<TLayerKey, TSubKey>> Find(TSubKey key)
+		{
+			for (int i = subLayers.Count - 1; i >= 0; i--)
+			{
+				if (subLayers[i].Key.Equals(key))
+				{
+					yield return subLayers[i];
+				}
+			}
+		}
+
 		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault()
 		{
 			return subLayers.LastOrDefault();
@@ -55,10 +66,6 @@ namespace Flour.Layer
 		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault(TSubKey key)
 		{
 			return FirstOrDefault(x => x.Key.Equals(key));
-		}
-		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault(AbstractSubLayer<TLayerKey, TSubKey> subLayer)
-		{
-			return FirstOrDefault(x => x == subLayer);
 		}
 		public AbstractSubLayer<TLayerKey, TSubKey> FirstOrDefault(System.Func<AbstractSubLayer<TLayerKey, TSubKey>, bool> func)
 		{
