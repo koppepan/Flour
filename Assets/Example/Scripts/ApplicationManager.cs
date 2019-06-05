@@ -44,10 +44,11 @@ namespace Example
 			var sceneHandler = new SceneHandler();
 			var layerHandler = new LayerHandler();
 
-			var types = new LayerType[] { LayerType.Back, LayerType.Middle, LayerType.Front, LayerType.System };
-			for (int i = 0; i < types.Length; i++)
+			var types = Enum.GetValues(typeof(LayerType)).Cast<LayerType>().Where(x => x != LayerType.Debug);
+			foreach (var t in types)
 			{
-				layerHandler.AddLayer(types[i], types[i].ToOrder(), canvasRoot, referenceResolution, safeAreaLayers.Contains(types[i]));
+				var safeArea = safeAreaLayers.Contains(t);
+				layerHandler.AddLayer(t, t.ToOrder(), canvasRoot, referenceResolution, safeArea);
 			}
 
 #if DEBUG_BUILD
