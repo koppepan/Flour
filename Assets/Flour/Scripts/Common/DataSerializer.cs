@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Flour
 {
-	public class DataSerializer
+	internal sealed class DataSerializer
 	{
 		readonly BinaryFormatter binaryFormatter = new BinaryFormatter();
 
