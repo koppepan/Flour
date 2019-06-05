@@ -97,22 +97,22 @@ namespace Flour
 		public bool GetBoolean(string section, string key)
 		{
 			var val = GetValue(section, key);
-			return bool.TryParse(val, out bool ret) ? ret : default;
+			return bool.TryParse(val, out bool ret) ? ret : default(bool);
 		}
 		public int GetInt(string section, string key)
 		{
 			var val = GetValue(section, key);
-			return int.TryParse(val, out int ret) ? ret : default;
+			return int.TryParse(val, out int ret) ? ret : default(int);
 		}
 		public float GetFloat(string section, string key)
 		{
 			var val = GetValue(section, key);
-			return float.TryParse(val, out float ret) ? ret : default;
+			return float.TryParse(val, out float ret) ? ret : default(float);
 		}
 		public double GetDouble(string section, string key)
 		{
 			var val = GetValue(section, key);
-			return double.TryParse(val, out double ret) ? ret : default;
+			return double.TryParse(val, out double ret) ? ret : default(double);
 		}
 	}
 }
