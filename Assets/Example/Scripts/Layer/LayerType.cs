@@ -1,43 +1,46 @@
 using Flour;
 
-public abstract class AbstractSubLayer : Flour.Layer.AbstractSubLayer<LayerType, SubLayerType> { }
-
-public enum LayerType
+namespace Example
 {
-	[Int(10)] Back = 10,
-	[Int(11)] Middle = 11,
-	[Int(12)] Front = 12,
-	[Int(13)] System = 13,
+	public abstract class AbstractSubLayer : Flour.Layer.AbstractSubLayer<LayerType, SubLayerType> { }
 
-	[Int(100)] Debug = 100,
-}
+	public enum LayerType
+	{
+		[Int(10)] Back = 10,
+		[Int(11)] Middle = 11,
+		[Int(12)] Front = 12,
+		[Int(13)] System = 13,
 
-public static class LayerTypeExtention
-{
-	static readonly AttributeCache<LayerType, int> cache = new AttributeCache<LayerType, int>();
-	public static int ToOrder(this LayerType type) => cache[type];
-}
+		[Int(100)] Debug = 100,
+	}
 
-public enum SubLayerType
-{
-	[Japanease("")] None,
-	[Japanease("Blackout")] Blackout,
+	public static class LayerTypeExtention
+	{
+		static readonly AttributeCache<LayerType, int> cache = new AttributeCache<LayerType, int>();
+		public static int ToOrder(this LayerType type) => cache[type];
+	}
 
-	[Japanease("Splash")] Splash,
-	[Japanease("Title")] Title,
+	public enum SubLayerType
+	{
+		[Japanease("")] None,
+		[Japanease("Blackout")] Blackout,
 
-	[Japanease("Footer")] Footer,
-	[Japanease("Sample1")] Sample1,
-	[Japanease("Sample2")] Sample2,
-	[Japanease("Sample3")] Sample3,
-	[Japanease("Sample4")] Sample4,
+		[Japanease("Splash")] Splash,
+		[Japanease("Title")] Title,
+
+		[Japanease("Footer")] Footer,
+		[Japanease("Sample1")] Sample1,
+		[Japanease("Sample2")] Sample2,
+		[Japanease("Sample3")] Sample3,
+		[Japanease("Sample4")] Sample4,
 
 
-	[Japanease("Debug/DebugDialog")] DebugDialog,
-}
+		[Japanease("Debug/DebugDialog")] DebugDialog,
+	}
 
-public static class SubLayerTypeExtention
-{
-	static readonly AttributeCache<SubLayerType, string> cache = new AttributeCache<SubLayerType, string>();
-	public static string ToResourcePath(this SubLayerType type) => cache[type];
+	public static class SubLayerTypeExtention
+	{
+		static readonly AttributeCache<SubLayerType, string> cache = new AttributeCache<SubLayerType, string>();
+		public static string ToResourcePath(this SubLayerType type) => cache[type];
+	}
 }

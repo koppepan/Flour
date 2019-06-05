@@ -1,21 +1,23 @@
 ﻿using UniRx.Async;
-using UnityEngine;
 
-public class OutGameScene : AbstractScene
+namespace Example
 {
-	Footer footer;
-	public override async UniTask Load(params object[] args)
+	public class OutGameScene : AbstractScene
 	{
-		footer = new Footer(InputBinder, LayerHandler);
-		await footer.Open();
-	}
-	public override void Unload()
-	{
-		footer.Close();
-	}
+		Footer footer;
+		public override async UniTask Load(params object[] args)
+		{
+			footer = new Footer(InputBinder, LayerHandler);
+			await footer.Open();
+		}
+		public override void Unload()
+		{
+			footer.Close();
+		}
 
-	public override void OnBack()
-	{
-		SceneHandler.LoadSceneAsync(SceneType.Title);
+		public override void OnBack()
+		{
+			SceneHandler.LoadSceneAsync(SceneType.Title);
+		}
 	}
 }

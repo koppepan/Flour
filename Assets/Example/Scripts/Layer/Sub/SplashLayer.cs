@@ -1,13 +1,16 @@
 ﻿using UniRx.Async;
 
-public class SplashLayer : AbstractSubLayer
+namespace Example
 {
-	public async UniTask Run()
+	public class SplashLayer : AbstractSubLayer
 	{
-		CanvasGroup.alpha = 0;
-		LeanTween.alphaCanvas(CanvasGroup, 1, 0.5f);
-		await UniTask.Delay(2000);
-		LeanTween.alphaCanvas(CanvasGroup, 0, 0.5f);
-		await UniTask.Delay(500);
+		public async UniTask Run()
+		{
+			CanvasGroup.alpha = 0;
+			LeanTween.alphaCanvas(CanvasGroup, 1, 0.5f);
+			await UniTask.Delay(2000);
+			LeanTween.alphaCanvas(CanvasGroup, 0, 0.5f);
+			await UniTask.Delay(500);
+		}
 	}
 }

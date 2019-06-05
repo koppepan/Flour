@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Button))]
-public class DebugButton : MonoBehaviour
+namespace Example
 {
-	[SerializeField]
-	private Text titleText = default;
-
-	public void Setup(string title, System.Action onClick)
+	[RequireComponent(typeof(Button))]
+	public class DebugButton : MonoBehaviour
 	{
-		titleText.text = title;
-		GetComponent<Button>().onClick.AddListener(() => onClick?.Invoke());
+		[SerializeField]
+		private Text titleText = default;
+
+		public void Setup(string title, System.Action onClick)
+		{
+			titleText.text = title;
+			GetComponent<Button>().onClick.AddListener(() => onClick?.Invoke());
+		}
 	}
 }

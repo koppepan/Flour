@@ -1,15 +1,18 @@
 ﻿
-public class FooterSubLayer : AbstractSubLayer
+namespace Example
 {
-	System.Action onClose;
-
-	public void Setup(System.Action onClose)
+	public class FooterSubLayer : AbstractSubLayer
 	{
-		this.onClose = onClose;
-	}
+		System.Action onClose;
 
-	protected override void OnBack()
-	{
-		onClose?.Invoke();
+		public void Setup(System.Action onClose)
+		{
+			this.onClose = onClose;
+		}
+
+		protected override void OnBack()
+		{
+			onClose?.Invoke();
+		}
 	}
 }

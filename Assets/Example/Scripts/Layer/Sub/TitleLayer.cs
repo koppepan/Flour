@@ -1,19 +1,22 @@
 ﻿using UnityEngine;
 
-class TitleLayer : AbstractSubLayer
+namespace Example
 {
-	[SerializeField]
-	UnityEngine.UI.Button button;
-
-	public override bool IgnoreBack => true;
-
-	System.Action onClick;
-	public void Setup(System.Action onClick)
+	class TitleLayer : AbstractSubLayer
 	{
-		this.onClick = onClick;
-	}
-	protected override void OnOpen()
-	{
-		button.onClick.AddListener(() => onClick?.Invoke());
+		[SerializeField]
+		UnityEngine.UI.Button button;
+
+		public override bool IgnoreBack => true;
+
+		System.Action onClick;
+		public void Setup(System.Action onClick)
+		{
+			this.onClick = onClick;
+		}
+		protected override void OnOpen()
+		{
+			button.onClick.AddListener(() => onClick?.Invoke());
+		}
 	}
 }

@@ -3,64 +3,68 @@ using UnityEngine;
 using UniRx;
 using UniRx.Async;
 
-using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
-using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
-
-public class DebugHandler
+namespace Example
 {
-	readonly SceneHandler sceneHandler;
-	readonly LayerHandler layerHandler;
+	using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
+	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
-	readonly SubLayerSourceRepository repository;
-
-	public DebugHandler(MonoBehaviour root, SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
+	public class DebugHandler
 	{
-		this.sceneHandler = sceneHandler;
-		this.layerHandler = layerHandler;
+		readonly SceneHandler sceneHandler;
+		readonly LayerHandler layerHandler;
 
-		this.repository = repository;
+		readonly SubLayerSourceRepository repository;
 
-#if UNITY_EDITOR
-		var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
-		var mouseUpStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonUp(1));
-#else
-		var mouseDownStream = Observable.EveryUpdate().Select(_ => Input.touchCount).Pairwise().Where(pair => pair.Current >= 3 && pair.Previous < 3);
-		var mouseUpStream = Observable.EveryUpdate().Select(_ => Input.touchCount).Pairwise().Where(pair => pair.Current < 3 && pair.Previous >= 3);
-#endif
-
-		mouseDownStream
-			.SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(1)))
-			.TakeUntil(mouseUpStream)
-			.RepeatUntilDestroy(root)
-#if UNITY_EDITOR
-			.Subscribe(_ => OpenDialog(Input.mousePosition))
-#else
-			.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
-#endif
-			.AddTo(root);
-	}
-
-	private async UniTask<DebugDialog> Open(string title, Vector2 position)
-	{
-		var prefab = await repository.LoadAsync<DebugDialog>(SubLayerType.DebugDialog);
-
-		var dialog = layerHandler.Add(LayerType.Debug, SubLayerType.DebugDialog, prefab, true);
-		if (dialog != null)
+		public DebugHandler(MonoBehaviour root, SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
 		{
-			dialog.Setup(title, Open);
-			dialog.transform.position = position;
+			this.sceneHandler = sceneHandler;
+			this.layerHandler = layerHandler;
+
+			this.repository = repository;
+
+#if UNITY_EDITOR
+			var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
+			var mouseUpStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonUp(1));
+#else
+			var mouseDownStream = Observable.EveryUpdate().Select(_ => Input.touchCount).Pairwise().Where(pair => pair.Current >= 3 && pair.Previous < 3);
+			var mouseUpStream = Observable.EveryUpdate().Select(_ => Input.touchCount).Pairwise().Where(pair => pair.Current < 3 && pair.Previous >= 3);
+#endif
+
+			mouseDownStream
+				.SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(1)))
+				.TakeUntil(mouseUpStream)
+				.RepeatUntilDestroy(root)
+#if UNITY_EDITOR
+				.Subscribe(_ => OpenDialog(Input.mousePosition))
+#else
+				.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
+#endif
+				.AddTo(root);
 		}
-		return dialog;
-	}
 
-	private async void OpenDialog(Vector2 position)
-	{
-		var dialog = await Open("debug", position);
-
-		((AbstractScene)sceneHandler.CurrentScene).OpenDebugDialog(dialog);
-		foreach (var s in sceneHandler.AdditiveScenes)
+		private async UniTask<DebugDialog> Open(string title, Vector2 position)
 		{
-			((AbstractScene)s).OpenDebugDialog(dialog);
+			var prefab = await repository.LoadAsync<DebugDialog>(SubLayerType.DebugDialog);
+
+			var dialog = layerHandler.Add(LayerType.Debug, SubLayerType.DebugDialog, prefab, true);
+			if (dialog != null)
+			{
+				dialog.Setup(title, Open);
+				dialog.transform.position = position;
+			}
+			return dialog;
+		}
+
+		private async void OpenDialog(Vector2 position)
+		{
+			var dialog = await Open("debug", position);
+
+			((AbstractScene)sceneHandler.CurrentScene).OpenDebugDialog(dialog);
+			foreach (var s in sceneHandler.AdditiveScenes)
+			{
+				((AbstractScene)s).OpenDebugDialog(dialog);
+			}
 		}
 	}
 }
+

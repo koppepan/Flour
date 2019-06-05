@@ -2,36 +2,39 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FooterLayer : AbstractSubLayer
+namespace Example
 {
-	public override bool IgnoreBack => true;
-
-	[SerializeField]
-	Button sample1Button = default;
-	[SerializeField]
-	Button sample2Button = default;
-	[SerializeField]
-	Button sample3Button = default;
-	[SerializeField]
-	Button sample4Button = default;
-
-	Action<SubLayerType> onSelect;
-
-	public void Setup(Action<SubLayerType> onSelect)
+	public class FooterLayer : AbstractSubLayer
 	{
-		this.onSelect = onSelect;
-	}
+		public override bool IgnoreBack => true;
 
-	protected override void OnOpen()
-	{
-		sample1Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample1));
-		sample2Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample2));
-		sample3Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample3));
-		sample4Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample4));
-	}
+		[SerializeField]
+		Button sample1Button = default;
+		[SerializeField]
+		Button sample2Button = default;
+		[SerializeField]
+		Button sample3Button = default;
+		[SerializeField]
+		Button sample4Button = default;
 
-	void OpenSubLayer(SubLayerType type)
-	{
-		onSelect?.Invoke(type);
+		Action<SubLayerType> onSelect;
+
+		public void Setup(Action<SubLayerType> onSelect)
+		{
+			this.onSelect = onSelect;
+		}
+
+		protected override void OnOpen()
+		{
+			sample1Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample1));
+			sample2Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample2));
+			sample3Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample3));
+			sample4Button.onClick.AddListener(() => OpenSubLayer(SubLayerType.Sample4));
+		}
+
+		void OpenSubLayer(SubLayerType type)
+		{
+			onSelect?.Invoke(type);
+		}
 	}
 }

@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
-public class InGameScene : AbstractScene
+namespace Example
 {
+	public class InGameScene : AbstractScene
+	{
+	}
 }

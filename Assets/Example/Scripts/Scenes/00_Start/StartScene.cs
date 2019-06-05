@@ -1,22 +1,25 @@
 ﻿using UniRx.Async;
 
-public class StartScene : AbstractScene
+namespace Example
 {
-	SplashLayer splash;
-
-	public override async UniTask Load(params object[] args)
+	public class StartScene : AbstractScene
 	{
-		splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
-		await splash.Run();
-	}
+		SplashLayer splash;
 
-	public override void Open()
-	{
-		SceneHandler.LoadSceneAsync(SceneType.Title);
-	}
+		public override async UniTask Load(params object[] args)
+		{
+			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
+			await splash.Run();
+		}
 
-	public override void Unload()
-	{
-		splash.Close();
+		public override void Open()
+		{
+			SceneHandler.LoadSceneAsync(SceneType.Title);
+		}
+
+		public override void Unload()
+		{
+			splash.Close();
+		}
 	}
 }

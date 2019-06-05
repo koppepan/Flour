@@ -1,8 +1,11 @@
 ﻿
-public enum SaveKey
+namespace Example
 {
-}
+	public enum SaveKey
+	{
+	}
 
-public enum TemporaryKey
-{
+	public enum TemporaryKey
+	{
+	}
 }

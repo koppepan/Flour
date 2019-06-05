@@ -1,26 +1,28 @@
-﻿using UnityEngine;
-using UniRx.Async;
+﻿using UniRx.Async;
 
-public class TitleScene : AbstractScene
+namespace Example
 {
-	TitleLayer titleLayer;
-	public override async UniTask Load(params object[] param)
+	public class TitleScene : AbstractScene
 	{
-		titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
-		titleLayer.Setup(GotoOutGame);
-	}
-	public override void Unload()
-	{
-		titleLayer.Close();
-	}
+		TitleLayer titleLayer;
+		public override async UniTask Load(params object[] param)
+		{
+			titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
+			titleLayer.Setup(GotoOutGame);
+		}
+		public override void Unload()
+		{
+			titleLayer.Close();
+		}
 
-	public override void OnBack()
-	{
-		AppOperator.ApplicationQuit();
-	}
+		public override void OnBack()
+		{
+			AppOperator.ApplicationQuit();
+		}
 
-	private void GotoOutGame()
-	{
-		SceneHandler.LoadSceneAsync(SceneType.OutGame);
+		private void GotoOutGame()
+		{
+			SceneHandler.LoadSceneAsync(SceneType.OutGame);
+		}
 	}
 }

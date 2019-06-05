@@ -4,64 +4,67 @@ using UnityEngine;
 using UniRx;
 using UniRx.Async;
 
-public sealed class SubLayerSourceRepository
+namespace Example
 {
-	List<SubLayerType> keys = new List<SubLayerType>();
-	Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
-
-	int maxCache;
-
-	public SubLayerSourceRepository(int maxCache)
+	public sealed class SubLayerSourceRepository
 	{
-		this.maxCache = maxCache == 0 ? 1 : maxCache;
-		keys.Clear();
-	}
+		List<SubLayerType> keys = new List<SubLayerType>();
+		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
-	public void AddType(SubLayerType key)
-	{
-		if (!keys.Contains(key))
+		int maxCache;
+
+		public SubLayerSourceRepository(int maxCache)
 		{
-			keys.Add(key);
+			this.maxCache = maxCache == 0 ? 1 : maxCache;
+			keys.Clear();
 		}
-	}
 
-	public bool ContainsKey(SubLayerType type)
-	{
-		return keys.Contains(type);
-	}
-
-	public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
-	{
-		if (!keys.Contains(type))
+		public void AddType(SubLayerType key)
 		{
-			Debug.LogWarning(type.ToString() + " : missing source path.");
-			return null;
+			if (!keys.Contains(key))
+			{
+				keys.Add(key);
+			}
 		}
-		if (srcCaches.ContainsKey(type))
+
+		public bool ContainsKey(SubLayerType type)
 		{
-			var cache = srcCaches[type];
-			srcCaches.Remove(type);
-			srcCaches.Add(type, cache);
+			return keys.Contains(type);
+		}
+
+		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
+		{
+			if (!keys.Contains(type))
+			{
+				Debug.LogWarning(type.ToString() + " : missing source path.");
+				return null;
+			}
+			if (srcCaches.ContainsKey(type))
+			{
+				var cache = srcCaches[type];
+				srcCaches.Remove(type);
+				srcCaches.Add(type, cache);
+				return (T)srcCaches[type];
+			}
+
+			var prefab = await Resources.LoadAsync<GameObject>(type.ToResourcePath());
+
+			if (prefab == null)
+			{
+				Debug.LogWarning(type.ToString() + " : not found resource.");
+				return null;
+			}
+			srcCaches.Add(type, ((GameObject)prefab).GetComponent<AbstractSubLayer>());
+
+			if (srcCaches.Count > maxCache)
+			{
+				var remove = srcCaches.FirstOrDefault(x => x.Key != type);
+				srcCaches.Remove(remove.Key);
+				remove = default;
+				await Resources.UnloadUnusedAssets();
+			}
+
 			return (T)srcCaches[type];
 		}
-
-		var prefab = await Resources.LoadAsync<GameObject>(type.ToResourcePath());
-
-		if (prefab == null)
-		{
-			Debug.LogWarning(type.ToString() + " : not found resource.");
-			return null;
-		}
-		srcCaches.Add(type, ((GameObject)prefab).GetComponent<AbstractSubLayer>());
-
-		if (srcCaches.Count > maxCache)
-		{
-			var remove = srcCaches.FirstOrDefault(x => x.Key != type);
-			srcCaches.Remove(remove.Key);
-			remove = default;
-			await Resources.UnloadUnusedAssets();
-		}
-
-		return (T)srcCaches[type];
 	}
 }
