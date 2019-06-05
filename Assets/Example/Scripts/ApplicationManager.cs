@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 using UniRx;
-using UniRx.Async;
 
 using Flour;
 
@@ -38,25 +37,25 @@ namespace Example
 
 		async void Start()
 		{
-			var configLoader = new ConfigLoader();
-			var repositories = await configLoader.LoadLayerSourceRepositories(FixedSubLayers);
-
 			var sceneHandler = new SceneHandler();
 			var layerHandler = new LayerHandler();
 
-			var types = Enum.GetValues(typeof(LayerType)).Cast<LayerType>().Where(x => x != LayerType.Debug);
-			foreach (var t in types)
+			foreach (var t in EnumExtension.ToEnumerable<LayerType>(x => LayerType.Debug != x))
 			{
 				var safeArea = safeAreaLayers.Contains(t);
 				layerHandler.AddLayer(t, t.ToOrder(), canvasRoot, referenceResolution, safeArea);
 			}
 
-#if DEBUG_BUILD
-			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
-			debugHandler = new DebugHandler(this, sceneHandler, layerHandler, configLoader.CreateDebugSorceRepository());
-#endif
+			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
+			await fixedRepository.LoadAllAsync();
 
-			appOperator = new ApplicationOperator(ApplicationQuit, sceneHandler, layerHandler, repositories);
+			appOperator = new ApplicationOperator(
+				ApplicationQuit,
+				sceneHandler,
+				layerHandler,
+				SubLayerSourceRepository.Create(EnumExtension.ToEnumerable<SubLayerType>(x => !FixedSubLayers.Contains(x)), 10),
+				fixedRepository
+				);
 
 			await appOperator.LoadSceneAsync(SceneType.Start);
 
@@ -71,6 +70,14 @@ namespace Example
 			Observable.FromEvent<UnityEditor.PauseState>(
 				h => UnityEditor.EditorApplication.pauseStateChanged += h,
 				h => UnityEditor.EditorApplication.pauseStateChanged -= h).Subscribe(PauseStateChanged).AddTo(this);
+#endif
+
+
+#if DEBUG_BUILD
+			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
+
+			var debugRepository = SubLayerSourceRepository.CreateDebug();
+			debugHandler = new DebugHandler(this, sceneHandler, layerHandler, debugRepository);
 #endif
 		}
 

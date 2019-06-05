@@ -8,28 +8,39 @@ namespace Example
 {
 	public sealed class SubLayerSourceRepository
 	{
-		List<SubLayerType> keys = new List<SubLayerType>();
+		readonly IEnumerable<SubLayerType> keys;
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
-		int maxCache;
+		int cacheLimit;
 
-		public SubLayerSourceRepository(int maxCache)
+		public static SubLayerSourceRepository Create(IEnumerable<SubLayerType> subLayers, int cacheLimit)
 		{
-			this.maxCache = maxCache == 0 ? 1 : maxCache;
-			keys.Clear();
+			subLayers = subLayers.Where(x => !x.ToResourcePath().StartsWith("Debug"));
+			return new SubLayerSourceRepository(subLayers, cacheLimit);
+		}
+		public static SubLayerSourceRepository CreateDebug()
+		{
+			var debugLayers = Flour.EnumExtension.ToEnumerable<SubLayerType>(x => x.ToResourcePath().StartsWith("Debug"));
+			return new SubLayerSourceRepository(debugLayers, debugLayers.Count());
 		}
 
-		public void AddType(SubLayerType key)
+		public SubLayerSourceRepository(IEnumerable<SubLayerType> subLayers, int cacheLimit)
 		{
-			if (!keys.Contains(key))
-			{
-				keys.Add(key);
-			}
+			this.cacheLimit = cacheLimit == 0 ? 1 : cacheLimit;
+			keys = subLayers;
 		}
 
 		public bool ContainsKey(SubLayerType type)
 		{
 			return keys.Contains(type);
+		}
+
+		public async UniTask LoadAllAsync()
+		{
+			foreach (var key in keys)
+			{
+				await LoadAsync<AbstractSubLayer>(key);
+			}
 		}
 
 		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
@@ -56,7 +67,7 @@ namespace Example
 			}
 			srcCaches.Add(type, ((GameObject)prefab).GetComponent<AbstractSubLayer>());
 
-			if (srcCaches.Count > maxCache)
+			if (srcCaches.Count > cacheLimit)
 			{
 				var remove = srcCaches.FirstOrDefault(x => x.Key != type);
 				srcCaches.Remove(remove.Key);

@@ -22,10 +22,10 @@ namespace Example
 
 		readonly Action onApplicationQuit;
 
-		readonly SubLayerSourceRepository[] subLayerRepositories;
-
 		readonly SceneHandler sceneHandler;
 		readonly LayerHandler layerHandler;
+
+		readonly SubLayerSourceRepository[] subLayerRepositories;
 
 		public UserPrefs<SaveKey> UserPrefs { get; private set; } = new UserPrefs<SaveKey>();
 		public TemporaryData<TemporaryKey> TemporaryData { get; private set; } = new TemporaryData<TemporaryKey>();
@@ -40,15 +40,15 @@ namespace Example
 			Action onApplicationQuit,
 			SceneHandler sceneHandler,
 			LayerHandler layerHandler,
-			SubLayerSourceRepository[] subLayerRepositories
+			params SubLayerSourceRepository[] subLayerRepositories
 			)
 		{
 			this.onApplicationQuit = onApplicationQuit;
 
-			this.subLayerRepositories = subLayerRepositories;
-
 			this.sceneHandler = sceneHandler;
 			this.layerHandler = layerHandler;
+
+			this.subLayerRepositories = subLayerRepositories;
 		}
 
 		public void Dispose()
