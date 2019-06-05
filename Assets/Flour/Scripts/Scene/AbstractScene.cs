@@ -14,6 +14,7 @@ namespace Flour.Scene
 		{
 			await UniTask.DelayFrame(1);
 		}
+		public virtual void Open() { }
 
 		public virtual void Unload() { }
 

@@ -31,6 +31,8 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	public ISceneHandler SceneHandler { get { return this; } }
 	public ILayerHandler LayerHandler { get { return this; } }
 
+	private bool sceneLoading = false;
+
 	public ApplicationOperator(
 		Action onApplicationQuit,
 		SceneHandler sceneHandler,
@@ -73,17 +75,26 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 
 	public async UniTask LoadSceneAsync(SceneType sceneType, params object[] args)
 	{
+		if (sceneLoading)
+		{
+			throw new Exception("another scene load is running.");
+		}
+
+		sceneLoading = true;
 		InputBinder.Bind();
 
 		var fade = await AddLayerAsync<FadeLayer>(LayerType.System, SubLayerType.Blackout);
 		await fade.FadeIn();
 
-		await sceneHandler.LoadAsync(sceneType.ToJpnName(), this, args);
+		async UniTask task()
+		{
+			await UnityEngine.Resources.UnloadUnusedAssets();
+			await UniTask.Run(() => GC.Collect(0, GCCollectionMode.Optimized));
+			await fade.FadeOut();
+			sceneLoading = false;
+		}
 
-		await UnityEngine.Resources.UnloadUnusedAssets();
-		await UniTask.Run(() => System.GC.Collect(0, System.GCCollectionMode.Optimized));
-
-		await fade.FadeOut();
+		await sceneHandler.LoadAsync(sceneType.ToJpnName(), this, task, args);
 
 		InputBinder.Unbind();
 	}

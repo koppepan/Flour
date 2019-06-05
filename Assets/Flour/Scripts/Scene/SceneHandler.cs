@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using UniRx;
@@ -57,7 +58,7 @@ namespace Flour.Scene
 			return null;
 		}
 
-		public async UniTask LoadAsync(string sceneName, T param, params object[] args)
+		public async UniTask LoadAsync(string sceneName, T param, Func<UniTask> awaitFunc, params object[] args)
 		{
 			CurrentScene?.Unload();
 			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
@@ -70,6 +71,10 @@ namespace Flour.Scene
 				CurrentScene = scene;
 				await LoadScene(CurrentScene, sceneName, param, args);
 			}
+
+			await awaitFunc();
+
+			CurrentScene?.Open();
 		}
 
 		public async UniTask AddAsync(string sceneName, T param, params object[] args)
@@ -80,8 +85,10 @@ namespace Flour.Scene
 			if (scene != null)
 			{
 				additiveScenes.Add(scene);
-				await LoadScene(CurrentScene, sceneName, param, args);
+				await LoadScene(scene, sceneName, param, args);
 			}
+
+			scene?.Open();
 		}
 
 		private async UniTask LoadScene(AbstractScene<T> scene, string sceneName, T param, params object[] args)

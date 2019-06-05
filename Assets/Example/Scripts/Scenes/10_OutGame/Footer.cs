@@ -55,7 +55,10 @@ public class Footer
 		var fade = await layerHandler.AddLayerAsync<FadeLayer>(LayerType.Middle, SubLayerType.Blackout);
 		await fade.FadeIn();
 
-		currentLayer?.Close();
+		if (currentLayer != null)
+		{
+			await currentLayer.CloseWait();
+		}
 		currentLayer = null;
 		if (subLayerType != SubLayerType.None)
 		{

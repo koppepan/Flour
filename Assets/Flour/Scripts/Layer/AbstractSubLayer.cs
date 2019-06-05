@@ -45,6 +45,7 @@ namespace Flour.Layer
 
 		public void MoveFront() => moveFront(layerKey, this);
 		public void Close() => onDestroy(this);
+		public async UniTask CloseWait() => await onDestroy(this);
 
 		internal void OnOpenInternal() => OnOpen();
 		internal async UniTask OnCloseInternal() => await OnClose();
@@ -54,8 +55,8 @@ namespace Flour.Layer
 		protected virtual void OnOpen() { }
 		protected virtual async UniTask OnClose()
 		{
-			await UniTask.DelayFrame(1);
 			Destroy(gameObject);
+			await UniTask.DelayFrame(1);
 		}
 		protected virtual void OnBack() { }
 		protected virtual void OnChangeSiblingIndex(int index) { }
