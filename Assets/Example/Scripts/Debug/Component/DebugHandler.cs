@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
@@ -14,6 +15,8 @@ namespace Example
 		readonly LayerHandler layerHandler;
 
 		readonly SubLayerSourceRepository repository;
+
+		readonly Dictionary<LogType, List<Tuple<string, string>>> logMap = new Dictionary<LogType, List<Tuple<string, string>>>();
 
 		public DebugHandler(MonoBehaviour root, SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
 		{
@@ -64,6 +67,19 @@ namespace Example
 			{
 				((AbstractScene)s).OpenDebugDialog(dialog);
 			}
+		}
+
+		public void LogMessageReceived(string body, string stackTrace, LogType logType)
+		{
+			if (logType == LogType.Log)
+			{
+				return;
+			}
+			if (!logMap.ContainsKey(logType))
+			{
+				logMap[logType] = new List<Tuple<string, string>>();
+			}
+			logMap[logType].Add(Tuple.Create(body, stackTrace));
 		}
 	}
 }

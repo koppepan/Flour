@@ -40,6 +40,8 @@ namespace Example
 			var sceneHandler = new SceneHandler();
 			var layerHandler = new LayerHandler();
 
+			InitializeDebug(sceneHandler, layerHandler);
+
 			foreach (var t in EnumExtension.ToEnumerable<LayerType>(x => LayerType.Debug != x))
 			{
 				var safeArea = safeAreaLayers.Contains(t);
@@ -71,14 +73,6 @@ namespace Example
 				h => UnityEditor.EditorApplication.pauseStateChanged += h,
 				h => UnityEditor.EditorApplication.pauseStateChanged -= h).Subscribe(PauseStateChanged).AddTo(this);
 #endif
-
-
-#if DEBUG_BUILD
-			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
-
-			var debugRepository = SubLayerSourceRepository.CreateDebug();
-			debugHandler = new DebugHandler(this, sceneHandler, layerHandler, debugRepository);
-#endif
 		}
 
 #if UNITY_EDITOR
@@ -104,6 +98,20 @@ namespace Example
 		{
 			appOperator.Dispose();
 			DontDestroyObjectList.Clear();
+		}
+
+		private void InitializeDebug(SceneHandler sceneHandler, LayerHandler layerHandler)
+		{
+#if DEBUG_BUILD
+			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
+
+			var debugRepository = SubLayerSourceRepository.CreateDebug();
+			debugHandler = new DebugHandler(this, sceneHandler, layerHandler, debugRepository);
+
+			Observable.FromEvent(
+				h => Application.logMessageReceived += debugHandler.LogMessageReceived,
+				h => Application.logMessageReceived -= debugHandler.LogMessageReceived).Subscribe().AddTo(this);
+#endif
 		}
 	}
 }
