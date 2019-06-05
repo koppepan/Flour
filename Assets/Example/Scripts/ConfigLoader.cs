@@ -8,7 +8,7 @@ namespace Example
 	{
 		public async UniTask<SubLayerSourceRepository[]> LoadLayerSourceRepositories(SubLayerType[] fixedLayers)
 		{
-			var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>().Where(x => !x.ToString().StartsWith("Debug"));
+			var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>().Where(x => !x.ToResourcePath().StartsWith("Debug"));
 			var repositories = new SubLayerSourceRepository[2] { new SubLayerSourceRepository(fixedLayers.Length), new SubLayerSourceRepository(10) };
 
 			foreach (var type in subLayers)
@@ -26,7 +26,7 @@ namespace Example
 
 		public SubLayerSourceRepository CreateDebugSorceRepository()
 		{
-			var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>().Where(x => x.ToString().StartsWith("Debug"));
+			var subLayers = Enum.GetValues(typeof(SubLayerType)).Cast<SubLayerType>().Where(x => x.ToResourcePath().StartsWith("Debug"));
 			var repo = new SubLayerSourceRepository(subLayers.Count());
 			foreach (var type in subLayers)
 			{
