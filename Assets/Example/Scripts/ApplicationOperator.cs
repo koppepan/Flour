@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine.EventSystems;
 using UniRx.Async;
+using Flour;
 
 using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
 using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
@@ -24,8 +25,8 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 	readonly SceneHandler sceneHandler;
 	readonly LayerHandler layerHandler;
 
-	public SaveData SaveData { get; private set; } = new SaveData();
-	public TemporaryData TemporaryData { get; private set; } = new TemporaryData();
+	public UserPrefs<SaveKey> UserPrefs { get; private set; } = new UserPrefs<SaveKey>();
+	public TemporaryData<TemporaryKey> TemporaryData { get; private set; } = new TemporaryData<TemporaryKey>();
 
 	public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
 	public ISceneHandler SceneHandler { get { return this; } }
@@ -50,7 +51,7 @@ public sealed class ApplicationOperator : IDisposable, IOperationBundler, IScene
 
 	public void Dispose()
 	{
-		SaveData.Dispose();
+		UserPrefs.Dispose();
 		TemporaryData.Dispose();
 	}
 

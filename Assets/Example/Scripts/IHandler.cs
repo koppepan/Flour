@@ -1,11 +1,12 @@
 ﻿using UniRx.Async;
+using Flour;
 
 public interface IOperationBundler
 {
 	void ApplicationQuit();
 
-	SaveData SaveData { get; }
-	TemporaryData TemporaryData { get; }
+	UserPrefs<SaveKey> UserPrefs { get; }
+	TemporaryData<TemporaryKey> TemporaryData { get; }
 
 	IInputBinder InputBinder { get; }
 	ISceneHandler SceneHandler { get; }
