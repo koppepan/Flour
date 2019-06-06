@@ -9,21 +9,25 @@ namespace Example
 	using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
 	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
-	public class DebugHandler
+	public class DebugHandler : MonoBehaviour
 	{
-		readonly SceneHandler sceneHandler;
-		readonly LayerHandler layerHandler;
+		SceneHandler sceneHandler;
+		LayerHandler layerHandler;
 
-		readonly SubLayerSourceRepository repository;
+		SubLayerSourceRepository repository;
 
 		readonly Dictionary<LogType, List<Tuple<string, string>>> logMap = new Dictionary<LogType, List<Tuple<string, string>>>();
 
-		public DebugHandler(MonoBehaviour root, SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
+		public void Initialize(SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
 		{
 			this.sceneHandler = sceneHandler;
 			this.layerHandler = layerHandler;
 
 			this.repository = repository;
+
+			Observable.FromEvent(
+				h => Application.logMessageReceived += LogMessageReceived,
+				h => Application.logMessageReceived -= LogMessageReceived).Subscribe().AddTo(this);
 
 #if UNITY_EDITOR
 			var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
@@ -36,13 +40,13 @@ namespace Example
 			mouseDownStream
 				.SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(1)))
 				.TakeUntil(mouseUpStream)
-				.RepeatUntilDestroy(root)
+				.RepeatUntilDestroy(this)
 #if UNITY_EDITOR
 				.Subscribe(_ => OpenDialog(Input.mousePosition))
 #else
 				.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
 #endif
-				.AddTo(root);
+				.AddTo(this);
 		}
 
 		private async UniTask<DebugDialog> Open(string title, Vector2 position)
@@ -69,7 +73,7 @@ namespace Example
 			}
 		}
 
-		public void LogMessageReceived(string body, string stackTrace, LogType logType)
+		private void LogMessageReceived(string body, string stackTrace, LogType logType)
 		{
 			if (logType == LogType.Log)
 			{

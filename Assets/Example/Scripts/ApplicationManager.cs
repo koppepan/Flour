@@ -25,10 +25,6 @@ namespace Example
 
 		private ApplicationOperator appOperator;
 
-#if DEBUG_BUILD
-		private DebugHandler debugHandler;
-#endif
-
 		private void Awake()
 		{
 			DontDestroyObjectList.Add<ApplicationManager>(gameObject);
@@ -106,11 +102,11 @@ namespace Example
 			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
 
 			var debugRepository = SubLayerSourceRepository.CreateDebug();
-			debugHandler = new DebugHandler(this, sceneHandler, layerHandler, debugRepository);
 
-			Observable.FromEvent(
-				h => Application.logMessageReceived += debugHandler.LogMessageReceived,
-				h => Application.logMessageReceived -= debugHandler.LogMessageReceived).Subscribe().AddTo(this);
+			var debugHandler = new GameObject("DebugHandler", typeof(DebugHandler)).GetComponent<DebugHandler>();
+			debugHandler.Initialize(sceneHandler, layerHandler, debugRepository);
+
+			DontDestroyObjectList.Add<DebugHandler>(debugHandler.gameObject);
 #endif
 		}
 	}
