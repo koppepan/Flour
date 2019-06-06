@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UniRx;
+using UnityEngine.Assertions;
 using UniRx.Async;
 
 namespace Flour.Layer
@@ -16,6 +16,9 @@ namespace Flour.Layer
 
 		public LayerHandler()
 		{
+			Assert.IsTrue(typeof(TLayerKey).IsEnum, "TLayerKey can use only enum.");
+			Assert.IsTrue(typeof(TSubKey).IsEnum, "TSubKey can use only enum.");
+
 			safeAreaHandler = new SafeAreaHandler<TLayerKey>(new Vector2(Screen.width, Screen.height), Screen.safeArea);
 		}
 
