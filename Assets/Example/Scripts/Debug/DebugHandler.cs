@@ -80,6 +80,11 @@ namespace Example
 				logMap[logType] = new List<Tuple<string, string>>();
 			}
 			logMap[logType].Add(Tuple.Create(body, stackTrace));
+
+			if (logMap[logType].Count >= 50)
+			{
+				logMap[logType].RemoveAt(0);
+			}
 		}
 	}
 }
