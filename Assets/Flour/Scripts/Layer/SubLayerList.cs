@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace Flour.Layer
 {
 	internal sealed class SubLayerList<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
 		List<AbstractSubLayer<TLayerKey, TSubKey>> subLayers = new List<AbstractSubLayer<TLayerKey, TSubKey>>();
-		UnityEngine.Transform subLayerParent;
+		Transform subLayerParent;
 
-		public SubLayerList(UnityEngine.Transform subLayerParent)
+		public SubLayerList(Transform subLayerParent)
 		{
 			this.subLayerParent = subLayerParent;
 		}
@@ -26,6 +27,11 @@ namespace Flour.Layer
 		{
 			subLayers.Add(layer);
 			layer.transform.SetParent(subLayerParent, false);
+
+			var rect = (RectTransform)layer.transform;
+			rect.anchorMin = Vector2.zero;
+			rect.anchorMax = Vector2.one;
+			rect.offsetMin = rect.offsetMax = Vector2.zero;
 
 			ResetSiblingIndex();
 		}
