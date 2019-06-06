@@ -1,10 +1,11 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 using UniRx.Async;
 
 namespace Flour.Layer
 {
-	[RequireComponent(typeof(CanvasGroup))]
+	[RequireComponent(typeof(Canvas), typeof(GraphicRaycaster), typeof(CanvasGroup))]
 	public abstract class AbstractSubLayer<TLayerKey, TSubKey> : MonoBehaviour where TLayerKey : struct where TSubKey : struct
 	{
 		public TSubKey Key { get; private set; }
@@ -21,11 +22,44 @@ namespace Flour.Layer
 		{
 			get
 			{
-				if (_canvasGroup == null)
-				{
-					_canvasGroup = GetComponent<CanvasGroup>();
-				}
+				if (_canvasGroup != null) return _canvasGroup;
+				_canvasGroup = GetComponent<CanvasGroup>();
 				return _canvasGroup;
+			}
+		}
+
+		private GraphicRaycaster _raycaster;
+		private GraphicRaycaster Raycaster
+		{
+			get
+			{
+				if (_raycaster != null) return _raycaster;
+				_raycaster = GetComponent<GraphicRaycaster>();
+				return _raycaster;
+			}
+		}
+
+		public bool Interactable
+		{
+			get
+			{
+				return Raycaster.enabled;
+			}
+			set
+			{
+				Raycaster.enabled = value;
+			}
+		}
+		
+		public float Alpha
+		{
+			get
+			{
+				return CanvasGroup.alpha;
+			}
+			set
+			{
+				CanvasGroup.alpha = value;
 			}
 		}
 
