@@ -23,6 +23,7 @@ namespace Example
 		protected override void OnChangeSiblingIndex(int index)
 		{
 			Debug.Log(Key + " index " + index);
+			Interactable = index == 0;
 		}
 	}
 }
