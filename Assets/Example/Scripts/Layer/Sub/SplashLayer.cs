@@ -1,4 +1,5 @@
-﻿using UniRx.Async;
+﻿using System.Collections;
+using UniRx.Async;
 
 namespace Example
 {
@@ -6,11 +7,17 @@ namespace Example
 	{
 		public async UniTask Run()
 		{
-			CanvasGroup.alpha = 0;
-			LeanTween.alphaCanvas(CanvasGroup, 1, 0.5f);
-			await UniTask.Delay(2000);
-			LeanTween.alphaCanvas(CanvasGroup, 0, 0.5f);
-			await UniTask.Delay(500);
+			await Fade(0, 1, 0.5f);
+			await UniTask.Delay(1500);
+			await Fade(1, 0, 0.5f);
+		}
+
+		IEnumerator Fade(float from, float to, float time)
+		{
+			bool complete = false;
+			LeanTween.value(gameObject, val => Alpha = val, from, to, time).setOnComplete(() => complete = true);
+
+			while (!complete) yield return null;
 		}
 	}
 }

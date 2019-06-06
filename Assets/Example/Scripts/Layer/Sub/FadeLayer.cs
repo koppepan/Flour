@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 using UniRx.Async;
 
@@ -14,20 +15,23 @@ namespace Example
 			panel = GetComponent<Image>();
 		}
 
-		private async UniTask Fade(int milliseconds, Color befor, Color after)
+		private IEnumerator Fade(float time, Color to)
 		{
-			panel.color = befor;
-			LeanTween.color(panel.rectTransform, after, milliseconds * 0.001f);
-			await UniTask.Delay(milliseconds);
+			bool complete = false;
+			LeanTween.color(panel.rectTransform, to, time).setOnComplete(() => complete = true);
+
+			while (!complete) yield return null;
 		}
 
-		public async UniTask FadeIn(int milliseconds = 200)
+		public async UniTask FadeIn(float time = 0.2f)
 		{
-			await Fade(milliseconds, Color.clear, Color.black);
+			panel.color = Color.clear;
+			await Fade(time, Color.black);
 		}
-		public async UniTask FadeOut(int millisecondes = 200)
+		public async UniTask FadeOut(float time = 0.2f)
 		{
-			await Fade(millisecondes, Color.black, Color.clear);
+			panel.color = Color.black;
+			await Fade(time, Color.clear);
 			await CloseWait();
 		}
 	}
