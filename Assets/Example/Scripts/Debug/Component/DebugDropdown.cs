@@ -7,9 +7,9 @@ namespace Example
 	public class DebugDropdown : MonoBehaviour
 	{
 		[SerializeField]
-		Dropdown dropdown;
+		Dropdown dropdown = default;
 		[SerializeField]
-		Button selectButton;
+		Button selectButton = default;
 
 		public void Setup(string[] contents, string defaultValue, System.Action<int, string> onSelect)
 		{

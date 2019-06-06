@@ -5,7 +5,7 @@ namespace Example
 	class TitleLayer : AbstractSubLayer
 	{
 		[SerializeField]
-		UnityEngine.UI.Button button;
+		UnityEngine.UI.Button button = default;
 
 		public override bool IgnoreBack => true;
 

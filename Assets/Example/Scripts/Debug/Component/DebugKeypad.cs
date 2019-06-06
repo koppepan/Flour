@@ -6,11 +6,11 @@ namespace Example
 	public class DebugKeypad : MonoBehaviour
 	{
 		[SerializeField]
-		private Text inputText;
+		private Text inputText = default;
 		[SerializeField]
-		private Button runButton;
+		private Button runButton = default;
 		[SerializeField]
-		private Transform keyParent;
+		private Transform keyParent = default;
 
 		string input;
 
