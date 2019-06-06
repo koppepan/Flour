@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Flour
 {
@@ -14,10 +14,7 @@ namespace Flour
 		public UserPrefs() : this(PlayerPrefs.GetString(LastTimeUserKey, "default")) { }
 		public UserPrefs(string userKey)
 		{
-			if (!typeof(TKey).IsEnum)
-			{
-				throw new Exception("only enum can be used.");
-			}
+			Assert.IsTrue(typeof(TKey).IsEnum, "UserPrefs can use only enum.");
 			ChangeUser(userKey);
 		}
 

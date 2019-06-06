@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Assertions;
 
 namespace Flour
 {
@@ -8,19 +9,13 @@ namespace Flour
 	{
 		public static IEnumerable<T> ToEnumerable<T>() where T : struct
 		{
-			if (!typeof(T).IsEnum)
-			{
-				throw new Exception("not an enum.");
-			}
+			Assert.IsTrue(typeof(T).IsEnum, "not an enum");
 			return Enum.GetValues(typeof(T)).Cast<T>();
 		}
 
 		public static IEnumerable<T> ToEnumerable<T>(Func<T, bool> func) where T : struct
 		{
-			if (!typeof(T).IsEnum)
-			{
-				throw new Exception("not an enum.");
-			}
+			Assert.IsTrue(typeof(T).IsEnum, "not an enum");
 			return Enum.GetValues(typeof(T)).Cast<T>().Where(func);
 		}
 	}
