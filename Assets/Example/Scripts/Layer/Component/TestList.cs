@@ -31,7 +31,8 @@ namespace Example
 			}
 
 			prefab.gameObject.SetActive(false);
-			layoutGroup.Initialize(scrollRect.horizontal, scrollRect.vertical, scrollRect.viewport, source.Count, prefab.RectTransform.sizeDelta, Create);
+			var rect = scrollRect.GetComponent<RectTransform>();
+			layoutGroup.Initialize(scrollRect.horizontal, scrollRect.vertical, rect, source.Count, prefab.RectTransform.sizeDelta, Create);
 		}
 
 		Flour.UI.IListItem Create()

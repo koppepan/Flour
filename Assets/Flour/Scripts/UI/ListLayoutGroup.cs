@@ -14,7 +14,7 @@ namespace Flour.UI
 	[RequireComponent(typeof(RectTransform))]
 	public class ListLayoutGroup : MonoBehaviour
 	{
-		private enum Scroll
+		protected enum Scroll
 		{
 			Horizontal,
 			Vertical,
@@ -27,15 +27,15 @@ namespace Flour.UI
 		[SerializeField]
 		float spacing = default;
 
-		Scroll scroll;
+		protected Scroll scroll;
 
 		int elementCount;
-		Vector3 elementSize;
-
 		Func<IListItem> createItem;
 
 		int renderingMin, renderingMax;
 		Tuple<float, float> LimitValue;
+
+		Dictionary<int, Rect> localPositionCache = new Dictionary<int, Rect>();
 
 		Dictionary<int, IListItem> activeItems = new Dictionary<int, IListItem>();
 		List<IListItem> poolItems = new List<IListItem>();
@@ -59,31 +59,47 @@ namespace Flour.UI
 			scroll = horizontal ? Scroll.Horizontal : Scroll.Vertical;
 
 			this.elementCount = elementCount;
-			this.elementSize = elementSize;
 			this.createItem = createItem;
-
-			StretchContentSize(elementCount);
 
 			renderingMin = renderingMax = 0;
 			var min = parent.TransformPoint(parent.rect.min);
 			var max = parent.TransformPoint(parent.rect.max);
 			LimitValue = new Tuple<float, float>(max[(int)scroll], min[(int)scroll]);
+
+			SetLocalPosition(elementCount, elementSize);
+			StretchContentSize(elementCount, elementSize);
 		}
 
-		private void StretchContentSize(int count)
+		protected virtual void SetLocalPosition(int elementCount, Vector2 elementSize)
 		{
-			var contentsSize = (elementSize[(int)scroll] * count) + (spacing * count) - spacing;
-			var paddingSize = scroll == Scroll.Horizontal ? padding.horizontal : padding.vertical;
+			int direction = scroll == Scroll.Horizontal ? 1 : -1;
 
-			var total = contentsSize + paddingSize;
+			var pos = new Vector2(padding.left, -padding.top);
+
+			for (int i = 0; i < elementCount; i++)
+			{
+				localPositionCache[i] = new Rect(pos, elementSize);
+				pos[(int)scroll] += direction * (elementSize[(int)scroll] + spacing);
+			}
+		}
+
+		Rect GetLocalPosition(int index)
+		{
+			return localPositionCache[index];
+		}
+
+		private void StretchContentSize(int elementCount, Vector2 elementSize)
+		{
+			var lastRect = GetLocalPosition(elementCount - 1);
+			var contentSize = Mathf.Abs(lastRect.position[(int)scroll]) + lastRect.size[(int)scroll] + (scroll == Scroll.Horizontal ? padding.right : padding.bottom);
 
 			if (scroll == Scroll.Horizontal)
 			{
-				RectTransform.LeftStretch(total);
+				RectTransform.LeftStretch(contentSize);
 			}
 			else
 			{
-				RectTransform.TopStretch(total);
+				RectTransform.TopStretch(contentSize);
 			}
 		}
 
@@ -117,18 +133,9 @@ namespace Flour.UI
 
 		bool WithinRange(int index)
 		{
-			var localPos = CalcLocalPosition(index);
-			var worldPos = RectTransform.TransformPoint(localPos);
-			return worldPos[(int)scroll] - elementSize[(int)scroll] < LimitValue.Item1 && worldPos[(int)scroll] > LimitValue.Item2;
-		}
-
-		Vector2 CalcLocalPosition(int index)
-		{
-			int direction = scroll == Scroll.Horizontal ? 1 : -1;
-
-			var pos = new Vector2(padding.left, -padding.top);
-			pos[(int)scroll] += ((direction * elementSize[(int)scroll]) + (direction * spacing)) * index;
-			return pos;
+			var localRect = GetLocalPosition(index);
+			var worldPos = RectTransform.TransformPoint(localRect.position);
+			return worldPos[(int)scroll] - localRect.size[(int)scroll] < LimitValue.Item1 && worldPos[(int)scroll] > LimitValue.Item2;
 		}
 
 		bool TryCreate(int index)
@@ -139,7 +146,7 @@ namespace Flour.UI
 			if (WithinRange(index))
 			{
 				var item = AddItem(index);
-				item.RectTransform.anchoredPosition = CalcLocalPosition(index);
+				item.RectTransform.anchoredPosition = GetLocalPosition(index).position;
 				item.UpdateData(index);
 				return true;
 			}
