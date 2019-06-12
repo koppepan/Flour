@@ -89,7 +89,7 @@ namespace Flour.UI
 			}
 		}
 
-		IListItem AddItem(int index)
+		void AddItem(int index)
 		{
 			IListItem item = null;
 
@@ -105,9 +105,11 @@ namespace Flour.UI
 				item.RectTransform.SetAlignment(TextAnchor.UpperLeft);
 			}
 
-			item.RectTransform.gameObject.SetActive(true);
 			activeItems[index] = item;
-			return item;
+
+			item.UpdateData(index);
+			item.RectTransform.anchoredPosition = GetLocalPosition(index).position;
+			item.RectTransform.gameObject.SetActive(true);
 		}
 
 		void ToPool(int index, IListItem item)
@@ -132,9 +134,7 @@ namespace Flour.UI
 
 			if (WithinRange(index))
 			{
-				var item = AddItem(index);
-				item.RectTransform.anchoredPosition = GetLocalPosition(index).position;
-				item.UpdateData(index);
+				AddItem(index);
 				return true;
 			}
 
