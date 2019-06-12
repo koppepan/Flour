@@ -12,7 +12,7 @@ namespace Flour.UI
 	}
 
 	[RequireComponent(typeof(RectTransform))]
-	public class ListLayoutGroup : MonoBehaviour
+	public abstract class LayoutGroup : MonoBehaviour
 	{
 		protected enum Scroll
 		{
@@ -20,8 +20,6 @@ namespace Flour.UI
 			Vertical,
 		}
 
-		[SerializeField]
-		TextAnchor anchor = default;
 		[SerializeField]
 		protected RectOffset padding = default;
 		[SerializeField]
@@ -41,7 +39,7 @@ namespace Flour.UI
 
 
 		RectTransform rectTransformCache;
-		RectTransform RectTransform
+		protected RectTransform RectTransform
 		{
 			get
 			{
@@ -69,18 +67,7 @@ namespace Flour.UI
 			StretchContentSize(elementCount, elementSize);
 		}
 
-		protected virtual void SetLocalPosition(int elementCount, Vector2 elementSize)
-		{
-			int direction = scroll == Scroll.Horizontal ? 1 : -1;
-
-			var pos = new Vector2(padding.left, -padding.top);
-
-			for (int i = 0; i < elementCount; i++)
-			{
-				localPositionCache[i] = new Rect(pos, elementSize);
-				pos[(int)scroll] += direction * (elementSize[(int)scroll] + spacing);
-			}
-		}
+		protected abstract void SetLocalPosition(int elementCount, Vector2 elementSize);
 
 		Rect GetLocalPosition(int index)
 		{
@@ -115,7 +102,7 @@ namespace Flour.UI
 			{
 				item = createItem();
 				item.RectTransform.SetParent(transform, false);
-				item.RectTransform.SetAlignment(anchor);
+				item.RectTransform.SetAlignment(TextAnchor.UpperLeft);
 			}
 
 			item.RectTransform.gameObject.SetActive(true);

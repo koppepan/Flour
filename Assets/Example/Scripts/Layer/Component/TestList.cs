@@ -13,7 +13,7 @@ namespace Example
 		Test prefab = default;
 
 		ScrollRect scrollRect;
-		Flour.UI.ListLayoutGroup layoutGroup;
+		Flour.UI.LayoutGroup layoutGroup;
 
 		List<string> source = new List<string>();
 
@@ -22,10 +22,10 @@ namespace Example
 			Assert.IsNotNull(GetComponent<ScrollRect>(), "not found ScrollRect component.");
 			scrollRect = GetComponent<ScrollRect>();
 
-			Assert.IsNotNull(scrollRect.content.GetComponent<Flour.UI.ListLayoutGroup>(), "LayoutGroup is not attached to content.");
-			layoutGroup = scrollRect.content.GetComponent<Flour.UI.ListLayoutGroup>();
+			Assert.IsNotNull(scrollRect.content.GetComponent<Flour.UI.LayoutGroup>(), "LayoutGroup is not attached to content.");
+			layoutGroup = scrollRect.content.GetComponent<Flour.UI.LayoutGroup>();
 
-			for (int i = 0; i < 20; i++)
+			for (int i = 0; i < 10000; i++)
 			{
 				source.Add(i.ToString());
 			}
