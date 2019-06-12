@@ -23,20 +23,19 @@ namespace Flour.UI
 		[SerializeField]
 		TextAnchor anchor = default;
 		[SerializeField]
-		RectOffset padding = default;
+		protected RectOffset padding = default;
 		[SerializeField]
-		float spacing = default;
+		protected float spacing = default;
 
 		protected Scroll scroll;
 
 		int elementCount;
 		Func<IListItem> createItem;
 
+		protected Rect LimitRect;
+		protected Dictionary<int, Rect> localPositionCache = new Dictionary<int, Rect>();
+
 		int renderingMin, renderingMax;
-		Tuple<float, float> LimitValue;
-
-		Dictionary<int, Rect> localPositionCache = new Dictionary<int, Rect>();
-
 		Dictionary<int, IListItem> activeItems = new Dictionary<int, IListItem>();
 		List<IListItem> poolItems = new List<IListItem>();
 
@@ -64,7 +63,7 @@ namespace Flour.UI
 			renderingMin = renderingMax = 0;
 			var min = parent.TransformPoint(parent.rect.min);
 			var max = parent.TransformPoint(parent.rect.max);
-			LimitValue = new Tuple<float, float>(max[(int)scroll], min[(int)scroll]);
+			LimitRect = new Rect(min.x, min.y, max.x - min.x, max.y - min.y);
 
 			SetLocalPosition(elementCount, elementSize);
 			StretchContentSize(elementCount, elementSize);
@@ -135,7 +134,8 @@ namespace Flour.UI
 		{
 			var localRect = GetLocalPosition(index);
 			var worldPos = RectTransform.TransformPoint(localRect.position);
-			return worldPos[(int)scroll] - localRect.size[(int)scroll] < LimitValue.Item1 && worldPos[(int)scroll] > LimitValue.Item2;
+
+			return worldPos[(int)scroll] - localRect.size[(int)scroll] < LimitRect.max[(int)scroll] && worldPos[(int)scroll] > LimitRect.min[(int)scroll];
 		}
 
 		bool TryCreate(int index)
