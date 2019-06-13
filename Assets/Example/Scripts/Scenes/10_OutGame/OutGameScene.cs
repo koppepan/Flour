@@ -10,9 +10,10 @@ namespace Example
 			footer = new Footer(InputBinder, LayerHandler);
 			await footer.Open();
 		}
-		public override void Unload()
+		public override async UniTask Unload()
 		{
 			footer.Close();
+			await base.Unload();
 		}
 
 		public override void OnBack()

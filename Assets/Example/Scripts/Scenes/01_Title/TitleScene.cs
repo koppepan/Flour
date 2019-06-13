@@ -10,9 +10,10 @@ namespace Example
 			titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
 			titleLayer.Setup(GotoOutGame);
 		}
-		public override void Unload()
+		public override async UniTask Unload()
 		{
 			titleLayer.Close();
+			await base.Unload();
 		}
 
 		public override void OnBack()

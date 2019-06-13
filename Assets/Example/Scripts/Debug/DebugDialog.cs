@@ -34,7 +34,7 @@ namespace Example
 		public void Setup(string title, Func<string, Vector2, UniTask<DebugDialog>> openDialogFunc)
 		{
 			titleText.text = title;
-			closeButton.onClick.AddListener(Close);
+			closeButton.onClick.AddListener(() => Close());
 
 			this.openDialogFunc = openDialogFunc;
 		}

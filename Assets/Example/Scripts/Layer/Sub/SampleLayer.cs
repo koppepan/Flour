@@ -9,10 +9,10 @@ namespace Example
 		{
 			Debug.Log(Key + " on open");
 		}
-		protected override async UniTask OnClose()
+		protected override async UniTask OnClose(bool force)
 		{
 			Debug.Log(Key + " on close");
-			await base.OnClose();
+			await base.OnClose(force);
 		}
 		protected override void OnBack()
 		{

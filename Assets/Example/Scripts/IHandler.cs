@@ -1,4 +1,5 @@
-﻿using UniRx.Async;
+﻿using UnityEngine;
+using UniRx.Async;
 using Flour;
 
 namespace Example
@@ -31,6 +32,9 @@ namespace Example
 
 	public interface ILayerHandler
 	{
+		void AddSceneLayer(Transform sceneObj, Camera camera);
+		UniTask<T> AddSceneLayerAsync<T>(SubLayerType subLayer) where T : AbstractSubLayer;
+
 		UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer;
 		UniTask<T> AddLayerOverlappingAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer;
 	}

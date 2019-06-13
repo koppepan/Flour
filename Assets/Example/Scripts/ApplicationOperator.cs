@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UniRx.Async;
 using Flour;
@@ -91,12 +92,13 @@ namespace Example
 
 			async UniTask task()
 			{
-				await UnityEngine.Resources.UnloadUnusedAssets();
+				await Resources.UnloadUnusedAssets();
 				await UniTask.Run(() => GC.Collect(0, GCCollectionMode.Optimized));
 				await fade.FadeOut();
 				sceneLoading = false;
 			}
 
+			await layerHandler.RemoveLayer(LayerType.Scene);
 			await sceneHandler.LoadAsync(sceneType.ToJpnName(), this, task, args);
 
 			InputBinder.Unbind();
@@ -124,6 +126,15 @@ namespace Example
 				}
 			}
 			return null;
+		}
+
+		public void AddSceneLayer(Transform sceneObj, Camera camera)
+		{
+			layerHandler.AddLayer(LayerType.Scene, (int)LayerType.Scene, sceneObj, new Vector2(Screen.width, Screen.height), RenderMode.ScreenSpaceCamera, camera);
+		}
+		public async UniTask<T> AddSceneLayerAsync<T>(SubLayerType subLayer) where T : AbstractSubLayer
+		{
+			return await AddLayerAsync<T>(LayerType.Scene, subLayer, false);
 		}
 
 		private async UniTask<T> AddLayerAsync<T>(LayerType layer, SubLayerType subLayer, bool overlap) where T : AbstractSubLayer

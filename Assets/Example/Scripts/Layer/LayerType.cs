@@ -6,6 +6,8 @@ namespace Example
 
 	public enum LayerType
 	{
+		[Int(0)] Scene = 0,
+
 		[Int(10)] Back = 10,
 		[Int(11)] Middle = 11,
 		[Int(12)] Front = 12,

@@ -17,9 +17,10 @@ namespace Example
 			SceneHandler.LoadSceneAsync(SceneType.Title);
 		}
 
-		public override void Unload()
+		public override async UniTask Unload()
 		{
 			splash.Close();
+			await base.Unload();
 		}
 	}
 }

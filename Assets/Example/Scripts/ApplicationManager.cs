@@ -36,7 +36,7 @@ namespace Example
 			var sceneHandler = new SceneHandler();
 			var layerHandler = new LayerHandler();
 
-			foreach (var t in EnumExtension.ToEnumerable<LayerType>(x => LayerType.Debug != x))
+			foreach (var t in EnumExtension.ToEnumerable<LayerType>(x => LayerType.Scene != x && LayerType.Debug != x))
 			{
 				var safeArea = safeAreaLayers.Contains(t);
 				layerHandler.AddLayer(t, t.ToOrder(), canvasRoot, referenceResolution, safeArea);
