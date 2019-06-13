@@ -127,28 +127,12 @@ namespace Flour.Layer
 			layer.List.Add(subLayer);
 		}
 
-		public async UniTask<bool> Remove(TLayerKey layer, bool force = false)
-		{
-			var sub = GetLayer(layer).List.FirstOrDefault();
-			if (sub != null)
-			{
-				await sub.CloseWait(force);
-			}
-			return sub != null;
-		}
 		public async UniTask RemoveAll(TLayerKey layer)
 		{
 			var l = GetLayer(layer).List.SubLayers;
 			for (int i = l.Count - 1; i >= 0; i--)
 			{
 				await l[i].CloseWait(true);
-			}
-		}
-		public async UniTask RemoveAll()
-		{
-			foreach (var layer in layerOrder.Values.Reverse())
-			{
-				await RemoveAll(layer);
 			}
 		}
 		async UniTask Remove(AbstractSubLayer<TLayerKey, TSubKey> subLayer, bool force)
