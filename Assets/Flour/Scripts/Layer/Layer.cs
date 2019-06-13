@@ -3,44 +3,49 @@ using UnityEngine.UI;
 
 namespace Flour.Layer
 {
-	sealed internal class Layer<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
+	sealed internal class Layer<TLayerKey, TSubKey> : System.IDisposable where TLayerKey : struct where TSubKey : struct
 	{
 		public RectTransform Parent { get; private set; }
 		public SubLayerList<TLayerKey, TSubKey> List { get; private set; }
 
+		private GameObject canvasObject;
+
 		public Layer(Transform canvasRoot, TLayerKey layer, int sortingOrder, Vector2 referenceResolution)
 		{
-			var canvas = CreateCanvas(canvasRoot, layer.ToString(), referenceResolution);
-			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			canvas.sortingOrder = sortingOrder;
-
-			Parent = GetContentsArea(canvas.gameObject.transform);
-			List = new SubLayerList<TLayerKey, TSubKey>(Parent);
+			CreateCanvas(canvasRoot, layer.ToString(), sortingOrder, referenceResolution, RenderMode.ScreenSpaceOverlay, null);
 		}
 
 		public Layer(Transform canvasRoot, TLayerKey layer, int sortingOrder, Vector2 referenceResolution, RenderMode renderMode, Camera camera)
 		{
-			var canvas = CreateCanvas(canvasRoot, layer.ToString(), referenceResolution);
-			canvas.renderMode = renderMode;
-			canvas.worldCamera = camera;
-			canvas.sortingOrder = sortingOrder;
-
-			Parent = GetContentsArea(canvas.gameObject.transform);
-			List = new SubLayerList<TLayerKey, TSubKey>(Parent);
+			CreateCanvas(canvasRoot, layer.ToString(), sortingOrder, referenceResolution, renderMode, camera);
 		}
 
-		Canvas CreateCanvas(Transform root, string name, Vector2 referenceResolution)
+		public void Dispose()
 		{
-			var obj = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-			obj.transform.SetParent(root, false);
+			GameObject.Destroy(canvasObject);
+		}
 
-			var scaler = obj.GetComponent<CanvasScaler>();
+		void CreateCanvas(Transform root, string name, int sortingOrder, Vector2 referenceResolution, RenderMode renderMode, Camera camera)
+		{
+			canvasObject = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+			canvasObject.transform.SetParent(root, false);
+
+			var canvas = canvasObject.GetComponent<Canvas>();
+			canvas.renderMode = renderMode;
+			canvas.sortingOrder = sortingOrder;
+			if (renderMode != RenderMode.ScreenSpaceOverlay)
+			{
+				canvas.worldCamera = camera;
+			}
+
+			var scaler = canvasObject.GetComponent<CanvasScaler>();
 			scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 			scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
 			scaler.referenceResolution = referenceResolution;
 			scaler.referencePixelsPerUnit = 100;
 
-			return obj.GetComponent<Canvas>();
+			Parent = GetContentsArea(canvasObject.transform);
+			List = new SubLayerList<TLayerKey, TSubKey>(Parent);
 		}
 
 		RectTransform GetContentsArea(Transform parent)

@@ -61,6 +61,7 @@ namespace Flour.Layer
 				return;
 			}
 			await RemoveAll(layerType);
+			layers[layerType].Dispose();
 			layers.Remove(layerType);
 		}
 
