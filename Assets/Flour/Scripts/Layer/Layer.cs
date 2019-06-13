@@ -5,16 +5,34 @@ namespace Flour.Layer
 {
 	sealed internal class Layer<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
+		public RectTransform Parent { get; private set; }
 		public SubLayerList<TLayerKey, TSubKey> List { get; private set; }
 
-		public Layer(Transform canvasRoot, TLayerKey layer, int sortingOrder, Vector2 referenceResolution, System.Action<TLayerKey, RectTransform> safeAreaReduction)
+		public Layer(Transform canvasRoot, TLayerKey layer, int sortingOrder, Vector2 referenceResolution)
 		{
-			var obj = new GameObject(layer.ToString(), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-			obj.transform.SetParent(canvasRoot, false);
-
-			var canvas = obj.GetComponent<Canvas>();
+			var canvas = CreateCanvas(canvasRoot, layer.ToString(), referenceResolution);
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 			canvas.sortingOrder = sortingOrder;
+
+			Parent = GetContentsArea(canvas.gameObject.transform);
+			List = new SubLayerList<TLayerKey, TSubKey>(Parent);
+		}
+
+		public Layer(Transform canvasRoot, TLayerKey layer, int sortingOrder, Vector2 referenceResolution, RenderMode renderMode, Camera camera)
+		{
+			var canvas = CreateCanvas(canvasRoot, layer.ToString(), referenceResolution);
+			canvas.renderMode = renderMode;
+			canvas.worldCamera = camera;
+			canvas.sortingOrder = sortingOrder;
+
+			Parent = GetContentsArea(canvas.gameObject.transform);
+			List = new SubLayerList<TLayerKey, TSubKey>(Parent);
+		}
+
+		Canvas CreateCanvas(Transform root, string name, Vector2 referenceResolution)
+		{
+			var obj = new GameObject(name, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+			obj.transform.SetParent(root, false);
 
 			var scaler = obj.GetComponent<CanvasScaler>();
 			scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -22,10 +40,7 @@ namespace Flour.Layer
 			scaler.referenceResolution = referenceResolution;
 			scaler.referencePixelsPerUnit = 100;
 
-			var parent = GetContentsArea(obj.transform);
-			safeAreaReduction?.Invoke(layer, parent);
-
-			List = new SubLayerList<TLayerKey, TSubKey>(parent);
+			return obj.GetComponent<Canvas>();
 		}
 
 		RectTransform GetContentsArea(Transform parent)

@@ -33,12 +33,35 @@ namespace Flour.Layer
 				throw new ArgumentException($"same key already exists. key => {layerType}");
 			}
 
-			var reduction = safeArea ? safeAreaHandler.Reduction : (Action<TLayerKey, RectTransform>)null;
-			var layer = new Layer<TLayerKey, TSubKey>(canvasRoot, layerType, sortingOrder, referenceResolution, reduction);
+			var layer = new Layer<TLayerKey, TSubKey>(canvasRoot, layerType, sortingOrder, referenceResolution);
+			if (safeArea)
+			{
+				safeAreaHandler.Reduction(layerType, layer.Parent);
+			}
 
 			layers.Add(layerType, layer);
 
 			layerOrder.Add(sortingOrder, layerType);
+		}
+
+		public void AddLayer(TLayerKey layerType, int sortingOrder, Transform canvasRoot, Vector2 referenceResolution, RenderMode renderMode, Camera camera)
+		{
+			if (layers.ContainsKey(layerType))
+			{
+				throw new ArgumentException($"same key already exists. key => {layerType}");
+			}
+			var layer = new Layer<TLayerKey, TSubKey>(canvasRoot, layerType, sortingOrder, referenceResolution, renderMode, camera);
+			layers.Add(layerType, layer);
+		}
+
+		public async UniTask RemoveLayer(TLayerKey layerType)
+		{
+			if (!layers.ContainsKey(layerType))
+			{
+				return;
+			}
+			await RemoveAll(layerType);
+			layers.Remove(layerType);
 		}
 
 		public bool OnBack()
@@ -104,20 +127,31 @@ namespace Flour.Layer
 			layer.List.Add(subLayer);
 		}
 
-		public bool Remove(TLayerKey layer)
+		public async UniTask<bool> Remove(TLayerKey layer, bool force = false)
 		{
 			var sub = GetLayer(layer).List.FirstOrDefault();
-			sub?.Close();
+			if (sub != null)
+			{
+				await sub.CloseWait(force);
+			}
 			return sub != null;
 		}
-		public void RemoveAll()
+		public async UniTask RemoveAll(TLayerKey layer)
+		{
+			var l = GetLayer(layer).List.SubLayers;
+			for (int i = l.Count - 1; i >= 0; i--)
+			{
+				await l[i].CloseWait(true);
+			}
+		}
+		public async UniTask RemoveAll()
 		{
 			foreach (var layer in layerOrder.Values.Reverse())
 			{
-				while (Remove(layer)) { }
+				await RemoveAll(layer);
 			}
 		}
-		async UniTask Remove(AbstractSubLayer<TLayerKey, TSubKey> subLayer)
+		async UniTask Remove(AbstractSubLayer<TLayerKey, TSubKey> subLayer, bool force)
 		{
 			if (subLayer == null)
 			{
@@ -129,7 +163,7 @@ namespace Flour.Layer
 				return;
 			}
 
-			await subLayer.OnCloseInternal();
+			await subLayer.OnCloseInternal(force);
 			layer.List.Remove(subLayer, true);
 		}
 	}

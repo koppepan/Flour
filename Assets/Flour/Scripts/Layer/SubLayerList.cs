@@ -9,6 +9,8 @@ namespace Flour.Layer
 		List<AbstractSubLayer<TLayerKey, TSubKey>> subLayers = new List<AbstractSubLayer<TLayerKey, TSubKey>>();
 		Transform subLayerParent;
 
+		public IList<AbstractSubLayer<TLayerKey, TSubKey>> SubLayers { get { return subLayers; } }
+
 		public SubLayerList(Transform subLayerParent)
 		{
 			this.subLayerParent = subLayerParent;

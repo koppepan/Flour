@@ -13,7 +13,7 @@ namespace Flour.Layer
 
 		private Action<TLayerKey, AbstractSubLayer<TLayerKey, TSubKey>> moveFront;
 		private Action<TLayerKey, RectTransform> safeAreaExpansion;
-		private Func<AbstractSubLayer<TLayerKey, TSubKey>, UniTask> onDestroy;
+		private Func<AbstractSubLayer<TLayerKey, TSubKey>, bool, UniTask> onDestroy;
 
 		public virtual bool IgnoreBack { get { return false; } }
 
@@ -66,7 +66,7 @@ namespace Flour.Layer
 		internal void SetConstParameter(TLayerKey layerKey, TSubKey key,
 			Action<TLayerKey, AbstractSubLayer<TLayerKey, TSubKey>> moveFront,
 			Action<TLayerKey, RectTransform> safeAreaExpansion,
-			Func<AbstractSubLayer<TLayerKey, TSubKey>, UniTask> onDestroy
+			Func<AbstractSubLayer<TLayerKey, TSubKey>, bool, UniTask> onDestroy
 			)
 		{
 			Key = key;
@@ -78,16 +78,16 @@ namespace Flour.Layer
 		}
 
 		public void MoveFront() => moveFront(layerKey, this);
-		public void Close() => onDestroy(this);
-		public async UniTask CloseWait() => await onDestroy(this);
+		public void Close(bool force = false) => onDestroy(this, force);
+		public async UniTask CloseWait(bool force = false) => await onDestroy(this, force);
 
 		internal void OnOpenInternal() => OnOpen();
-		internal async UniTask OnCloseInternal() => await OnClose();
+		internal async UniTask OnCloseInternal(bool force) => await OnClose(force);
 		internal void OnBackInternal() => OnBack();
 		internal void OnChangeSiblingIndexInternal(int index) => OnChangeSiblingIndex(index);
 
 		protected virtual void OnOpen() { }
-		protected virtual async UniTask OnClose()
+		protected virtual async UniTask OnClose(bool force)
 		{
 			Destroy(gameObject);
 			await UniTask.DelayFrame(1);

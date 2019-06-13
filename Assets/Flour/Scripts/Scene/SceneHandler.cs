@@ -60,7 +60,10 @@ namespace Flour.Scene
 
 		public async UniTask LoadAsync(string sceneName, T param, Func<UniTask> awaitFunc, params object[] args)
 		{
-			CurrentScene?.Unload();
+			if (CurrentScene != null)
+			{
+				await CurrentScene.Unload();
+			}
 			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
 			var scene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
