@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Networking;
 using UniRx;
 
@@ -18,6 +20,8 @@ namespace Flour.Net
 
 	public abstract class ParallelWebRequest<T>
 	{
+		readonly WaitForSeconds waitForSeconds = new WaitForSeconds(0.1f);
+
 		readonly string baseUrl;
 
 		readonly int parallel;
@@ -30,18 +34,25 @@ namespace Flour.Net
 		readonly List<IDownloader<T>> downloaders = new List<IDownloader<T>>();
 
 		int requestCount = 0;
-		int downloadedCount = 0;
+		int _downloadedCount = 0;
 
-		IDisposable updateDisposable;
-
-		public float Progress
+		int DownloadedCount
 		{
 			get
 			{
-				if (requestCount == 0) return 0;
-				return (float)downloadedCount / (float)requestCount;
+				return _downloadedCount;
+			}
+			set
+			{
+				_downloadedCount = value;
+				progress.OnNext(requestCount == 0 ? 0 : (float)_downloadedCount / (float)requestCount);
 			}
 		}
+
+		IDisposable updateDisposable;
+
+		private Subject<float> progress = new Subject<float>();
+		public ISubject<float> Progress { get { return progress; } }
 
 		public ParallelWebRequest(string baseUrl, int parallel, int timeout, IObserver<Tuple<string, T>> downloadObserver, IObserver<Tuple<string, long>> errorObserver)
 		{
@@ -52,15 +63,11 @@ namespace Flour.Net
 
 			this.downloadObserver = downloadObserver;
 			this.errorObserver = errorObserver;
-
-			updateDisposable = Observable.EveryUpdate().Subscribe(EveryUpdate);
 		}
 
 		public void Dispose()
 		{
-			updateDisposable.Dispose();
-			updateDisposable = null;
-
+			StopUpdate();
 
 			waitingList.ForEach(x => x.Dispose());
 			waitingList.Clear();
@@ -70,10 +77,27 @@ namespace Flour.Net
 			ResetProgress();
 		}
 
+		void StartUpdate()
+		{
+			if (updateDisposable != null)
+			{
+				return;
+			}
+			updateDisposable = Observable.FromCoroutine(EveryUpdate).Subscribe();
+		}
+		void StopUpdate()
+		{
+			if (updateDisposable != null)
+			{
+				updateDisposable.Dispose();
+				updateDisposable = null;
+			}
+		}
+
 		public void ResetProgress()
 		{
 			requestCount = 0;
-			downloadedCount = 0;
+			DownloadedCount = 0;
 		}
 
 		public void AddRequest(IDownloader<T> downloader)
@@ -83,35 +107,48 @@ namespace Flour.Net
 
 			requestCount++;
 			waitingList.Add(downloader);
+
+			StartUpdate();
 		}
 
-		void EveryUpdate(long _)
+		IEnumerator EveryUpdate()
 		{
-			for (int i = downloaders.Count - 1; i >= 0; i--)
+			while (true)
 			{
-				var d = downloaders[i];
-				if (d.Request.isDone || (d.Request.isHttpError || d.Request.isNetworkError))
+				for (int i = downloaders.Count - 1; i >= 0; i--)
 				{
-					if (d.Request.isDone)
+					var d = downloaders[i];
+					if (d.Request.isDone || (d.Request.isHttpError || d.Request.isNetworkError))
 					{
-						downloadObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
+						if (d.Request.isHttpError || d.Request.isNetworkError)
+						{
+							errorObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode));
+						}
+						else
+						{
+							downloadObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
+						}
+
+						DownloadedCount++;
+						downloaders.Remove(d);
 					}
-					else if (d.Request.isHttpError || d.Request.isNetworkError)
-					{
-						errorObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode));
-					}
-					downloadedCount++;
-					downloaders.Remove(d);
 				}
-			}
 
-			while (waitingList.Count > 0 && downloaders.Count < parallel)
-			{
-				var req = waitingList[0];
-				req.Send(baseUrl, timeout);
+				while (waitingList.Count > 0 && downloaders.Count < parallel)
+				{
+					var req = waitingList[0];
+					req.Send(baseUrl, timeout);
 
-				waitingList.Remove(req);
-				downloaders.Add(req);
+					waitingList.Remove(req);
+					downloaders.Add(req);
+				}
+
+				if (downloaders.Count == 0 && waitingList.Count == 0)
+				{
+					StopUpdate();
+				}
+
+				yield return waitForSeconds;
 			}
 		}
 	}
