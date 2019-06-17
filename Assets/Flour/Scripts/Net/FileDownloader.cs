@@ -1,12 +1,10 @@
-﻿using System;
-using UnityEngine.Networking;
+﻿using UnityEngine.Networking;
 
 namespace Flour.Net
 {
 	public class ParalleFileDownloader : ParallelWebRequest<string>
 	{
-		public ParalleFileDownloader(string baseUrl, int parallel, int timeout, IObserver<Tuple<string, string>> downloadObserver, IObserver<Tuple<string, long>> errorObserver)
-			: base(baseUrl, parallel, timeout, downloadObserver, errorObserver)
+		public ParalleFileDownloader(string baseUrl, int parallel, int timeout) : base(baseUrl, parallel, timeout)
 		{
 		}
 	}

@@ -27,11 +27,15 @@ namespace Flour.Net
 		readonly int parallel;
 		readonly int timeout;
 
-		readonly IObserver<Tuple<string, T>> downloadObserver;
-		readonly IObserver<Tuple<string, long>> errorObserver;
-
 		readonly List<IDownloader<T>> waitingList = new List<IDownloader<T>>();
 		readonly List<IDownloader<T>> downloaders = new List<IDownloader<T>>();
+
+		readonly Subject<Tuple<string, T>> downloadedObserver = new Subject<Tuple<string, T>>();
+		readonly Subject<Tuple<string, long>> erroredObserver = new Subject<Tuple<string, long>>();
+
+		public IObservable<Tuple<string, T>> DownloadedObservable { get { return downloadedObserver; } }
+		public IObservable<Tuple<string, long>> ErroredObservable { get { return erroredObserver; } }
+
 
 		int requestCount = 0;
 		int _downloadedCount = 0;
@@ -54,15 +58,12 @@ namespace Flour.Net
 		private Subject<float> progress = new Subject<float>();
 		public ISubject<float> Progress { get { return progress; } }
 
-		public ParallelWebRequest(string baseUrl, int parallel, int timeout, IObserver<Tuple<string, T>> downloadObserver, IObserver<Tuple<string, long>> errorObserver)
+		public ParallelWebRequest(string baseUrl, int parallel, int timeout)
 		{
 			this.baseUrl = baseUrl;
 
 			this.parallel = parallel;
 			this.timeout = timeout;
-
-			this.downloadObserver = downloadObserver;
-			this.errorObserver = errorObserver;
 		}
 
 		public void Dispose()
@@ -73,6 +74,12 @@ namespace Flour.Net
 			waitingList.Clear();
 			downloaders.ForEach(x => x.Dispose());
 			downloaders.Clear();
+
+			downloadedObserver.OnCompleted();
+			downloadedObserver.Dispose();
+
+			erroredObserver.OnCompleted();
+			erroredObserver.Dispose();
 
 			ResetProgress();
 		}
@@ -122,11 +129,11 @@ namespace Flour.Net
 					{
 						if (d.Request.isHttpError || d.Request.isNetworkError)
 						{
-							errorObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode));
+							erroredObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode));
 						}
 						else
 						{
-							downloadObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
+							downloadedObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
 						}
 
 						DownloadedCount++;

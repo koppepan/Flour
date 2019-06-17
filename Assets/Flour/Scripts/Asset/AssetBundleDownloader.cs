@@ -1,13 +1,11 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 namespace Flour.Asset
 {
 	public class ParallelAssetBundleDownloader : Net.ParallelWebRequest<AssetBundle>
 	{
-		public ParallelAssetBundleDownloader(string baseUrl, int parallel, int timeout, IObserver<Tuple<string, AssetBundle>> downloadObserver, IObserver<Tuple<string, long>> errorObserver)
-			: base(baseUrl, parallel, timeout, downloadObserver, errorObserver)
+		public ParallelAssetBundleDownloader(string baseUrl, int parallel, int timeout) : base(baseUrl, parallel, timeout)
 		{
 		}
 	}
