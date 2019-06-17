@@ -133,10 +133,9 @@ namespace Flour.Net
 						}
 						else
 						{
+							DownloadedCount++;
 							downloadedObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
 						}
-
-						DownloadedCount++;
 						downloaders.Remove(d);
 					}
 				}
