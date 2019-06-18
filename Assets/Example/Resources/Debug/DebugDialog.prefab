@@ -233,8 +233,6 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
 --- !u!114 &1065776975069791671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,11 +261,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titleText: {fileID: 322400266855170219}
   closeButton: {fileID: 6135358969162471647}
+  textPrefab: {fileID: 3687383709783157837, guid: 7742f36dbc41dea42baec20ca91e5339,
+    type: 3}
   buttonPrefab: {fileID: 2617436589000341481, guid: 927cde4d5950d424e92c87085e0073b1,
     type: 3}
   keypadPrefab: {fileID: -3419872342467681746, guid: 0d3ef06375c4eaa42867f6869dbee8bf,
     type: 3}
   dropdownPrefab: {fileID: -4357336715863283525, guid: 59dc9336eb86320458edb3dbcfb1add2,
+    type: 3}
+  togglePrefab: {fileID: 6044097513547379445, guid: 4e7529d801b46634e9266f1adecc57e7,
+    type: 3}
+  inputFieldPrefab: {fileID: 374855220420082932, guid: e9e8954a9da55b8479e287f7a1d12626,
     type: 3}
 --- !u!1 &3536319883344778797
 GameObject:
@@ -347,7 +351,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: Title
 --- !u!1 &4419664894203441178
 GameObject:
   m_ObjectHideFlags: 0
@@ -544,20 +548,17 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 3364023760842930771}

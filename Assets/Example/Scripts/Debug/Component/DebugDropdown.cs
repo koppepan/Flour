@@ -13,6 +13,9 @@ namespace Example
 
 		public void Setup(string[] contents, string defaultValue, System.Action<int, string> onSelect)
 		{
+			dropdown.ClearOptions();
+			selectButton.onClick.RemoveAllListeners();
+
 			var options = contents.Select(x => new Dropdown.OptionData(x)).ToList();
 			dropdown.AddOptions(options);
 			if (!string.IsNullOrEmpty(defaultValue))

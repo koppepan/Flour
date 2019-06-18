@@ -17,11 +17,18 @@ namespace Example
 		private Button closeButton = default;
 
 		[SerializeField]
+		private DebugText textPrefab = default;
+		[SerializeField]
 		private DebugButton buttonPrefab = default;
 		[SerializeField]
 		private DebugKeypad keypadPrefab = default;
 		[SerializeField]
 		private DebugDropdown dropdownPrefab = default;
+		[SerializeField]
+		private DebugToggle togglePrefab = default;
+
+		[SerializeField]
+		private DebugInputField inputFieldPrefab = default;
 
 		Func<string, Vector2, UniTask<DebugDialog>> openDialogFunc;
 
@@ -91,6 +98,12 @@ namespace Example
 			return content;
 		}
 
+		public DebugDialog AddText(string key)
+		{
+			var text = AddContent<DebugText>(key, textPrefab);
+			text.Setup(key);
+			return this;
+		}
 		public DebugDialog AddButton(string key, Action onClick)
 		{
 			var button = AddContent<DebugButton>(key, buttonPrefab);
@@ -113,6 +126,19 @@ namespace Example
 		{
 			var dropdown = AddContent<DebugDropdown>(key, dropdownPrefab);
 			dropdown?.Setup(contents, defaultValue, onSelect);
+			return this;
+		}
+		public DebugDialog AddToggle(string key, Action<bool> onChanged)
+		{
+			var toggle = AddContent<DebugToggle>(key, togglePrefab);
+			toggle?.Setup(key, onChanged);
+			return this;
+		}
+
+		public DebugDialog AddInputField(string key, Action<string> onEndEdit)
+		{
+			var input = AddContent<DebugInputField>(key, inputFieldPrefab);
+			input?.Setup(onEndEdit);
 			return this;
 		}
 	}

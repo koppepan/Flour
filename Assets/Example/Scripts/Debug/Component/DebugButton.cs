@@ -12,7 +12,10 @@ namespace Example
 		public void Setup(string title, System.Action onClick)
 		{
 			titleText.text = title;
-			GetComponent<Button>().onClick.AddListener(() => onClick?.Invoke());
+
+			var button = GetComponent<Button>();
+			button.onClick.RemoveAllListeners();
+			button.onClick.AddListener(() => onClick?.Invoke());
 		}
 	}
 }
