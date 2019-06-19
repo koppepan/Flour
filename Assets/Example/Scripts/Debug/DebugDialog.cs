@@ -33,6 +33,8 @@ namespace Example
 		private DebugDropdown dropdownPrefab = default;
 		[SerializeField]
 		private DebugToggle togglePrefab = default;
+		[SerializeField]
+		private DebugSlider sliderPrefab = default;
 
 		[SerializeField]
 		private DebugInputField inputFieldPrefab = default;
@@ -151,6 +153,12 @@ namespace Example
 		{
 			var toggle = AddContent<DebugToggle>(key, togglePrefab);
 			toggle?.Setup(title, onChanged);
+			return this;
+		}
+		public DebugDialog AddSlider(string key, float value, float min, float max, Action<float> onChanged = null)
+		{
+			var slider = AddContent<DebugSlider>(key, sliderPrefab);
+			slider.Setup(value, min, max, onChanged);
 			return this;
 		}
 
