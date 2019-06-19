@@ -129,38 +129,38 @@ namespace Example
 			button?.Setup(title, onClick);
 			return this;
 		}
-		public DebugDialog AddFloatKeypad(string key, Action<double> onSelect)
+		public DebugDialog AddFloatKeypad(string key, Action<double> onSelect = null)
 		{
 			var keypad = AddContent<DebugFloatKeypad>(key, floatKeypadPrefab);
 			keypad?.Setup(onSelect);
 			return this;
 		}
-		public DebugDialog AddIntegerKeypad(string key, Action<long> onSelect)
+		public DebugDialog AddIntegerKeypad(string key, Action<long> onSelect = null)
 		{
 			var keypad = AddContent<DebugIntegerKeypad>(key, integerKeypadPrefab);
 			keypad?.Setup(onSelect);
 			return this;
 		}
-		public DebugDialog AddDropdown(string key, string[] contents, string defaultValue, Action<int, string> onChanged)
+		public DebugDialog AddDropdown(string key, string[] contents, string defaultValue, Action<int, string> onChanged = null)
 		{
 			var dropdown = AddContent<DebugDropdown>(key, dropdownPrefab);
 			dropdown?.Setup(contents, defaultValue, onChanged);
 			return this;
 		}
-		public DebugDialog AddToggle(string key, string title, Action<bool> onChanged)
+		public DebugDialog AddToggle(string key, string title, Action<bool> onChanged = null)
 		{
 			var toggle = AddContent<DebugToggle>(key, togglePrefab);
 			toggle?.Setup(title, onChanged);
 			return this;
 		}
 
-		public DebugDialog AddInputField(string key, Action<string> onEndEdit)
+		public DebugDialog AddInputField(string key, Action<string> onEndEdit = null)
 		{
 			var input = AddContent<DebugInputField>(key, inputFieldPrefab);
 			input?.Setup(onEndEdit);
 			return this;
 		}
-		public DebugDialog AddInputDate(string key, Action<DateTime> onChanged)
+		public DebugDialog AddInputDate(string key, Action<DateTime> onChanged = null)
 		{
 			var input = AddContent<DebugInputDate>(key, inputDatePrefab);
 			input?.Setup(DateTime.Now, onChanged);
