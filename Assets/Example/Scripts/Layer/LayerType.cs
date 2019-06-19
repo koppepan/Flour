@@ -25,19 +25,19 @@ namespace Example
 	public enum SubLayerType
 	{
 		[Japanease("")] None,
-		[Japanease("Blackout")] Blackout,
+		[Japanease("UI/Blackout")] Blackout,
 
-		[Japanease("Splash")] Splash,
-		[Japanease("Title")] Title,
+		[Japanease("UI/Splash")] Splash,
+		[Japanease("UI/Title")] Title,
 
-		[Japanease("Footer")] Footer,
-		[Japanease("Sample1")] Sample1,
-		[Japanease("Sample2")] Sample2,
-		[Japanease("Sample3")] Sample3,
-		[Japanease("Sample4")] Sample4,
+		[Japanease("UI/Footer")] Footer,
+		[Japanease("UI/Sample1")] Sample1,
+		[Japanease("UI/Sample2")] Sample2,
+		[Japanease("UI/Sample3")] Sample3,
+		[Japanease("UI/Sample4")] Sample4,
 
 
-		[Japanease("Debug/DebugDialog")] DebugDialog,
+		[Japanease("UI/Debug/DebugDialog")] DebugDialog,
 	}
 
 	public static class SubLayerTypeExtention

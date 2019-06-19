@@ -15,12 +15,12 @@ namespace Example
 
 		public static SubLayerSourceRepository Create(IEnumerable<SubLayerType> subLayers, int cacheLimit)
 		{
-			subLayers = subLayers.Where(x => !x.ToResourcePath().StartsWith("Debug"));
+			subLayers = subLayers.Where(x => !x.ToResourcePath().StartsWith("UI/Debug"));
 			return new SubLayerSourceRepository(subLayers, cacheLimit);
 		}
 		public static SubLayerSourceRepository CreateDebug()
 		{
-			var debugLayers = Flour.EnumExtension.ToEnumerable<SubLayerType>(x => x.ToResourcePath().StartsWith("Debug"));
+			var debugLayers = Flour.EnumExtension.ToEnumerable<SubLayerType>(x => x.ToResourcePath().StartsWith("UI/Debug"));
 			return new SubLayerSourceRepository(debugLayers, debugLayers.Count());
 		}
 
