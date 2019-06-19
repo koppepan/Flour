@@ -30,7 +30,7 @@ namespace Flour.Layer
 			}
 			if (layers.ContainsKey(layerType))
 			{
-				throw new ArgumentException($"same key already exists. key => {layerType}");
+				throw new ArgumentException($"[LayerHandler] same key already exists. key => {layerType}");
 			}
 
 			var layer = new Layer<TLayerKey, TSubKey>(canvasRoot, layerType, sortingOrder, referenceResolution);
@@ -48,7 +48,7 @@ namespace Flour.Layer
 		{
 			if (layers.ContainsKey(layerType))
 			{
-				throw new ArgumentException($"same key already exists. key => {layerType}");
+				throw new ArgumentException($"[LayerHandler] same key already exists. key => {layerType}");
 			}
 			var layer = new Layer<TLayerKey, TSubKey>(canvasRoot, layerType, sortingOrder, referenceResolution, renderMode, camera);
 			layers.Add(layerType, layer);
@@ -81,7 +81,7 @@ namespace Flour.Layer
 		{
 			if (!layers.ContainsKey(layerType))
 			{
-				throw new NullReferenceException($"not found {layerType} layer canvas.");
+				throw new NullReferenceException($"[LayerHandler] not found {layerType} layer canvas.");
 			}
 			return layers[layerType];
 		}
@@ -105,7 +105,7 @@ namespace Flour.Layer
 
 			if (!overlap && old != null)
 			{
-				throw new ArgumentException($"same key already exists. key => {key}");
+				throw new ArgumentException($"[LayerHandler] same key already exists. key => {key}");
 			}
 
 			var sub = GameObject.Instantiate(prefab);
