@@ -101,10 +101,8 @@ namespace Example
 #if DEBUG_BUILD
 			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
 
-			var debugRepository = SubLayerSourceRepository.CreateDebug();
-
 			var debugHandler = new GameObject("DebugHandler", typeof(DebugHandler)).GetComponent<DebugHandler>();
-			debugHandler.Initialize(sceneHandler, layerHandler, debugRepository);
+			debugHandler.Initialize(sceneHandler, layerHandler, SubLayerSourceRepository.CreateDebug());
 
 			DontDestroyObjectList.Add<DebugHandler>(debugHandler.gameObject);
 #endif

@@ -30,22 +30,22 @@ namespace Example
 				h => Application.logMessageReceived += LogMessageReceived,
 				h => Application.logMessageReceived -= LogMessageReceived).Subscribe().AddTo(this);
 
-#if UNITY_EDITOR
-			var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
-			var mouseUpStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonUp(1));
-#else
+#if UNITY_ANDROID || UNITY_IOS
 			var mouseDownStream = Observable.EveryUpdate().Select(_ => Input.touchCount).Pairwise().Where(pair => pair.Current >= 3 && pair.Previous < 3);
 			var mouseUpStream = Observable.EveryUpdate().Select(_ => Input.touchCount).Pairwise().Where(pair => pair.Current < 3 && pair.Previous >= 3);
+#elif UNITY_EDITOR || UNITY_STANDALONE
+			var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
+			var mouseUpStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonUp(1));
 #endif
 
 			mouseDownStream
 				.SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(1)))
 				.TakeUntil(mouseUpStream)
 				.RepeatUntilDestroy(this)
-#if UNITY_EDITOR
-				.Subscribe(_ => OpenDialog(Input.mousePosition))
-#else
+#if UNITY_ANDROID || UNITY_IOS
 				.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
+#elif UNITY_EDITOR || UNITY_STANDALONE
+				.Subscribe(_ => OpenDialog(Input.mousePosition))
 #endif
 				.AddTo(this);
 		}
