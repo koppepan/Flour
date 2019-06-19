@@ -3,14 +3,14 @@ using UnityEngine.Networking;
 
 namespace Flour.Asset
 {
-	public class ParallelAssetBundleDownloader : Net.ParallelWebRequest<AssetBundle>
+	internal class ParallelAssetBundleDownloader : Net.ParallelWebRequest<AssetBundle>
 	{
 		public ParallelAssetBundleDownloader(string baseUrl, int parallel, int timeout) : base(baseUrl, parallel, timeout)
 		{
 		}
 	}
 
-	public struct AssetBundleDownloader : Net.IDownloader<AssetBundle>
+	internal struct AssetBundleDownloader : Net.IDownloader<AssetBundle>
 	{
 		public string Path { get; private set; }
 		public UnityWebRequest Request { get; private set; }

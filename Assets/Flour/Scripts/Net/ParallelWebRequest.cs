@@ -58,6 +58,9 @@ namespace Flour.Net
 		private Subject<float> progress = new Subject<float>();
 		public ISubject<float> Progress { get { return progress; } }
 
+		BoolReactiveProperty runningProperty = new BoolReactiveProperty(false);
+		public IReactiveProperty<bool> Running { get { return runningProperty; } }
+
 		public ParallelWebRequest(string baseUrl, int parallel, int timeout)
 		{
 			this.baseUrl = baseUrl;
@@ -90,6 +93,7 @@ namespace Flour.Net
 			{
 				return;
 			}
+			runningProperty.Value = true;
 			updateDisposable = Observable.FromCoroutine(EveryUpdate).Subscribe();
 		}
 		void StopUpdate()
@@ -99,6 +103,7 @@ namespace Flour.Net
 				updateDisposable.Dispose();
 				updateDisposable = null;
 			}
+			runningProperty.Value = false;
 		}
 
 		public void ResetProgress()
