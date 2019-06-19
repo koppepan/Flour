@@ -12,14 +12,14 @@ namespace Example
 		[SerializeField]
 		private Transform keyParent = default;
 
-		string input;
+		protected string input;
 
-		public void SetupFloat(System.Action<double> onRun)
+		protected void SetupFloat(System.Action<double> onRun)
 		{
 			Initialize();
 			RegisterEvent(true, () => onRun?.Invoke(double.Parse(input)));
 		}
-		public void SetupInteger(System.Action<long> onRun)
+		protected void SetupInteger(System.Action<long> onRun)
 		{
 			Initialize();
 			RegisterEvent(false, () => onRun?.Invoke(long.Parse(input)));

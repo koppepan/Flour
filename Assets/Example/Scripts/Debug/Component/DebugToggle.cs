@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Example
 {
 	[RequireComponent(typeof(Toggle))]
-	public class DebugToggle : MonoBehaviour
+	public class DebugToggle : MonoBehaviour, DebugDialog.IContent<bool>
 	{
 		public void Setup(string title, System.Action<bool> onChanged)
 		{
@@ -13,6 +13,11 @@ namespace Example
 			var t = GetComponent<Toggle>();
 			t.onValueChanged.RemoveAllListeners();
 			t.onValueChanged.AddListener(b => onChanged?.Invoke(b));
+		}
+
+		public bool GetValue()
+		{
+			return GetComponent<Toggle>().isOn;
 		}
 	}
 }

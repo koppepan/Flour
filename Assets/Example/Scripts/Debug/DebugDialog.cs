@@ -9,6 +9,11 @@ namespace Example
 {
 	public class DebugDialog : AbstractSubLayer, IPointerDownHandler, IPointerUpHandler, IDragHandler
 	{
+		public interface IContent<T>
+		{
+			T GetValue();
+		}
+
 		public override bool IgnoreBack => true;
 
 		[SerializeField]
@@ -21,7 +26,9 @@ namespace Example
 		[SerializeField]
 		private DebugButton buttonPrefab = default;
 		[SerializeField]
-		private DebugKeypad keypadPrefab = default;
+		private DebugFloatKeypad floatKeypadPrefab = default;
+		[SerializeField]
+		private DebugIntegerKeypad integerKeypadPrefab = default;
 		[SerializeField]
 		private DebugDropdown dropdownPrefab = default;
 		[SerializeField]
@@ -29,6 +36,8 @@ namespace Example
 
 		[SerializeField]
 		private DebugInputField inputFieldPrefab = default;
+		[SerializeField]
+		private DebugInputDate inputDatePrefab = default;
 
 		Func<string, Vector2, UniTask<DebugDialog>> openDialogFunc;
 
@@ -83,6 +92,16 @@ namespace Example
 			}
 		}
 
+		public T GetValeu<T>(string key)
+		{
+			if (!contents.ContainsKey(key))
+			{
+				Debug.LogWarning($"not found debug content key => {key}");
+				return default;
+			}
+			return contents[key].GetComponent<IContent<T>>().GetValue();
+		}
+
 		private T AddContent<T>(string key, T prefab) where T : MonoBehaviour
 		{
 			if (contents.ContainsKey(key))
@@ -104,34 +123,34 @@ namespace Example
 			text.Setup(key);
 			return this;
 		}
-		public DebugDialog AddButton(string key, Action onClick)
+		public DebugDialog AddButton(string key, string title, Action onClick)
 		{
 			var button = AddContent<DebugButton>(key, buttonPrefab);
-			button?.Setup(key, onClick);
+			button?.Setup(title, onClick);
 			return this;
 		}
-		public DebugDialog AddFloatKeypad(string key, Action<double> onRun)
+		public DebugDialog AddFloatKeypad(string key, Action<double> onSelect)
 		{
-			var keypad = AddContent<DebugKeypad>(key, keypadPrefab);
-			keypad?.SetupFloat(onRun);
+			var keypad = AddContent<DebugFloatKeypad>(key, floatKeypadPrefab);
+			keypad?.Setup(onSelect);
 			return this;
 		}
-		public DebugDialog AddIntegerKeypad(string key, Action<long> onRun)
+		public DebugDialog AddIntegerKeypad(string key, Action<long> onSelect)
 		{
-			var keypad = AddContent<DebugKeypad>(key, keypadPrefab);
-			keypad?.SetupInteger(onRun);
+			var keypad = AddContent<DebugIntegerKeypad>(key, integerKeypadPrefab);
+			keypad?.Setup(onSelect);
 			return this;
 		}
-		public DebugDialog AddDropdown(string key, string[] contents, string defaultValue, Action<int, string> onSelect)
+		public DebugDialog AddDropdown(string key, string[] contents, string defaultValue, Action<int, string> onChanged)
 		{
 			var dropdown = AddContent<DebugDropdown>(key, dropdownPrefab);
-			dropdown?.Setup(contents, defaultValue, onSelect);
+			dropdown?.Setup(contents, defaultValue, onChanged);
 			return this;
 		}
-		public DebugDialog AddToggle(string key, Action<bool> onChanged)
+		public DebugDialog AddToggle(string key, string title, Action<bool> onChanged)
 		{
 			var toggle = AddContent<DebugToggle>(key, togglePrefab);
-			toggle?.Setup(key, onChanged);
+			toggle?.Setup(title, onChanged);
 			return this;
 		}
 
@@ -139,6 +158,12 @@ namespace Example
 		{
 			var input = AddContent<DebugInputField>(key, inputFieldPrefab);
 			input?.Setup(onEndEdit);
+			return this;
+		}
+		public DebugDialog AddInputDate(string key, Action<DateTime> onChanged)
+		{
+			var input = AddContent<DebugInputDate>(key, inputDatePrefab);
+			input?.Setup(DateTime.Now, onChanged);
 			return this;
 		}
 	}

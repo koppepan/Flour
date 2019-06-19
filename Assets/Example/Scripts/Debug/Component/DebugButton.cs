@@ -4,7 +4,7 @@ using UnityEngine.UI;
 namespace Example
 {
 	[RequireComponent(typeof(Button))]
-	public class DebugButton : MonoBehaviour
+	public class DebugButton : MonoBehaviour, DebugDialog.IContent<bool>
 	{
 		[SerializeField]
 		private Text titleText = default;
@@ -16,6 +16,10 @@ namespace Example
 			var button = GetComponent<Button>();
 			button.onClick.RemoveAllListeners();
 			button.onClick.AddListener(() => onClick?.Invoke());
+		}
+		public bool GetValue()
+		{
+			return GetComponent<Button>().interactable;
 		}
 	}
 }

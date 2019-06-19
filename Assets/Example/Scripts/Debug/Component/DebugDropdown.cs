@@ -4,17 +4,13 @@ using UnityEngine.UI;
 
 namespace Example
 {
-	public class DebugDropdown : MonoBehaviour
+	[RequireComponent(typeof(Dropdown))]
+	public class DebugDropdown : MonoBehaviour, DebugDialog.IContent<System.Tuple<int, string>>
 	{
-		[SerializeField]
-		Dropdown dropdown = default;
-		[SerializeField]
-		Button selectButton = default;
-
-		public void Setup(string[] contents, string defaultValue, System.Action<int, string> onSelect)
+		public void Setup(string[] contents, string defaultValue, System.Action<int, string> onChanged)
 		{
+			var dropdown = GetComponent<Dropdown>();
 			dropdown.ClearOptions();
-			selectButton.onClick.RemoveAllListeners();
 
 			var options = contents.Select(x => new Dropdown.OptionData(x)).ToList();
 			dropdown.AddOptions(options);
@@ -23,7 +19,14 @@ namespace Example
 				dropdown.value = contents.ToList().IndexOf(defaultValue);
 			}
 
-			selectButton.onClick.AddListener(() => onSelect?.Invoke(dropdown.value, dropdown.options[dropdown.value].text));
+			dropdown.onValueChanged.RemoveAllListeners();
+			dropdown.onValueChanged.AddListener(_ => onChanged?.Invoke(dropdown.value, dropdown.options[dropdown.value].text));
+		}
+
+		public System.Tuple<int, string> GetValue()
+		{
+			var dropdown = GetComponent<Dropdown>();
+			return System.Tuple.Create(dropdown.value, dropdown.options[dropdown.value].text);
 		}
 	}
 }

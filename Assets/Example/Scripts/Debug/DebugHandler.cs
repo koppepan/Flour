@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
+using Flour;
 
 namespace Example
 {
@@ -57,6 +58,7 @@ namespace Example
 			if (dialog != null)
 			{
 				dialog.Setup(title, Open);
+				dialog.GetComponent<RectTransform>().SetAlignment(TextAnchor.UpperCenter);
 				dialog.transform.position = position;
 			}
 			return dialog;
