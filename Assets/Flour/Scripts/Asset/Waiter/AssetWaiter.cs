@@ -25,7 +25,7 @@ namespace Flour.Asset
 		void OnError(string assetBundleName, string assetName, Exception e);
 	}
 
-	public class AssetWaiter<T> :IWaiter where T : UnityEngine.Object
+	public class AssetWaiter<T> : IWaiter where T : UnityEngine.Object
 	{
 		internal class Request : IAssetRequest
 		{
@@ -95,6 +95,15 @@ namespace Flour.Asset
 			}
 
 			var ab = Path.Combine(Key, assetbundleName);
+
+#if UNITY_EDITOR && USE_LOCAL_ASSET
+			var localAsset = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(ab, assetName);
+			if (localAsset.Length > 0)
+			{
+				return Observable.Return<T>((T)UnityEditor.AssetDatabase.LoadAssetAtPath(localAsset[0], typeof(T)));
+			}
+#endif
+
 			var req = new Request(ab, manifest.GetAllDependencies(ab), assetName, new Subject<T>());
 			requests.Add(req);
 
