@@ -24,7 +24,7 @@ namespace Flour.Asset
 
 	public class AssetWaiter<T> :IWaiter where T : UnityEngine.Object
 	{
-		internal struct Request : IAssetRequest
+		internal class Request : IAssetRequest
 		{
 			public string AssetBundleName { get; private set; }
 			public string[] Dependencies { get; private set; }
@@ -68,7 +68,7 @@ namespace Flour.Asset
 			}
 		}
 
-		public IObservable<T> LoadAsync(string assetbundleName, string assetName)
+		public virtual IObservable<T> LoadAsync(string assetbundleName, string assetName)
 		{
 			var ab = Path.Combine(Key, assetbundleName);
 			var req = new Request(ab, manifest.GetAllDependencies(ab), assetName, new Subject<T>());
@@ -78,17 +78,22 @@ namespace Flour.Asset
 			return req.subject;
 		}
 
-		public void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset)
+		public virtual void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset)
 		{
 			var req = requests.FirstOrDefault(x => x.AssetBundleName == assetBundleName && x.AssetName == assetName);
 			if (req.Equals(default(Request)))
 			{
 				return;
 			}
-			req.subject.OnNext((T)asset);
+			req.subject.OnNext(GetAsset(asset));
 			req.subject.OnCompleted();
 
 			requests.Remove(req);
+		}
+
+		protected virtual T GetAsset(UnityEngine.Object asset)
+		{
+			return (T)asset;
 		}
 	}
 }
