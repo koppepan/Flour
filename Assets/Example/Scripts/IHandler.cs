@@ -16,6 +16,11 @@ namespace Example
 		ILayerHandler LayerHandler { get; }
 	}
 
+	public interface IAssetHandler
+	{
+		Flour.Asset.SpriteAssetWaiter SpriteWaiter { get; }
+	}
+
 	public interface IInputBinder
 	{
 		bool Binded { get; }

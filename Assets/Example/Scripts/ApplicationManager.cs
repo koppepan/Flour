@@ -7,7 +7,7 @@ using Flour;
 
 namespace Example
 {
-	using SceneHandler = Flour.Scene.SceneHandler<IOperationBundler>;
+	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, IAssetHandler>>;
 	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
 	public sealed class ApplicationManager : MonoBehaviour
@@ -24,6 +24,7 @@ namespace Example
 		readonly SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
 
 		private ApplicationOperator appOperator;
+		private AssetHandler assetHandler;
 
 		private void Awake()
 		{
@@ -54,7 +55,8 @@ namespace Example
 				SubLayerSourceRepository.Create(EnumExtension.ToEnumerable<SubLayerType>(x => !FixedSubLayers.Contains(x)), 10),
 				fixedRepository
 				);
-
+			await appOperator.InitializeAsync();
+		
 			await appOperator.LoadSceneAsync(SceneType.Start);
 
 			// AndroidのBackKey対応
