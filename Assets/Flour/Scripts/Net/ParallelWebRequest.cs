@@ -31,10 +31,10 @@ namespace Flour.Net
 		readonly List<IDownloader<T>> downloaders = new List<IDownloader<T>>();
 
 		readonly Subject<Tuple<string, T>> downloadedObserver = new Subject<Tuple<string, T>>();
-		readonly Subject<Tuple<string, long>> erroredObserver = new Subject<Tuple<string, long>>();
+		readonly Subject<Tuple<string, long, string>> erroredObserver = new Subject<Tuple<string, long, string>>();
 
 		public IObservable<Tuple<string, T>> DownloadedObservable { get { return downloadedObserver; } }
-		public IObservable<Tuple<string, long>> ErroredObservable { get { return erroredObserver; } }
+		public IObservable<Tuple<string, long, string>> ErroredObservable { get { return erroredObserver; } }
 
 
 		int requestCount = 0;
@@ -134,7 +134,7 @@ namespace Flour.Net
 					{
 						if (d.Request.isHttpError || d.Request.isNetworkError)
 						{
-							erroredObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode));
+							erroredObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode, d.Request.error));
 						}
 						else
 						{

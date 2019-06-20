@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using UnityEngine;
 using UniRx;
 
@@ -15,10 +16,10 @@ namespace Flour.Asset
 		readonly List<Tuple<string, string, AssetBundleRequest>> requests = new List<Tuple<string, string, AssetBundleRequest>>();
 
 		readonly Subject<Tuple<string, string, UnityEngine.Object>> loadedSubject = new Subject<Tuple<string, string, UnityEngine.Object>>();
-		readonly Subject<Tuple<string, Exception>> erroredSubject = new Subject<Tuple<string, Exception>>();
+		readonly Subject<Tuple<string, string, Exception>> erroredSubject = new Subject<Tuple<string, string, Exception>>();
 
 		internal IObservable<Tuple<string, string, UnityEngine.Object>> LoadObservable { get { return loadedSubject; } }
-		internal IObservable<Tuple<string, Exception>> ErrorObservable { get { return erroredSubject; } }
+		internal IObservable<Tuple<string, string, Exception>> ErrorObservable { get { return erroredSubject; } }
 
 
 		IDisposable updateDisposable;
@@ -80,7 +81,14 @@ namespace Flour.Asset
 			}
 			if (!requests.Any(x => x.Item1 == path && x.Item2 == assetName))
 			{
-				requests.Add(Tuple.Create(path, assetName, assetBundles[path].LoadAssetAsync(assetName)));
+				if (!assetBundles[path].GetAllAssetNames().Any(x => Path.GetFileNameWithoutExtension(x) == assetName))
+				{
+					erroredSubject.OnNext(Tuple.Create(path, assetName, new Exception("no asset in AssetBundle.")));
+				}
+				else
+				{
+					requests.Add(Tuple.Create(path, assetName, assetBundles[path].LoadAssetAsync(assetName)));
+				}
 			}
 
 			if (requests.Count > 0)

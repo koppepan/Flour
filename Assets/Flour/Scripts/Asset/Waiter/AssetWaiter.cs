@@ -20,6 +20,8 @@ namespace Flour.Asset
 
 		IEnumerable<IAssetRequest> GetRequests(string assetBundleName);
 		void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset);
+		void OnError(string assetBundleName, Exception e);
+		void OnError(string assetBundleName, string assetName, Exception e);
 	}
 
 	public class AssetWaiter<T> :IWaiter where T : UnityEngine.Object
@@ -98,6 +100,30 @@ namespace Flour.Asset
 					req.subject.OnNext(GetAsset(asset));
 					req.subject.OnCompleted();
 
+					requests.Remove(req);
+				}
+			}
+		}
+		public void OnError(string assetBundleName, Exception e)
+		{
+			for (int i = requests.Count - 1; i >= 0; i--)
+			{
+				var req = requests[i];
+				if (req.AssetBundleName == assetBundleName)
+				{
+					req.subject.OnError(new Exception(assetBundleName, e));
+					requests.Remove(req);
+				}
+			}
+		}
+		public void OnError(string assetBundleName, string assetName, Exception e)
+		{
+			for (int i = requests.Count - 1; i >= 0; i--)
+			{
+				var req = requests[i];
+				if (req.AssetBundleName == assetBundleName && req.AssetName == assetName)
+				{
+					req.subject.OnError(new Exception($"{assetBundleName}.{assetName}", e));
 					requests.Remove(req);
 				}
 			}

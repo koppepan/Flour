@@ -95,8 +95,15 @@ namespace Flour.Asset
 			}
 		}
 
-		void OnDownloadError(Tuple<string, long> error)
+		void OnDownloadError(Tuple<string, long, string> error)
 		{
+			for (int i = 0; i < waiters.Count; i++)
+			{
+				if (error.Item1.StartsWith(waiters[i].Key))
+				{
+					waiters[i].OnError(error.Item1, new Exception(error.Item3));
+				}
+			}
 		}
 
 		void OnLoadedObject(Tuple<string, string, UnityEngine.Object> asset)
@@ -112,8 +119,15 @@ namespace Flour.Asset
 			}
 		}
 
-		void OnAssetLoadError(Tuple<string, Exception> error)
+		void OnAssetLoadError(Tuple<string, string, Exception> error)
 		{
+			for (int i = 0; i < waiters.Count; i++)
+			{
+				if (error.Item1.StartsWith(waiters[i].Key))
+				{
+					waiters[i].OnError(error.Item1, error.Item2, error.Item3);
+				}
+			}
 		}
 	}
 }
