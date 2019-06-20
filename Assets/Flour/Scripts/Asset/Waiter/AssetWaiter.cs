@@ -104,7 +104,7 @@ namespace Flour.Asset
 
 		protected virtual T GetAsset(UnityEngine.Object asset)
 		{
-			return (T)asset;
+			return asset != null ? (T)asset : null;
 		}
 
 		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset)

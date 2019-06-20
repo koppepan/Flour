@@ -18,6 +18,7 @@ namespace Example
 
 	public interface IAssetHandler
 	{
+		Flour.Asset.SceneWaiter SceneWaiter { get; }
 		Flour.Asset.SpriteAssetWaiter SpriteWaiter { get; }
 	}
 
