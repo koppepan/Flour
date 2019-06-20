@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.IO;
 using UnityEditor;
 
 public class CustomMenu
@@ -28,4 +29,17 @@ public class CustomMenu
 		Flour.Build.BuildScript.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { DebugSymboleValue });
 	}
 	#endregion
+
+
+	[MenuItem("CustomMenu/AssetBundles Build")]
+	public static void BuildAssetBundle()
+	{
+		if (!Directory.Exists("AssetBundles"))
+		{
+			Directory.CreateDirectory("AssetBundles");
+		}
+
+		var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
+		BuildPipeline.BuildAssetBundles("AssetBundles", options, BuildTarget.StandaloneWindows64);
+	}
 }
