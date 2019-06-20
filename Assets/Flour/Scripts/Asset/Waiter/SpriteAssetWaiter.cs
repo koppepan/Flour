@@ -7,7 +7,7 @@ namespace Flour.Asset
 {
 	public class SpriteAssetWaiter : AssetWaiter<Sprite>
 	{
-		Dictionary<string, Sprite> cache = new Dictionary<string, Sprite>();
+		readonly Dictionary<string, Sprite> cache = new Dictionary<string, Sprite>();
 
 		public SpriteAssetWaiter(string key) : base(key)
 		{

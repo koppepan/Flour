@@ -50,8 +50,6 @@ namespace Flour.Asset
 
 		readonly List<Request> requests = new List<Request>();
 
-		IDisposable disposable;
-
 		AssetBundleManifest manifest;
 		Action<string, string[]> addRequest;
 		Action<string, string[]> cleanRequest;

@@ -21,9 +21,6 @@ namespace Flour.Asset
 		internal IObservable<Tuple<string, string, UnityEngine.Object>> LoadObservable { get { return loadedSubject; } }
 		internal IObservable<Tuple<string, string, Exception>> ErrorObservable { get { return erroredSubject; } }
 
-		internal IEnumerable<string> HasKeys { get { return assetBundles.Keys; } }
-
-
 		IDisposable updateDisposable;
 
 		internal void Dispose()
