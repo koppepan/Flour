@@ -97,8 +97,15 @@ namespace Flour.Asset
 				var req = requests[i];
 				if (req.AssetBundleName == assetBundleName && req.AssetName == assetName)
 				{
-					req.subject.OnNext(GetAsset(asset));
-					req.subject.OnCompleted();
+					if (req.subject.HasObservers)
+					{
+						req.subject.OnNext(GetAsset(asset));
+						req.subject.OnCompleted();
+					}
+					else
+					{
+						req.subject.Dispose();
+					}
 
 					requests.Remove(req);
 				}
