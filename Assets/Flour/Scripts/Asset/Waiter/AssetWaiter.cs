@@ -19,7 +19,7 @@ namespace Flour.Asset
 		void SetManifest(AssetBundleManifest manifest, Action<string, string[]> addRequest);
 
 		IEnumerable<IAssetRequest> GetRequests(string assetBundleName);
-		void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset);
+		void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset);
 		void OnError(string assetBundleName, Exception e);
 		void OnError(string assetBundleName, string assetName, Exception e);
 	}
@@ -90,7 +90,7 @@ namespace Flour.Asset
 			return (T)asset;
 		}
 
-		public void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset)
+		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset)
 		{
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{

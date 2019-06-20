@@ -114,7 +114,7 @@ namespace Flour.Asset
 			{
 				if (asset.Item1.StartsWith(waiters[i].Key))
 				{
-					waiters[i].OnDownloaded(asset.Item1, asset.Item2, asset.Item3);
+					waiters[i].OnLoaded(asset.Item1, asset.Item2, asset.Item3);
 				}
 			}
 		}
