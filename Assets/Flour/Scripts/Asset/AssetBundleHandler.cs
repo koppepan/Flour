@@ -54,7 +54,7 @@ namespace Flour.Asset
 
 		public void AddWaiter(IWaiter waiter)
 		{
-			waiter.SetManifest(manifest, AddRequest);
+			waiter.SetHandler(manifest, AddRequest, CleanRequest);
 			waiters.Add(waiter);
 		}
 
@@ -67,11 +67,26 @@ namespace Flour.Asset
 			downloadHandler.AddRequest(new AssetBundleDownloader(assetbundlePath, manifest.GetAssetBundleHash(assetbundlePath)));
 		}
 
-		public void AddRequest(string assetbundlePath, string[] dependencies)
+		void AddRequest(string assetBundleName, string[] dependencies)
 		{
-			AddRequestInternal(assetbundlePath);
+			AddRequestInternal(assetBundleName);
 			for (int i = 0; i < dependencies.Length; i++) AddRequestInternal(dependencies[i]);
 		}
+		void CleanRequest(string assetBundleName, string[] dependencies)
+		{
+			if (waiters.Any(x => !x.ContainsRequest(assetBundleName)))
+			{
+				assetLoadHandler.Unload(assetBundleName);
+			}
+			for (int i = 0; i < dependencies.Length; i++)
+			{
+				if (waiters.Any(x => !x.ContainsRequest(dependencies[i])))
+				{
+					assetLoadHandler.Unload(dependencies[i]);
+				}
+			}
+		}
+
 
 		void OnCompleteDownload(Tuple<string, AssetBundle> asset)
 		{

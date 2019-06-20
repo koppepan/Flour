@@ -16,8 +16,9 @@ namespace Flour.Asset
 	public interface IWaiter
 	{
 		string Key { get; }
-		void SetManifest(AssetBundleManifest manifest, Action<string, string[]> addRequest);
+		void SetHandler(AssetBundleManifest manifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest);
 
+		bool ContainsRequest(string assetBundleName);
 		IEnumerable<IAssetRequest> GetRequests(string assetBundleName);
 		void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset);
 		void OnError(string assetBundleName, Exception e);
@@ -53,15 +54,28 @@ namespace Flour.Asset
 
 		AssetBundleManifest manifest;
 		Action<string, string[]> addRequest;
+		Action<string, string[]> cleanRequest;
 
 		public AssetWaiter(string key) => Key = key;
 
-		public void SetManifest(AssetBundleManifest manifest, Action<string, string[]> addRequest)
+		public void SetHandler(AssetBundleManifest manifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest)
 		{
 			this.manifest = manifest;
 			this.addRequest = addRequest;
+			this.cleanRequest = cleanRequest;
 		}
 
+		public bool ContainsRequest(string assetBundleName)
+		{
+			for (int i = 0; i < requests.Count; i++)
+			{
+				if (requests[i].AssetBundleName == assetBundleName || requests[i].Dependencies.Contains(assetBundleName))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 		public IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
 		{
 			for (int i = 0; i < requests.Count; i++)
@@ -118,6 +132,7 @@ namespace Flour.Asset
 					}
 
 					requests.Remove(req);
+					cleanRequest(req.AssetBundleName, req.Dependencies);
 				}
 			}
 		}
@@ -130,6 +145,7 @@ namespace Flour.Asset
 				{
 					req.subject.OnError(new Exception(assetBundleName, e));
 					requests.Remove(req);
+					cleanRequest(req.AssetBundleName, req.Dependencies);
 				}
 			}
 		}
@@ -142,6 +158,7 @@ namespace Flour.Asset
 				{
 					req.subject.OnError(new Exception($"{assetBundleName}.{assetName}", e));
 					requests.Remove(req);
+					cleanRequest(req.AssetBundleName, req.Dependencies);
 				}
 			}
 		}

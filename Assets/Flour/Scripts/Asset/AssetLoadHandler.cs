@@ -21,6 +21,8 @@ namespace Flour.Asset
 		internal IObservable<Tuple<string, string, UnityEngine.Object>> LoadObservable { get { return loadedSubject; } }
 		internal IObservable<Tuple<string, string, Exception>> ErrorObservable { get { return erroredSubject; } }
 
+		internal IEnumerable<string> HasKeys { get { return assetBundles.Keys; } }
+
 
 		IDisposable updateDisposable;
 
@@ -65,6 +67,17 @@ namespace Flour.Asset
 		internal bool AllExist(string assetBundleName, string[] dependencies)
 		{
 			return ContainsKey(assetBundleName) && dependencies.All(x => ContainsKey(x));
+		}
+
+		internal void Unload(string assetBundleName)
+		{
+			if (!assetBundles.ContainsKey(assetBundleName))
+			{
+				return;
+			}
+			assetBundles[assetBundleName].Unload(false);
+			assetBundles.Remove(assetBundleName);
+			Debug.Log($"unload AssetBundle => {assetBundleName}");
 		}
 
 		internal void AddAssetBundle(string path, AssetBundle assetBundle)
