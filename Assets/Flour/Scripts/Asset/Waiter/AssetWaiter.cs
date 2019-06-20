@@ -68,6 +68,11 @@ namespace Flour.Asset
 			}
 		}
 
+		public IObservable<T> LoadAsync(string assetName)
+		{
+			return LoadAsync(assetName, assetName);
+		}
+
 		public virtual IObservable<T> LoadAsync(string assetbundleName, string assetName)
 		{
 			var ab = Path.Combine(Key, assetbundleName);
@@ -78,22 +83,24 @@ namespace Flour.Asset
 			return req.subject;
 		}
 
-		public virtual void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset)
-		{
-			var req = requests.FirstOrDefault(x => x.AssetBundleName == assetBundleName && x.AssetName == assetName);
-			if (req.Equals(default(Request)))
-			{
-				return;
-			}
-			req.subject.OnNext(GetAsset(asset));
-			req.subject.OnCompleted();
-
-			requests.Remove(req);
-		}
-
 		protected virtual T GetAsset(UnityEngine.Object asset)
 		{
 			return (T)asset;
+		}
+
+		public void OnDownloaded(string assetBundleName, string assetName, UnityEngine.Object asset)
+		{
+			for (int i = requests.Count - 1; i >= 0; i--)
+			{
+				var req = requests[i];
+				if (req.AssetBundleName == assetBundleName && req.AssetName == assetName)
+				{
+					req.subject.OnNext(GetAsset(asset));
+					req.subject.OnCompleted();
+
+					requests.Remove(req);
+				}
+			}
 		}
 	}
 }
