@@ -23,7 +23,7 @@ namespace Example
 
 		readonly Action onApplicationQuit;
 
-		readonly AssetHandler assetHandler;
+		private readonly IAssetHandler assetHandler;
 
 		readonly SceneHandler sceneHandler;
 		readonly LayerHandler layerHandler;
@@ -41,6 +41,7 @@ namespace Example
 
 		public ApplicationOperator(
 			Action onApplicationQuit,
+			IAssetHandler assetHandler,
 			SceneHandler sceneHandler,
 			LayerHandler layerHandler,
 			params SubLayerSourceRepository[] subLayerRepositories
@@ -48,18 +49,12 @@ namespace Example
 		{
 			this.onApplicationQuit = onApplicationQuit;
 
+			this.assetHandler = assetHandler;
+
 			this.sceneHandler = sceneHandler;
 			this.layerHandler = layerHandler;
 
 			this.subLayerRepositories = subLayerRepositories;
-
-			assetHandler = new AssetHandler("file://" + System.IO.Path.Combine(Application.dataPath, "../AssetBundles/"));
-
-		}
-
-		public async UniTask InitializeAsync()
-		{
-			await assetHandler.LoadManifestAsync();
 		}
 
 		public void Dispose()

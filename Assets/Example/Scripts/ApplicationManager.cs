@@ -48,14 +48,17 @@ namespace Example
 			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
 			await fixedRepository.LoadAllAsync();
 
+			assetHandler = new AssetHandler("file://" + System.IO.Path.Combine(Application.dataPath, "../AssetBundles/"));
+			await assetHandler.LoadManifestAsync();
+
 			appOperator = new ApplicationOperator(
 				ApplicationQuit,
+				assetHandler,
 				sceneHandler,
 				layerHandler,
 				SubLayerSourceRepository.Create(EnumExtension.ToEnumerable<SubLayerType>(x => !FixedSubLayers.Contains(x)), 10),
 				fixedRepository
 				);
-			await appOperator.InitializeAsync();
 		
 			await appOperator.LoadSceneAsync(SceneType.Start);
 
@@ -95,6 +98,8 @@ namespace Example
 		private void OnApplicationQuit()
 		{
 			appOperator.Dispose();
+			assetHandler.Dispose();
+
 			DontDestroyObjectList.Clear();
 		}
 

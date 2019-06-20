@@ -15,6 +15,11 @@ namespace Example
 			SpriteWaiter = new SpriteAssetWaiter("icons/");
 		}
 
+		public void Dispose()
+		{
+			handler.Dispose();
+		}
+
 		public async UniTask LoadManifestAsync()
 		{
 			await handler.LoadManifestAsync();
