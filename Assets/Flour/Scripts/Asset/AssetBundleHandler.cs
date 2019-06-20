@@ -103,7 +103,15 @@ namespace Flour.Asset
 					{
 						if (assetLoadHandler.AllExist(req.AssetBundleName, req.Dependencies))
 						{
-							assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
+							if (asset.Item2.GetAllScenePaths().Length > 0)
+							{
+								var scene = Path.GetFileNameWithoutExtension(asset.Item2.GetAllScenePaths()[0]);
+								waiters[i].OnLoaded(asset.Item1, scene, null);
+							}
+							else
+							{
+								assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
+							}
 						}
 					}
 				}
