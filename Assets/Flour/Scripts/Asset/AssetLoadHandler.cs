@@ -23,7 +23,7 @@ namespace Flour.Asset
 
 		IDisposable updateDisposable;
 
-		internal void Dispose()
+		public void Dispose()
 		{
 			StopUpdate();
 
@@ -57,16 +57,40 @@ namespace Flour.Asset
 			}
 		}
 
-		internal bool ContainsKey(string path)
+		IEnumerator EveryUpdate()
+		{
+			while (true)
+			{
+				for (int i = requests.Count - 1; i >= 0; i--)
+				{
+					var req = requests[i];
+					if (req.Item3.isDone)
+					{
+						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
+						requests.Remove(req);
+					}
+				}
+
+				if (requests.Count <= 0)
+				{
+					StopUpdate();
+				}
+
+				yield return waitForSeconds;
+			}
+		}
+
+
+		public bool ContainsKey(string path)
 		{
 			return assetBundles.ContainsKey(path);
 		}
-		internal bool AllExist(string assetBundleName, string[] dependencies)
+		public bool AllExist(string assetBundleName, string[] dependencies)
 		{
 			return ContainsKey(assetBundleName) && dependencies.All(x => ContainsKey(x));
 		}
 
-		internal void Unload(string assetBundleName)
+		public void Unload(string assetBundleName)
 		{
 			if (!assetBundles.ContainsKey(assetBundleName))
 			{
@@ -77,12 +101,12 @@ namespace Flour.Asset
 			Debug.Log($"unload AssetBundle => {assetBundleName}");
 		}
 
-		internal void AddAssetBundle(string path, AssetBundle assetBundle)
+		public void AddAssetBundle(string path, AssetBundle assetBundle)
 		{
 			assetBundles[path] = assetBundle;
 		}
 
-		internal void AddRequest(string path, string assetName)
+		public void AddRequest(string path, string assetName)
 		{
 			if (!ContainsKey(path))
 			{
@@ -104,29 +128,6 @@ namespace Flour.Asset
 			if (requests.Count > 0)
 			{
 				StartUpdate();
-			}
-		}
-
-		IEnumerator EveryUpdate()
-		{
-			while (true)
-			{
-				for (int i = requests.Count - 1; i >= 0; i--)
-				{
-					var req = requests[i];
-					if (req.Item3.isDone)
-					{
-						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
-						requests.Remove(req);
-					}
-				}
-
-				if (requests.Count <= 0)
-				{
-					StopUpdate();
-				}
-
-				yield return waitForSeconds;
 			}
 		}
 	}
