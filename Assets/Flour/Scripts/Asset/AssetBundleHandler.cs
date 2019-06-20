@@ -22,8 +22,8 @@ namespace Flour.Asset
 
 		CompositeDisposable disposable = new CompositeDisposable();
 
-		IObservable<float> Progress { get { return downloadHandler.Progress; } }
-		IReactiveProperty<bool> Running { get { return downloadHandler.Running; } }
+		public IObservable<float> Progress { get { return downloadHandler.Progress; } }
+		public IReactiveProperty<bool> Running { get { return downloadHandler.Running; } }
 
 		public AssetBundleHandler(string baseUrl)
 		{
