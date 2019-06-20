@@ -72,11 +72,21 @@ namespace Flour.Asset
 
 		public IObservable<T> LoadAsync(string assetName)
 		{
-			return LoadAsync(assetName, assetName);
+			return LoadAsync(assetName, assetName, "");
 		}
 
-		public virtual IObservable<T> LoadAsync(string assetbundleName, string assetName)
+		public IObservable<T> LoadAsync(string assetName, string valiant)
 		{
+			return LoadAsync(assetName, assetName, valiant);
+		}
+
+		public virtual IObservable<T> LoadAsync(string assetbundleName, string assetName, string valiant)
+		{
+			if (!string.IsNullOrEmpty(valiant))
+			{
+				assetbundleName += $".{valiant}";
+			}
+
 			var ab = Path.Combine(Key, assetbundleName);
 			var req = new Request(ab, manifest.GetAllDependencies(ab), assetName, new Subject<T>());
 			requests.Add(req);

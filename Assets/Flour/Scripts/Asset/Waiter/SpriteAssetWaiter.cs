@@ -13,13 +13,13 @@ namespace Flour.Asset
 		{
 		}
 
-		public override IObservable<Sprite> LoadAsync(string assetbundleName, string assetName)
+		public override IObservable<Sprite> LoadAsync(string assetbundleName, string assetName, string valiant)
 		{
 			if (cache.ContainsKey(assetName))
 			{
 				return Observable.Return<Sprite>(cache[assetName]);
 			}
-			return base.LoadAsync(assetbundleName, assetName);
+			return base.LoadAsync(assetbundleName, assetName, valiant);
 		}
 
 		protected override Sprite GetAsset(UnityEngine.Object asset)
