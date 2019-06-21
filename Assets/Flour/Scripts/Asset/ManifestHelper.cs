@@ -13,7 +13,7 @@ namespace Flour.Asset
 
 			if (request.isHttpError || request.isNetworkError)
 			{
-				// manifest load error
+				Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
 				return null;
 			}
 
