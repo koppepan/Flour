@@ -14,19 +14,40 @@ public class CustomMenu
 
 
 	#region DefineSymbols
-	private static readonly string DebugSymboleValue = "DEBUG_BUILD";
+	private static readonly string DebugSymbole = "DEBUG_BUILD";
+	private static readonly string UseLocalAssetSymbol = "USE_LOCAL_ASSET";
 
-	[MenuItem("CustomMenu/Build/Add Debug Symbole")]
+	static void AddSymbol(string add)
+	{
+		var group = EditorUserBuildSettings.selectedBuildTargetGroup;
+		Flour.Build.BuildScript.SetDefineSynboles(group, new string[] { add }, Enumerable.Empty<string>());
+	}
+	static void RemoveSymbol(string remove)
+	{
+		var group = EditorUserBuildSettings.selectedBuildTargetGroup;
+		Flour.Build.BuildScript.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { remove });
+	}
+
+	[MenuItem("CustomMenu/DefineSymbols/Add Debug Symbole", priority = 0)]
 	public static void AddDebugSymbole()
 	{
-		var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-		Flour.Build.BuildScript.SetDefineSynboles(group, new string[] { DebugSymboleValue }, Enumerable.Empty<string>());
+		AddSymbol(DebugSymbole);
 	}
-	[MenuItem("CustomMenu/Build/Remove Debug Symbole")]
+	[MenuItem("CustomMenu/DefineSymbols/Remove Debug Symbole", priority = 1)]
 	public static void RemoveDebugSymbole()
 	{
-		var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-		Flour.Build.BuildScript.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { DebugSymboleValue });
+		RemoveSymbol(DebugSymbole);
+	}
+
+	[MenuItem("CustomMenu/DefineSymbols/Add UseLocalAsset Symbole", priority = 100)]
+	public static void AddUseLocalAssetSymbole()
+	{
+		AddSymbol(UseLocalAssetSymbol);
+	}
+	[MenuItem("CustomMenu/DefineSymbols/Remove UseLocalAsset Symbole", priority = 101)]
+	public static void RemoveUseLocalAssetSymbole()
+	{
+		RemoveSymbol(UseLocalAssetSymbol);
 	}
 	#endregion
 
