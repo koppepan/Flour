@@ -22,7 +22,7 @@ namespace Flour.Build
 		public static void CreateAssetBundleSizeManifest(string assetBundleDirectoryPath)
 		{
 			var all = AssetDatabase.GetAllAssetBundleNames();
-			var assetBunldes = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != "manifest");
+			var assetBunldes = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
 
 			using (var sw = File.CreateText(Path.Combine(assetBundleDirectoryPath, "AssetBundleSize")))
