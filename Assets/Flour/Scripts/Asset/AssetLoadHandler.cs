@@ -73,6 +73,11 @@ namespace Flour.Asset
 		{
 			while (true)
 			{
+				if (requests.Count <= 0)
+				{
+					StopUpdate();
+				}
+
 				for (int i = requests.Count - 1; i >= 0; i--)
 				{
 					var req = requests[i];
@@ -84,11 +89,6 @@ namespace Flour.Asset
 						loadedCount++;
 						UpdateProgress(0);
 					}
-				}
-
-				if (requests.Count <= 0)
-				{
-					StopUpdate();
 				}
 
 				yield return waitForSeconds;

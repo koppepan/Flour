@@ -13,6 +13,9 @@ namespace Example
 		public Action<float> AssetLoadProgress = delegate { };
 		public Action<bool> AssetLoadRunning = delegate { };
 
+		public float DownloadProvressValue { get; private set; }
+		public float AssetLoadProgressValue { get; private set; }
+
 		private CompositeDisposable disposables = new CompositeDisposable();
 
 		public LoadProgress(int downloadCount)
@@ -33,6 +36,7 @@ namespace Example
 		{
 			download.Subscribe(p =>
 			{
+				DownloadProvressValue = p;
 				DownloadProgress.Invoke(downloadCount == 0 ? 0 : p / downloadCount);
 				if (downloadCount == p)
 				{
@@ -42,6 +46,7 @@ namespace Example
 
 			assetLoad.Subscribe(p =>
 			{
+				AssetLoadProgressValue = p;
 				AssetLoadProgress.Invoke(assetCount == 0 ? 0 : p / assetCount);
 				if (assetCount == p)
 				{

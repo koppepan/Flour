@@ -105,6 +105,11 @@ namespace Flour.Net
 		{
 			while (true)
 			{
+				if (downloaders.Count == 0 && waitingList.Count == 0)
+				{
+					StopUpdate();
+				}
+
 				for (int i = downloaders.Count - 1; i >= 0; i--)
 				{
 					var d = downloaders[i];
@@ -133,11 +138,6 @@ namespace Flour.Net
 
 					waitingList.Remove(req);
 					downloaders.Add(req);
-				}
-
-				if (downloaders.Count == 0 && waitingList.Count == 0)
-				{
-					StopUpdate();
 				}
 
 				yield return waitForSeconds;

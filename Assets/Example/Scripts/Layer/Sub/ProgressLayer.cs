@@ -19,10 +19,7 @@ namespace Example
 
 		void UpdateProgress(float value)
 		{
-			if (LeanTween.isTweening(progressImage.gameObject))
-			{
-				LeanTween.cancel(progressImage.gameObject);
-			}
+			if (LeanTween.isTweening(progressImage.gameObject)) LeanTween.cancel(progressImage.gameObject);
 			LeanTween.value(progressImage.gameObject, val => progressImage.fillAmount = val, progressImage.fillAmount, value, 0.1f);
 		}
 
@@ -31,6 +28,9 @@ namespace Example
 			if (!complete) return;
 			progress.DownloadProgress -= UpdateProgress;
 			progress.DownloadRunning -= Downloaded;
+
+			if (LeanTween.isTweening(progressImage.gameObject)) LeanTween.cancel(progressImage.gameObject);
+			progressImage.fillAmount = progress.AssetLoadProgressValue;
 
 			progress.AssetLoadProgress += UpdateProgress;
 		}
