@@ -7,48 +7,11 @@ using UniRx;
 
 namespace Flour.Asset
 {
-	public interface IAssetRequest
-	{
-		string AssetBundleName { get; }
-		string[] Dependencies { get; }
-		string AssetName { get; }
-	}
-	public interface IWaiter
-	{
-		string Key { get; }
-		void SetHandler(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest);
-
-		bool ContainsRequest(string assetBundleName);
-		IEnumerable<IAssetRequest> GetRequests(string assetBundleName);
-		void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset);
-		void OnError(string assetBundleName, Exception e);
-		void OnError(string assetBundleName, string assetName, Exception e);
-	}
-
 	public class AssetWaiter<T> : IWaiter where T : UnityEngine.Object
 	{
-		internal class Request : IAssetRequest
-		{
-			public string AssetBundleName { get; private set; }
-			public string[] Dependencies { get; private set; }
-			public string AssetName { get; private set; }
-
-			public Subject<T> subject;
-
-			public Request(string assetbundleName, string[] dependencies, string assetName, Subject<T> subject)
-			{
-				AssetBundleName = assetbundleName;
-				Dependencies = dependencies;
-				AssetName = assetName;
-
-				this.subject = subject;
-			}
-			public bool Containts(string assetBundleName) => AssetBundleName == assetBundleName || Dependencies.Contains(assetBundleName);
-		}
-
 		public string Key { get; private set; }
 
-		readonly List<Request> requests = new List<Request>();
+		readonly List<Request<T>> requests = new List<Request<T>>();
 
 		AssetBundleManifest manifest;
 		AssetBundleSizeManifest sizeManifest;
@@ -113,7 +76,7 @@ namespace Flour.Asset
 			}
 #endif
 
-			var req = new Request(ab, manifest.GetAllDependencies(ab), assetName, new Subject<T>());
+			var req = new Request<T>(ab, manifest.GetAllDependencies(ab), assetName, new Subject<T>());
 			requests.Add(req);
 
 			addRequest.Invoke(req.AssetBundleName, req.Dependencies);
