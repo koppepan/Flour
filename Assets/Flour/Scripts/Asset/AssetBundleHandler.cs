@@ -40,8 +40,13 @@ namespace Flour.Asset
 
 		public async UniTask LoadManifestAsync()
 		{
+#if UNITY_EDITOR && USE_LOCAL_ASSET
+			await UniTask.DelayFrame(1);
+			Debug.Log("use editor local asset");
+#else
 			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, "AssetBundles"));
 			Debug.Log("loaded AssetBundleManifest.");
+#endif
 		}
 
 		public void Dispose()
