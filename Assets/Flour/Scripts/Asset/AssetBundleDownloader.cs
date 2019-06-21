@@ -40,7 +40,7 @@ namespace Flour.Asset
 		}
 		public void Dispose()
 		{
-			Request.Dispose();
+			Request?.Dispose();
 		}
 	}
 }

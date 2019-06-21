@@ -36,30 +36,12 @@ namespace Flour.Net
 		public IObservable<Tuple<string, T>> DownloadedObservable { get { return downloadedObserver; } }
 		public IObservable<Tuple<string, long, string>> ErroredObservable { get { return erroredObserver; } }
 
+		int downloadedCount = 0;
 
-		int requestCount = 0;
-		int _downloadedCount = 0;
+		CompositeDisposable updateDisposable;
 
-		int DownloadedCount
-		{
-			get
-			{
-				return _downloadedCount;
-			}
-			set
-			{
-				_downloadedCount = value;
-				progress.OnNext(requestCount == 0 ? 0 : (float)_downloadedCount / (float)requestCount);
-			}
-		}
-
-		IDisposable updateDisposable;
-
-		private Subject<float> progress = new Subject<float>();
-		public ISubject<float> Progress { get { return progress; } }
-
-		BoolReactiveProperty runningProperty = new BoolReactiveProperty(false);
-		public IReactiveProperty<bool> Running { get { return runningProperty; } }
+		private FloatReactiveProperty progress = new FloatReactiveProperty(0);
+		public IReactiveProperty<float> Progress { get { return progress; } }
 
 		public ParallelWebRequest(string baseUrl, int parallel, int timeout)
 		{
@@ -83,18 +65,22 @@ namespace Flour.Net
 
 			erroredObserver.OnCompleted();
 			erroredObserver.Dispose();
-
-			ResetProgress();
 		}
 
+		internal void ResetProgressCount()
+		{
+			downloadedCount = 0;
+		}
 		void StartUpdate()
 		{
 			if (updateDisposable != null)
 			{
 				return;
 			}
-			runningProperty.Value = true;
-			updateDisposable = Observable.FromCoroutine(EveryUpdate).Subscribe();
+
+			updateDisposable = new CompositeDisposable();
+			Observable.FromCoroutine(EveryUpdate).Subscribe().AddTo(updateDisposable);
+			Observable.EveryLateUpdate().Subscribe(UpdateProgress).AddTo(updateDisposable);
 		}
 		void StopUpdate()
 		{
@@ -103,13 +89,6 @@ namespace Flour.Net
 				updateDisposable.Dispose();
 				updateDisposable = null;
 			}
-			runningProperty.Value = false;
-		}
-
-		public void ResetProgress()
-		{
-			requestCount = 0;
-			DownloadedCount = 0;
 		}
 
 		public void AddRequest(IDownloader<T> downloader)
@@ -117,7 +96,6 @@ namespace Flour.Net
 			if (waitingList.Any(x => x.Path == downloader.Path)) return;
 			if (downloaders.Any(x => x.Path == downloader.Path)) return;
 
-			requestCount++;
 			waitingList.Add(downloader);
 
 			StartUpdate();
@@ -132,16 +110,19 @@ namespace Flour.Net
 					var d = downloaders[i];
 					if (d.Request.isDone || (d.Request.isHttpError || d.Request.isNetworkError))
 					{
+						downloaders.Remove(d);
+
 						if (d.Request.isHttpError || d.Request.isNetworkError)
 						{
 							erroredObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode, d.Request.error));
 						}
 						else
 						{
-							DownloadedCount++;
 							downloadedObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
+
+							downloadedCount++;
+							UpdateProgress(0);
 						}
-						downloaders.Remove(d);
 					}
 				}
 
@@ -161,6 +142,17 @@ namespace Flour.Net
 
 				yield return waitForSeconds;
 			}
+		}
+
+		void UpdateProgress(long _)
+		{
+			float currentProgress = 0;
+			for (int i = 0; i < downloaders.Count; i++)
+			{
+				currentProgress += downloaders[i].Request.downloadProgress;
+			}
+
+			progress.Value = downloadedCount + currentProgress;
 		}
 	}
 }

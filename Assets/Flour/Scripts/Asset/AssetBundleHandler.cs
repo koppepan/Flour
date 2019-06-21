@@ -23,8 +23,8 @@ namespace Flour.Asset
 
 		CompositeDisposable disposable = new CompositeDisposable();
 
-		public IObservable<float> Progress { get { return downloadHandler.Progress; } }
-		public IReactiveProperty<bool> Running { get { return downloadHandler.Running; } }
+		public IReactiveProperty<float> DownloadProgress { get { return downloadHandler.Progress; } }
+		public IReactiveProperty<float> AssetLoadProgress { get { return assetLoadHandler.Progress; } }
 
 		public AssetBundleHandler(string baseUrl)
 		{
@@ -57,6 +57,12 @@ namespace Flour.Asset
 			assetLoadHandler.Dispose();
 
 			AssetBundle.UnloadAllAssetBundles(true);
+		}
+
+		public void ResetProgressCount()
+		{
+			downloadHandler.ResetProgressCount();
+			assetLoadHandler.ResetProgressCount();
 		}
 
 		public void AddWaiter(IWaiter waiter)
@@ -97,7 +103,7 @@ namespace Flour.Asset
 
 		void OnCompleteDownload(Tuple<string, AssetBundle> asset)
 		{
-			Debug.Log($"downloaded AssetBundle => {asset.Item1}");
+			//Debug.Log($"downloaded AssetBundle => {asset.Item1}");
 
 			assetLoadHandler.AddAssetBundle(asset.Item1, asset.Item2);
 
@@ -138,7 +144,7 @@ namespace Flour.Asset
 
 		void OnLoadedObject(Tuple<string, string, UnityEngine.Object> asset)
 		{
-			Debug.Log($"loaded Asset => {asset.Item1}.{asset.Item2}");
+			//Debug.Log($"loaded Asset => {asset.Item1}.{asset.Item2}");
 
 			for (int i = 0; i < waiters.Count; i++)
 			{

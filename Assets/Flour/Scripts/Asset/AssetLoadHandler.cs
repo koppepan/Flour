@@ -21,7 +21,12 @@ namespace Flour.Asset
 		internal IObservable<Tuple<string, string, UnityEngine.Object>> LoadObservable { get { return loadedSubject; } }
 		internal IObservable<Tuple<string, string, Exception>> ErrorObservable { get { return erroredSubject; } }
 
-		IDisposable updateDisposable;
+		CompositeDisposable updateDisposables;
+
+		int loadedCount = 0;
+
+		private FloatReactiveProperty progress = new FloatReactiveProperty(0);
+		public IReactiveProperty<float> Progress { get { return progress; } }
 
 		public void Dispose()
 		{
@@ -40,20 +45,27 @@ namespace Flour.Asset
 			assetBundles.Clear();
 		}
 
+		internal void ResetProgressCount()
+		{
+			loadedCount = 0;
+		}
 		void StartUpdate()
 		{
-			if (updateDisposable != null)
+			if (updateDisposables != null)
 			{
 				return;
 			}
-			updateDisposable = Observable.FromCoroutine(EveryUpdate).Subscribe();
+			updateDisposables = new CompositeDisposable();
+
+			Observable.FromCoroutine(EveryUpdate).Subscribe().AddTo(updateDisposables);
+			Observable.EveryLateUpdate().Subscribe(UpdateProgress).AddTo(updateDisposables);
 		}
 		void StopUpdate()
 		{
-			if (updateDisposable != null)
+			if (updateDisposables != null)
 			{
-				updateDisposable.Dispose();
-				updateDisposable = null;
+				updateDisposables.Dispose();
+				updateDisposables = null;
 			}
 		}
 
@@ -66,8 +78,11 @@ namespace Flour.Asset
 					var req = requests[i];
 					if (req.Item3.isDone)
 					{
-						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
 						requests.Remove(req);
+						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
+
+						loadedCount++;
+						UpdateProgress(0);
 					}
 				}
 
@@ -78,6 +93,16 @@ namespace Flour.Asset
 
 				yield return waitForSeconds;
 			}
+		}
+
+		void UpdateProgress(long _)
+		{
+			float currentProgress = 0;
+			for (int i = 0; i < requests.Count; i++)
+			{
+				currentProgress += requests[i].Item3.progress;
+			}
+			progress.Value = loadedCount + currentProgress;
 		}
 
 
@@ -98,7 +123,7 @@ namespace Flour.Asset
 			}
 			assetBundles[assetBundleName].Unload(false);
 			assetBundles.Remove(assetBundleName);
-			Debug.Log($"unload AssetBundle => {assetBundleName}");
+			//Debug.Log($"unload AssetBundle => {assetBundleName}");
 		}
 
 		public void AddAssetBundle(string path, AssetBundle assetBundle)
