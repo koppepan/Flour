@@ -26,7 +26,11 @@ namespace Flour.Asset
 
 		public void Send(string baseUrl, int timeout)
 		{
-			Request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, Path), hash);
+			var cachedAb = new CachedAssetBundle(Path, hash);
+
+			Caching.ClearOtherCachedVersions(cachedAb.name, cachedAb.hash);
+
+			Request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, Path), cachedAb);
 			Request.timeout = timeout;
 			Request.SendWebRequest();
 		}
