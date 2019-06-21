@@ -14,6 +14,7 @@ namespace Flour.Build
 				Directory.CreateDirectory(outputPath);
 			}
 
+			AssetDatabase.RemoveUnusedAssetBundleNames();
 			BuildPipeline.BuildAssetBundles(outputPath, options, BuildTarget.StandaloneWindows64);
 
 			Debug.Log("done build AssetBundles");
@@ -21,9 +22,9 @@ namespace Flour.Build
 
 		public static void CreateAssetBundleSizeManifest(string assetBundleDirectoryPath)
 		{
+			AssetDatabase.RemoveUnusedAssetBundleNames();
 			var all = AssetDatabase.GetAllAssetBundleNames();
 			var assetBunldes = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
-
 
 			using (var sw = File.CreateText(Path.Combine(assetBundleDirectoryPath, "AssetBundleSize")))
 			{
@@ -43,6 +44,7 @@ namespace Flour.Build
 
 		public static void CleanUnnecessaryAssetBundles(string outputPath)
 		{
+			AssetDatabase.RemoveUnusedAssetBundleNames();
 			var all = AssetDatabase.GetAllAssetBundleNames();
 			var files = Directory.GetFiles(outputPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
