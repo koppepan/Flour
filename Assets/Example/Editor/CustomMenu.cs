@@ -20,12 +20,12 @@ public class CustomMenu
 	static void AddSymbol(string add)
 	{
 		var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-		Flour.Build.BuildScript.SetDefineSynboles(group, new string[] { add }, Enumerable.Empty<string>());
+		Flour.Build.BuildClient.SetDefineSynboles(group, new string[] { add }, Enumerable.Empty<string>());
 	}
 	static void RemoveSymbol(string remove)
 	{
 		var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-		Flour.Build.BuildScript.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { remove });
+		Flour.Build.BuildClient.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { remove });
 	}
 
 	[MenuItem("CustomMenu/DefineSymbols/Add Debug Symbole", priority = 0)]
@@ -55,12 +55,7 @@ public class CustomMenu
 	[MenuItem("CustomMenu/AssetBundles Build")]
 	public static void BuildAssetBundle()
 	{
-		if (!Directory.Exists("AssetBundles"))
-		{
-			Directory.CreateDirectory("AssetBundles");
-		}
-
-		var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
-		BuildPipeline.BuildAssetBundles("AssetBundles", options, BuildTarget.StandaloneWindows64);
+		Flour.Build.BuildAssetBundle.Build("AssetBundles");
+		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles("AssetBundles");
 	}
 }

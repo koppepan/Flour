@@ -5,7 +5,7 @@ using UnityEditor;
 
 namespace Flour.Build
 {
-	public static class BuildScript
+	public static class BuildClient
 	{
 		public static void SetDefineSynboles(BuildTargetGroup targetGroup, IEnumerable<string> addSymbols, IEnumerable<string> removeSymbols)
 		{
