@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
 
@@ -21,6 +22,32 @@ namespace Flour.Asset
 			await loadReq;
 
 			return (AssetBundleManifest)loadReq.asset;
+		}
+
+		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url)
+		{
+			var request = UnityWebRequest.Get(url);
+			await request.SendWebRequest();
+
+			if (request.isHttpError || request.isNetworkError)
+			{
+				Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
+				return null;
+			}
+
+			var dic = new Dictionary<string, long>();
+			var split = request.downloadHandler.text.Split('\n');
+			for (int i = 0; i < split.Length; i++)
+			{
+				if (string.IsNullOrEmpty(split[i]))
+				{
+					continue;
+				}
+				var size = split[i].Split(' ');
+				dic[size[0]] = long.Parse(size[1]);
+			}
+
+			return new AssetBundleSizeManifest(dic);
 		}
 	}
 }

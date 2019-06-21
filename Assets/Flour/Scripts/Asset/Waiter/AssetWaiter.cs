@@ -16,7 +16,7 @@ namespace Flour.Asset
 	public interface IWaiter
 	{
 		string Key { get; }
-		void SetHandler(AssetBundleManifest manifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest);
+		void SetHandler(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest);
 
 		bool ContainsRequest(string assetBundleName);
 		IEnumerable<IAssetRequest> GetRequests(string assetBundleName);
@@ -51,14 +51,16 @@ namespace Flour.Asset
 		readonly List<Request> requests = new List<Request>();
 
 		AssetBundleManifest manifest;
+		AssetBundleSizeManifest sizeManifest;
 		Action<string, string[]> addRequest;
 		Action<string, string[]> cleanRequest;
 
 		public AssetWaiter(string key) => Key = key;
 
-		public void SetHandler(AssetBundleManifest manifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest)
+		public void SetHandler(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest)
 		{
 			this.manifest = manifest;
+			this.sizeManifest = sizeManifest;
 			this.addRequest = addRequest;
 			this.cleanRequest = cleanRequest;
 		}
@@ -74,6 +76,13 @@ namespace Flour.Asset
 			}
 			return false;
 		}
+
+		public long GetSize(string assetBundleName)
+		{
+			var ab = string.Intern(Path.Combine(Key, assetBundleName));
+			return sizeManifest.GetSize(ab);
+		}
+
 		public IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
 		{
 			for (int i = 0; i < requests.Count; i++)
@@ -87,14 +96,14 @@ namespace Flour.Asset
 			return LoadAsync(assetName, assetName, valiant);
 		}
 
-		public virtual IObservable<T> LoadAsync(string assetbundleName, string assetName, string valiant = "")
+		public virtual IObservable<T> LoadAsync(string assetBundleName, string assetName, string valiant = "")
 		{
 			if (!string.IsNullOrEmpty(valiant))
 			{
-				assetbundleName += $".{valiant}";
+				assetBundleName += $".{valiant}";
 			}
 
-			var ab = Path.Combine(Key, assetbundleName);
+			var ab = string.Intern(Path.Combine(Key, assetBundleName));
 
 #if UNITY_EDITOR && USE_LOCAL_ASSET
 			var localAsset = UnityEditor.AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(ab, assetName);

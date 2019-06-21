@@ -19,6 +19,7 @@ namespace Flour.Asset
 		readonly List<IWaiter> waiters = new List<IWaiter>();
 
 		AssetBundleManifest manifest;
+		AssetBundleSizeManifest sizeManifest;
 
 		CompositeDisposable disposable = new CompositeDisposable();
 
@@ -45,6 +46,7 @@ namespace Flour.Asset
 			Debug.Log("use editor local asset");
 #else
 			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, "AssetBundles"));
+			sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, "AssetBundleSize"));
 			Debug.Log("loaded AssetBundleManifest.");
 #endif
 		}
@@ -59,7 +61,7 @@ namespace Flour.Asset
 
 		public void AddWaiter(IWaiter waiter)
 		{
-			waiter.SetHandler(manifest, AddRequest, CleanRequest);
+			waiter.SetHandler(manifest, sizeManifest, AddRequest, CleanRequest);
 			waiters.Add(waiter);
 		}
 
