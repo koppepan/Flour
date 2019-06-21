@@ -55,7 +55,11 @@ public class CustomMenu
 	[MenuItem("CustomMenu/AssetBundles Build")]
 	public static void BuildAssetBundle()
 	{
-		Flour.Build.BuildAssetBundle.Build("AssetBundles");
-		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles("AssetBundles");
+		var outputPath = "AssetBundles";
+
+		var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
+		Flour.Build.BuildAssetBundle.Build(outputPath, options);
+		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath);
+		Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath);
 	}
 }

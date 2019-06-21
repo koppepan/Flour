@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -9,23 +7,44 @@ namespace Flour.Build
 {
 	public static class BuildAssetBundle
 	{
-		public static void Build(string outputPath)
+		public static void Build(string outputPath, BuildAssetBundleOptions options = BuildAssetBundleOptions.None)
 		{
 			if (!Directory.Exists(outputPath))
 			{
 				Directory.CreateDirectory(outputPath);
 			}
 
-			var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
 			BuildPipeline.BuildAssetBundles(outputPath, options, BuildTarget.StandaloneWindows64);
 
 			Debug.Log("done build AssetBundles");
 		}
 
+		public static void CreateAssetBundleSizeManifest(string assetBundleDirectoryPath)
+		{
+			var all = AssetDatabase.GetAllAssetBundleNames();
+			var assetBunldes = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != "manifest");
+
+
+			using (var sw = File.CreateText(Path.Combine(assetBundleDirectoryPath, "AssetBundleSize")))
+			{
+				foreach (var ab in assetBunldes)
+				{
+					var name = ab.Remove(0, assetBundleDirectoryPath.Length + 1).Replace('\\', '/');
+
+					if (name == "AssetBundles" || all.Contains(name))
+					{
+						sw.WriteLine($"{name} {new FileInfo(ab).Length.ToString()}");
+					}
+				}
+			}
+
+			Debug.Log("done build AssetBundle size manifest");
+		}
+
 		public static void CleanUnnecessaryAssetBundles(string outputPath)
 		{
 			var all = AssetDatabase.GetAllAssetBundleNames();
-			var files = Directory.GetFiles(outputPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != "manifest");
+			var files = Directory.GetFiles(outputPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
 			foreach (var f in files)
 			{
