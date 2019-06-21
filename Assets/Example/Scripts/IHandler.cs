@@ -18,6 +18,7 @@ namespace Example
 
 	public interface IAssetHandler
 	{
+		LoadProgress GetProgress(int downloadCount, int assetCount);
 		Flour.Asset.SceneWaiter SceneWaiter { get; }
 		Flour.Asset.SpriteAssetWaiter SpriteWaiter { get; }
 	}

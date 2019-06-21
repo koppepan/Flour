@@ -23,6 +23,15 @@ namespace Example
 			handler.Dispose();
 		}
 
+		public LoadProgress GetProgress(int downloadCount, int assetCount)
+		{
+			handler.ResetProgressCount();
+
+			var progress = new LoadProgress(downloadCount, assetCount);
+			progress.SetObservable(handler.DownloadProgress, handler.AssetLoadProgress);
+			return progress;
+		}
+
 		public async UniTask LoadManifestAsync()
 		{
 			await handler.LoadManifestAsync();

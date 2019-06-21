@@ -26,6 +26,7 @@ namespace Example
 	{
 		[Japanease("")] None,
 		[Japanease("UI/Blackout")] Blackout,
+		[Japanease("UI/Progress")] Progress,
 
 		[Japanease("UI/Splash")] Splash,
 		[Japanease("UI/Title")] Title,
