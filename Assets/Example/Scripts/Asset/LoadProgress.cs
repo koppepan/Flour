@@ -5,28 +5,29 @@ namespace Example
 {
 	public class LoadProgress
 	{
-		int downloadCount;
-		int assetCount;
+		int downloadCount = 0;
+		int assetCount = 0;
 
-		public Action<float> DownloadProgress = delegate { };
-		public Action<bool> DownloadRunning = delegate { };
-		public Action<float> AssetLoadProgress = delegate { };
-		public Action<bool> AssetLoadRunning = delegate { };
+		float downloadProgress = 0;
+		float assetLoadProgress = 0;
 
-		public float DownloadProvressValue { get; private set; }
-		public float AssetLoadProgressValue { get; private set; }
+		public Action<float> Progress = delegate { };
+		public Action<bool> Running = delegate { };
+
+		public float ProgressValue { get; private set; } = 0;
 
 		private CompositeDisposable disposables = new CompositeDisposable();
 
 		public LoadProgress(int downloadCount)
 		{
-			this.downloadCount = assetCount = downloadCount;
+			this.downloadCount = this.assetCount = downloadCount;
 		}
 		public LoadProgress(int downloadCount, int assetCount)
 		{
 			this.downloadCount = downloadCount;
 			this.assetCount = assetCount;
 		}
+
 		public void Dispose()
 		{
 			disposables.Dispose();
@@ -34,25 +35,31 @@ namespace Example
 
 		public void SetObservable(IReactiveProperty<float> download, IReactiveProperty<float> assetLoad)
 		{
-			download.Subscribe(p =>
-			{
-				DownloadProvressValue = p;
-				DownloadProgress.Invoke(downloadCount == 0 ? 0 : p / downloadCount);
-				if (downloadCount == p)
-				{
-					DownloadRunning.Invoke(true);
-				}
-			}).AddTo(disposables);
+			download.Subscribe(UpdateDownloadProgress).AddTo(disposables);
+			assetLoad.Subscribe(UpdateAssetLoadProgress).AddTo(disposables);
+		}
 
-			assetLoad.Subscribe(p =>
+		private void UpdateDownloadProgress(float val)
+		{
+			downloadProgress = val;
+			UpdateProgress();
+		}
+
+		private void UpdateAssetLoadProgress(float val)
+		{
+			assetLoadProgress = val;
+			UpdateProgress();
+		}
+
+		private void UpdateProgress()
+		{
+			var value = (downloadProgress + assetLoadProgress) * 0.5f;
+			Progress.Invoke(value);
+
+			if (value == 1)
 			{
-				AssetLoadProgressValue = p;
-				AssetLoadProgress.Invoke(assetCount == 0 ? 0 : p / assetCount);
-				if (assetCount == p)
-				{
-					AssetLoadRunning.Invoke(true);
-				}
-			}).AddTo(disposables);
+				Running.Invoke(false);
+			}
 		}
 	}
 }

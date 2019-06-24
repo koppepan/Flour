@@ -13,8 +13,7 @@ namespace Example
 		public void Setup(LoadProgress progress)
 		{
 			this.progress = progress;
-			progress.DownloadProgress += UpdateProgress;
-			progress.DownloadRunning += Downloaded;
+			progress.Progress += UpdateProgress;
 		}
 
 		void UpdateProgress(float value)
@@ -23,25 +22,9 @@ namespace Example
 			LeanTween.value(progressImage.gameObject, val => progressImage.fillAmount = val, progressImage.fillAmount, value, 0.1f);
 		}
 
-		void Downloaded(bool complete)
-		{
-			if (!complete) return;
-			progress.DownloadProgress -= UpdateProgress;
-			progress.DownloadRunning -= Downloaded;
-
-			if (LeanTween.isTweening(progressImage.gameObject)) LeanTween.cancel(progressImage.gameObject);
-			progressImage.fillAmount = progress.AssetLoadProgressValue;
-
-			progress.AssetLoadProgress += UpdateProgress;
-		}
-
 		protected override async UniTask OnClose(bool force)
 		{
-			progress.DownloadProgress -= UpdateProgress;
-			progress.DownloadRunning -= Downloaded;
-
-			progress.AssetLoadProgress -= UpdateProgress;
-
+			progress.Progress -= UpdateProgress;
 			progress.Dispose();
 
 			UpdateProgress(1);
