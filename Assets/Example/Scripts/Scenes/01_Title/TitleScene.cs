@@ -5,7 +5,7 @@ namespace Example
 	public class TitleScene : AbstractScene
 	{
 		TitleLayer titleLayer;
-		public override async UniTask Load(params object[] param)
+		public override async UniTask Load(params object[] args)
 		{
 			titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
 			titleLayer.Setup(GotoOutGame);
