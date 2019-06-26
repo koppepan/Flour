@@ -6,12 +6,13 @@ namespace Flour
 {
 	public sealed class UserPrefs<TKey> : IDisposable where TKey : struct
 	{
+		static readonly string DefaultUserKey = "default";
 		static readonly string LastTimeUserKey = "LastTimeUserKey";
-		public string UserKey { get; private set; } = "default";
+		public string UserKey { get; private set; } = DefaultUserKey;
 
 		readonly DataSerializer serializer = new DataSerializer();
 
-		public UserPrefs() : this(PlayerPrefs.GetString(LastTimeUserKey, "default")) { }
+		public UserPrefs() : this(PlayerPrefs.GetString(LastTimeUserKey, DefaultUserKey)) { }
 		public UserPrefs(string userKey)
 		{
 			Assert.IsTrue(typeof(TKey).IsEnum, "UserPrefs can use only enum.");
@@ -32,7 +33,8 @@ namespace Flour
 		}
 		
 
-		private string GetKey(TKey key) => $"{UserKey}:{key}";
+		private string GetKey(TKey key) => $"{UserKey}:{key.GetHashCode()}";
+		private string GetKey(string userKey, TKey key) => $"{userKey}:{key.GetHashCode()}";
 
 		public bool HasKey(TKey key) => PlayerPrefs.HasKey(GetKey(key));
 
@@ -41,11 +43,19 @@ namespace Flour
 			PlayerPrefs.DeleteKey(GetKey(key));
 			PlayerPrefs.Save();
 		}
+		private void DeleteKey(string userKey, TKey key)
+		{
+			if (PlayerPrefs.HasKey(GetKey(userKey, key)))
+			{
+				PlayerPrefs.DeleteKey(GetKey(userKey, key));
+			}
+			PlayerPrefs.Save();
+		}
 		public void DeleteUser(string userKey)
 		{
 			foreach (var key in EnumExtension.ToEnumerable<TKey>())
 			{
-				DeleteKey(key);
+				DeleteKey(userKey, key);
 			}
 		}
 
