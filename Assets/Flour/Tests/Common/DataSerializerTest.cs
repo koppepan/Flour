@@ -14,6 +14,26 @@ namespace Flour.Test
 		}
 
 		[Test]
+		public void TestToDefaultType()
+		{
+			int testInt = 23;
+			float testFloat = 123.13f;
+			string testString = "test string";
+
+			var si = serializer.Serialize(testInt);
+			var sf = serializer.Serialize(testFloat);
+			var ss = serializer.Serialize(testString);
+
+			var di = serializer.Deserialize<int>(si);
+			var df = serializer.Deserialize<float>(sf);
+			var ds = serializer.Deserialize<string>(ss);
+
+			Assert.IsTrue(testInt == di);
+			Assert.IsTrue(testFloat == df);
+			Assert.IsTrue(testString == ds);
+		}
+
+		[Test]
 		public void TestToStruct()
 		{
 			var src = new TestStruct { text = "hoge", count = 19, value = 15.43f };
