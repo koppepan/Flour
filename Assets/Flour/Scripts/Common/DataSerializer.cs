@@ -12,7 +12,7 @@ namespace Flour
 
 		public string Serialize<T>(T obj)
 		{
-			Assert.IsFalse(Attribute.GetCustomAttribute(typeof(T), typeof(SerializableAttribute)) == null, $"SerializableAttribute not set. => {typeof(T)}");
+			Assert.IsNotNull(Attribute.GetCustomAttribute(typeof(T), typeof(SerializableAttribute)), $"SerializableAttribute not set. => {typeof(T)}");
 
 			using (var stream = new MemoryStream())
 			{
@@ -30,7 +30,7 @@ namespace Flour
 
 		public T Deserialize<T>(string str)
 		{
-			Assert.IsFalse(Attribute.GetCustomAttribute(typeof(T), typeof(SerializableAttribute)) == null, $"SerializableAttribute not set. => {typeof(T)}");
+			Assert.IsNotNull(Attribute.GetCustomAttribute(typeof(T), typeof(SerializableAttribute)), $"SerializableAttribute not set. => {typeof(T)}");
 
 			using (var memory = new MemoryStream(Convert.FromBase64String(str)))
 			{
