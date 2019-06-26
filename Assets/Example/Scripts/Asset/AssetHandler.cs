@@ -3,7 +3,7 @@ using Flour.Asset;
 
 namespace Example
 {
-	class AssetHandler : IAssetHandler
+	public class AssetHandler
 	{
 		private AssetBundleHandler handler;
 

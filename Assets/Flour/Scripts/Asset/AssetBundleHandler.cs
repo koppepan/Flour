@@ -16,7 +16,7 @@ namespace Flour.Asset
 		readonly ParallelAssetBundleDownloader downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
 
-		readonly List<IWaiter> waiters = new List<IWaiter>();
+		readonly List<WaiterBridge> waiters = new List<WaiterBridge>();
 
 		AssetBundleManifest manifest;
 		AssetBundleSizeManifest sizeManifest;
@@ -56,6 +56,9 @@ namespace Flour.Asset
 			downloadHandler.Dispose();
 			assetLoadHandler.Dispose();
 
+			waiters.ForEach(x => x.Dispose());
+			waiters.Clear();
+
 			AssetBundle.UnloadAllAssetBundles(true);
 		}
 
@@ -65,10 +68,11 @@ namespace Flour.Asset
 			assetLoadHandler.ResetProgressCount();
 		}
 
-		public void AddWaiter(IWaiter waiter)
+		public void AddWaiter<T>(AssetWaiter<T> waiter) where T : UnityEngine.Object
 		{
-			waiter.SetHandler(manifest, sizeManifest, AddRequest, CleanRequest);
-			waiters.Add(waiter);
+			var bridge = new WaiterBridge(waiter.Key, manifest, sizeManifest, AddRequest, CleanRequest);
+			waiter.SetBridge(bridge);
+			waiters.Add(bridge);
 		}
 
 		private void AddRequestInternal(string assetbundlePath)

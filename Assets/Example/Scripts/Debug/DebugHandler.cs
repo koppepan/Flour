@@ -7,7 +7,7 @@ using Flour;
 
 namespace Example
 {
-	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, IAssetHandler>>;
+	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
 	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
 	public class DebugHandler : MonoBehaviour

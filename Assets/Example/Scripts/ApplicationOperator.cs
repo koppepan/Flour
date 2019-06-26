@@ -6,7 +6,7 @@ using Flour;
 
 namespace Example
 {
-	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, IAssetHandler>>;
+	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
 	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
 
 	public sealed class ApplicationOperator : IDisposable, IOperationBundler, ISceneHandler, ILayerHandler
@@ -23,7 +23,7 @@ namespace Example
 
 		readonly Action onApplicationQuit;
 
-		private readonly IAssetHandler assetHandler;
+		private readonly AssetHandler assetHandler;
 
 		readonly SceneHandler sceneHandler;
 		readonly LayerHandler layerHandler;
@@ -41,7 +41,7 @@ namespace Example
 
 		public ApplicationOperator(
 			Action onApplicationQuit,
-			IAssetHandler assetHandler,
+			AssetHandler assetHandler,
 			SceneHandler sceneHandler,
 			LayerHandler layerHandler,
 			params SubLayerSourceRepository[] subLayerRepositories
@@ -104,14 +104,14 @@ namespace Example
 			}
 
 			await layerHandler.RemoveLayer(LayerType.Scene);
-			await sceneHandler.LoadAsync(sceneType.ToJpnName(), Tuple.Create<IOperationBundler, IAssetHandler>(this, assetHandler), task, args);
+			await sceneHandler.LoadAsync(sceneType.ToJpnName(), Tuple.Create<IOperationBundler, AssetHandler>(this, assetHandler), task, args);
 
 			InputBinder.Unbind();
 		}
 		public async UniTask AddSceneAsync(string sceneName, params object[] args)
 		{
 			InputBinder.Bind();
-			await sceneHandler.AddAsync(sceneName, Tuple.Create<IOperationBundler, IAssetHandler>(this, assetHandler), args);
+			await sceneHandler.AddAsync(sceneName, Tuple.Create<IOperationBundler, AssetHandler>(this, assetHandler), args);
 			InputBinder.Unbind();
 		}
 		public async UniTask UnloadSceneAsync(string sceneName)

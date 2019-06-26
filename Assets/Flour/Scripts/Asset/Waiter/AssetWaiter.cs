@@ -2,56 +2,47 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 using UniRx;
 
 namespace Flour.Asset
 {
-	public class AssetWaiter<T> : IWaiter where T : UnityEngine.Object
+	public class AssetWaiter<T> where T : UnityEngine.Object
 	{
 		public string Key { get; private set; }
 
 		readonly List<Request<T>> requests = new List<Request<T>>();
 
-		AssetBundleManifest manifest;
-		AssetBundleSizeManifest sizeManifest;
-		Action<string, string[]> addRequest;
-		Action<string, string[]> cleanRequest;
+		WaiterBridge bridge;
 
 		public AssetWaiter(string key) => Key = key;
 
-		public void SetHandler(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest)
+		internal void SetBridge(WaiterBridge bridge)
 		{
-			this.manifest = manifest;
-			this.sizeManifest = sizeManifest;
-			this.addRequest = addRequest;
-			this.cleanRequest = cleanRequest;
+			this.bridge = bridge;
+
+			this.bridge.OnAssetLoaded += OnLoaded;
+			this.bridge.OnDownloadedError += OnError;
+			this.bridge.OnLoadedError += OnError;
+
+			this.bridge.SetFunc(ContainsRequest, GetRequests, Dispose);
 		}
 
-		public bool ContainsRequest(string assetBundleName)
+		internal void Dispose()
 		{
-			for (int i = 0; i < requests.Count; i++)
-			{
-				if (requests[i].AssetBundleName == assetBundleName || requests[i].Dependencies.Contains(assetBundleName))
-				{
-					return true;
-				}
-			}
-			return false;
+			this.bridge.OnAssetLoaded -= OnLoaded;
+			this.bridge.OnDownloadedError -= OnError;
+			this.bridge.OnLoadedError -= OnError;
 		}
 
 		public long GetSize(string assetBundleName)
 		{
 			var ab = string.Intern(Path.Combine(Key, assetBundleName));
-			return sizeManifest.GetSize(ab);
+			return bridge.SizeManiefst.GetSize(ab);
 		}
 
-		public IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
+		protected virtual T GetAsset(UnityEngine.Object asset)
 		{
-			for (int i = 0; i < requests.Count; i++)
-			{
-				if (requests[i].Containts(assetBundleName)) yield return requests[i];
-			}
+			return asset != null ? (T)asset : null;
 		}
 
 		public IObservable<T> LoadAsync(string assetName, string valiant = "")
@@ -76,19 +67,33 @@ namespace Flour.Asset
 			}
 #endif
 
-			var req = new Request<T>(ab, manifest.GetAllDependencies(ab), assetName, new Subject<T>());
+			var req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, new Subject<T>());
 			requests.Add(req);
 
-			addRequest.Invoke(req.AssetBundleName, req.Dependencies);
+			bridge.AddRequest(req.AssetBundleName, req.Dependencies);
 			return req.subject;
 		}
 
-		protected virtual T GetAsset(UnityEngine.Object asset)
+		bool ContainsRequest(string assetBundleName)
 		{
-			return asset != null ? (T)asset : null;
+			for (int i = 0; i < requests.Count; i++)
+			{
+				if (requests[i].AssetBundleName == assetBundleName || requests[i].Dependencies.Contains(assetBundleName))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
+		{
+			for (int i = 0; i < requests.Count; i++)
+			{
+				if (requests[i].Containts(assetBundleName)) yield return requests[i];
+			}
 		}
 
-		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset)
+		void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset)
 		{
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
@@ -106,11 +111,11 @@ namespace Flour.Asset
 					}
 
 					requests.Remove(req);
-					cleanRequest(req.AssetBundleName, req.Dependencies);
+					bridge.CleanRequest(req.AssetBundleName, req.Dependencies);
 				}
 			}
 		}
-		public void OnError(string assetBundleName, Exception e)
+		void OnError(string assetBundleName, Exception e)
 		{
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
@@ -119,11 +124,11 @@ namespace Flour.Asset
 				{
 					req.subject.OnError(new Exception(assetBundleName, e));
 					requests.Remove(req);
-					cleanRequest(req.AssetBundleName, req.Dependencies);
+					bridge.CleanRequest(req.AssetBundleName, req.Dependencies);
 				}
 			}
 		}
-		public void OnError(string assetBundleName, string assetName, Exception e)
+		void OnError(string assetBundleName, string assetName, Exception e)
 		{
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
@@ -132,7 +137,7 @@ namespace Flour.Asset
 				{
 					req.subject.OnError(new Exception($"{assetBundleName}.{assetName}", e));
 					requests.Remove(req);
-					cleanRequest(req.AssetBundleName, req.Dependencies);
+					bridge.CleanRequest(req.AssetBundleName, req.Dependencies);
 				}
 			}
 		}
