@@ -77,7 +77,7 @@ namespace Flour
 
 		public int GetInt(TKey key, int defaultValue = 0)
 		{
-			if (HasKey(key))
+			if (!HasKey(key))
 			{
 				Debug.LogWarning($"key not found. {key}");
 				return defaultValue;
@@ -86,7 +86,7 @@ namespace Flour
 		}
 		public float GetFloat(TKey key, float defaultValue = 0)
 		{
-			if (HasKey(key))
+			if (!HasKey(key))
 			{
 				Debug.LogWarning($"key not found. {key}");
 				return defaultValue;
@@ -95,7 +95,7 @@ namespace Flour
 		}
 		public string GetString(TKey key, string defaultValue = "")
 		{
-			if (HasKey(key))
+			if (!HasKey(key))
 			{
 				Debug.LogWarning($"key not found. {key}");
 				return defaultValue;
@@ -104,7 +104,7 @@ namespace Flour
 		}
 		public T GetValue<T>(TKey key)
 		{
-			if (HasKey(key))
+			if (!HasKey(key))
 			{
 				Debug.LogWarning($"key not found. {key}");
 				return default(T);
