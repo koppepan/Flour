@@ -10,7 +10,7 @@ namespace Flour.Test
 		[SetUp]
 		public void Setup()
 		{
-			encryptor = new Encryptor("tTAaCFdG16TOsFQEreh1K7q2OofNHjAd");
+			encryptor = new Encryptor("tTAaCFdG16TOsFQEreh1K7q2OofNHjAd", "rQ8yqPhLdAMEdfWtYL0UL1Yy3OrgOaBh");
 		}
 
 		[TearDown]
@@ -35,7 +35,7 @@ namespace Flour.Test
 		{
 			byte[] testSrc = new byte[] { 0xC3, 0x8A , 0x13, 0x2D, 0xAA, 0xFF, 0x01, 0x33 };
 
-			using (var e = new Encryptor("5mqcUvTMPEXxlsqBpROg7CxhmutAL5M4"))
+			using (var e = new Encryptor("5mqcUvTMPEXxlsqBpROg7CxhmutAL5M4", "KglFuSMgRvA5lWESkOvE2OI8rjle4rJ7"))
 			{
 				var eBytes = e.Encrypt(testSrc);
 				var dBytes = e.Decrypt(eBytes);
@@ -60,7 +60,7 @@ namespace Flour.Test
 		{
 			var testSrc = "これはテスト用の文字列かもしれません。";
 
-			using (var e = new Encryptor("jcPsII6mudEQmMuC8oDhOlFy5piIlQkD"))
+			using (var e = new Encryptor("tTAaCFdG16TOsFQEreh1K7q2OofNHjAd", "7jVoKSwiQJKOh27Fhe1Rw8rSRUAUwd4C"))
 			{
 				var eText = e.Encrypt(testSrc);
 				var dText = e.Decrypt(eText);

@@ -7,7 +7,7 @@ namespace Flour
 	{
 		RijndaelManaged rijndael;
 
-		public Encryptor(string pass)
+		public Encryptor(string pass, string salt)
 		{
 			rijndael = new RijndaelManaged();
 
@@ -17,8 +17,7 @@ namespace Flour
 			rijndael.KeySize = 128;
 			rijndael.BlockSize = 128;
 
-			var salt = Encoding.UTF8.GetBytes("7jVoKSwiQJKOh27Fhe1Rw8rSRUAUwd4C");
-			var deriveBytes = new Rfc2898DeriveBytes(pass, salt);
+			var deriveBytes = new Rfc2898DeriveBytes(pass, Encoding.UTF8.GetBytes(salt));
 			deriveBytes.IterationCount = 1000;
 
 			rijndael.Key = deriveBytes.GetBytes(rijndael.KeySize / 8);
