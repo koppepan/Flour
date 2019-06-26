@@ -2,6 +2,7 @@
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using UnityEngine.Assertions;
 
 namespace Flour
 {
@@ -11,6 +12,8 @@ namespace Flour
 
 		public string Serialize<T>(T obj)
 		{
+			Assert.IsFalse(Attribute.GetCustomAttribute(typeof(T), typeof(SerializableAttribute)) == null, $"SerializableAttribute not set. => {typeof(T)}");
+
 			using (var stream = new MemoryStream())
 			{
 				try
@@ -27,6 +30,8 @@ namespace Flour
 
 		public T Deserialize<T>(string str)
 		{
+			Assert.IsFalse(Attribute.GetCustomAttribute(typeof(T), typeof(SerializableAttribute)) == null, $"SerializableAttribute not set. => {typeof(T)}");
+
 			using (var memory = new MemoryStream(Convert.FromBase64String(str)))
 			{
 				try
