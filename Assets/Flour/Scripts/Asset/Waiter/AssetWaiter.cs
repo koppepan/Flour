@@ -24,7 +24,7 @@ namespace Flour.Asset
 			this.bridge.OnDownloadedError += OnError;
 			this.bridge.OnLoadedError += OnError;
 
-			this.bridge.SetFunc(ContainsRequest, GetRequests, Dispose);
+			this.bridge.AddWaiter(Key, ContainsRequest, GetRequests, Dispose);
 		}
 
 		internal void Dispose()
@@ -95,6 +95,8 @@ namespace Flour.Asset
 
 		void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset)
 		{
+			if (!assetBundleName.StartsWith(Key)) return;
+
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
@@ -117,6 +119,8 @@ namespace Flour.Asset
 		}
 		void OnError(string assetBundleName, Exception e)
 		{
+			if (!assetBundleName.StartsWith(Key)) return;
+
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
@@ -130,6 +134,8 @@ namespace Flour.Asset
 		}
 		void OnError(string assetBundleName, string assetName, Exception e)
 		{
+			if (!assetBundleName.StartsWith(Key)) return;
+
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];

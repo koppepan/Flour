@@ -1,44 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Flour.Asset
 {
 	internal class WaiterBridge
 	{
-		public string Key { get; private set; }
+		internal delegate void AddRequestDelegate(string assetBundleName, string[] dependencies);
+		internal delegate void CleanRequestDelegate(string assetBundleName, string[] dependencies);
+
+		internal delegate bool ContainsRequestDelegate(string assetBundleName);
+		internal delegate IEnumerable<IAssetRequest> GetRequestsDelegate(string assetBundleName);
+		internal delegate void WaiterDispose();
+
 		public AssetBundleManifest Manifest { get; private set; }
 		public AssetBundleSizeManifest SizeManiefst { get; private set; }
 
-		public Action<string, string[]> AddRequest { get; private set; }
-		public Action<string, string[]> CleanRequest { get; private set; }
+		private AddRequestDelegate addRequestDelegate;
+		private CleanRequestDelegate cleanRequestDelegate;
 
-		public Func<string, bool> ContainsRequest { get; private set; }
-		public Func<string, IEnumerable<IAssetRequest>> GetRequests { get; private set; }
-		public Action Dispose;
-
+		private Dictionary<string, ContainsRequestDelegate> containsRequestDelegates = new Dictionary<string, ContainsRequestDelegate>();
+		private Dictionary<string, GetRequestsDelegate> getRequestsDelegates = new Dictionary<string, GetRequestsDelegate>();
+		private List<WaiterDispose> waiterDisposes = new List<WaiterDispose>();
 
 		public event Action<string, string, UnityEngine.Object> OnAssetLoaded = delegate { };
 		public event Action<string, Exception> OnDownloadedError = delegate { };
 		public event Action<string, string, Exception> OnLoadedError = delegate { };
 
-		public WaiterBridge(string key, AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, Action<string, string[]> addRequest, Action<string, string[]> cleanRequest)
+		public WaiterBridge(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, AddRequestDelegate addRequest, CleanRequestDelegate cleanRequest)
 		{
-			Key = key;
-
 			Manifest = manifest;
 			SizeManiefst = sizeManifest;
-			AddRequest = addRequest;
-			CleanRequest = cleanRequest;
+
+			addRequestDelegate = addRequest;
+			cleanRequestDelegate = cleanRequest;
 		}
 
-		public void SetFunc(Func<string, bool> containtsRequest, Func<string, IEnumerable<IAssetRequest>> getRequests, Action dispose)
+		public void AddWaiter(string key, ContainsRequestDelegate containsRequest, GetRequestsDelegate getRequests, WaiterDispose dispose)
 		{
-			ContainsRequest = containtsRequest;
-			GetRequests = getRequests;
-			Dispose = dispose;
+			containsRequestDelegates[key] = containsRequest;
+			getRequestsDelegates[key] = getRequests;
+			waiterDisposes.Add(dispose);
 		}
 
+		public void Dispose()
+		{
+			waiterDisposes.ForEach(x => x());
+		}
+
+		public void AddRequest(string assetBundleName, string[] dependencies) => addRequestDelegate(assetBundleName, dependencies);
+		public void CleanRequest(string assetBundleName, string[] dependencies) => cleanRequestDelegate(assetBundleName, dependencies);
+
+		public bool ContainsRequest(string assetBundleName)
+		{
+			foreach (var pair in containsRequestDelegates)
+			{
+				if (assetBundleName.StartsWith(pair.Key) && pair.Value(assetBundleName)) return true;
+			}
+			return false;
+		}
+
+		public IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
+		{
+			foreach (var pair in getRequestsDelegates)
+			{
+				if (!assetBundleName.StartsWith(pair.Key)) continue;
+				return pair.Value(assetBundleName);
+			}
+			return Enumerable.Empty<IAssetRequest>();
+		}
 
 		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset) => OnAssetLoaded.Invoke(assetBundleName, assetName, asset);
 		public void OnError(string assetBundleName, Exception e) => OnDownloadedError.Invoke(assetBundleName, e);

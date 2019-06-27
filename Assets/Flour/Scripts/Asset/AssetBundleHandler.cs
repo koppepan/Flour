@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEngine;
@@ -16,7 +14,7 @@ namespace Flour.Asset
 		readonly ParallelAssetBundleDownloader downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
 
-		readonly List<WaiterBridge> waiters = new List<WaiterBridge>();
+		WaiterBridge waiterBridge;
 
 		AssetBundleManifest manifest;
 		AssetBundleSizeManifest sizeManifest;
@@ -56,8 +54,7 @@ namespace Flour.Asset
 			downloadHandler.Dispose();
 			assetLoadHandler.Dispose();
 
-			waiters.ForEach(x => x.Dispose());
-			waiters.Clear();
+			waiterBridge.Dispose();
 
 			AssetBundle.UnloadAllAssetBundles(true);
 		}
@@ -70,9 +67,11 @@ namespace Flour.Asset
 
 		public void AddWaiter<T>(AssetWaiter<T> waiter) where T : UnityEngine.Object
 		{
-			var bridge = new WaiterBridge(waiter.Key, manifest, sizeManifest, AddRequest, CleanRequest);
-			waiter.SetBridge(bridge);
-			waiters.Add(bridge);
+			if (waiterBridge == null)
+			{
+				waiterBridge = new WaiterBridge(manifest, sizeManifest, AddRequest, CleanRequest);
+			}
+			waiter.SetBridge(waiterBridge);
 		}
 
 		private void AddRequestInternal(string assetbundlePath)
@@ -91,16 +90,11 @@ namespace Flour.Asset
 		}
 		void CleanRequest(string assetBundleName, string[] dependencies)
 		{
-			if (waiters.Any(x => !x.ContainsRequest(assetBundleName)))
-			{
-				assetLoadHandler.Unload(assetBundleName);
-			}
+			if (!waiterBridge.ContainsRequest(assetBundleName)) assetLoadHandler.Unload(assetBundleName);
+
 			for (int i = 0; i < dependencies.Length; i++)
 			{
-				if (waiters.Any(x => !x.ContainsRequest(dependencies[i])))
-				{
-					assetLoadHandler.Unload(dependencies[i]);
-				}
+				if (!waiterBridge.ContainsRequest(dependencies[i])) assetLoadHandler.Unload(dependencies[i]);
 			}
 		}
 
@@ -111,24 +105,22 @@ namespace Flour.Asset
 
 			assetLoadHandler.AddAssetBundle(asset.Item1, asset.Item2);
 
-			for (int i = 0; i < waiters.Count; i++)
+			var requests = waiterBridge.GetRequests(asset.Item1);
+
+			if (requests.Any())
 			{
-				var requests = waiters[i].GetRequests(asset.Item1);
-				if (requests.Any())
+				foreach (var req in requests)
 				{
-					foreach (var req in requests)
+					if (assetLoadHandler.AllExist(req.AssetBundleName, req.Dependencies))
 					{
-						if (assetLoadHandler.AllExist(req.AssetBundleName, req.Dependencies))
+						if (asset.Item2.GetAllScenePaths().Length > 0)
 						{
-							if (asset.Item2.GetAllScenePaths().Length > 0)
-							{
-								var scene = Path.GetFileNameWithoutExtension(asset.Item2.GetAllScenePaths()[0]);
-								waiters[i].OnLoaded(asset.Item1, scene, null);
-							}
-							else
-							{
-								assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
-							}
+							var scene = Path.GetFileNameWithoutExtension(asset.Item2.GetAllScenePaths()[0]);
+							waiterBridge.OnLoaded(asset.Item1, scene, null);
+						}
+						else
+						{
+							assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
 						}
 					}
 				}
@@ -137,37 +129,19 @@ namespace Flour.Asset
 
 		void OnDownloadError(Tuple<string, long, string> error)
 		{
-			for (int i = 0; i < waiters.Count; i++)
-			{
-				if (error.Item1.StartsWith(waiters[i].Key))
-				{
-					waiters[i].OnError(error.Item1, new Exception(error.Item3));
-				}
-			}
+			waiterBridge.OnError(error.Item1, new Exception(error.Item3));
 		}
 
 		void OnLoadedObject(Tuple<string, string, UnityEngine.Object> asset)
 		{
 			//Debug.Log($"loaded Asset => {asset.Item1}.{asset.Item2}");
 
-			for (int i = 0; i < waiters.Count; i++)
-			{
-				if (asset.Item1.StartsWith(waiters[i].Key))
-				{
-					waiters[i].OnLoaded(asset.Item1, asset.Item2, asset.Item3);
-				}
-			}
+			waiterBridge.OnLoaded(asset.Item1, asset.Item2, asset.Item3);
 		}
 
 		void OnAssetLoadError(Tuple<string, string, Exception> error)
 		{
-			for (int i = 0; i < waiters.Count; i++)
-			{
-				if (error.Item1.StartsWith(waiters[i].Key))
-				{
-					waiters[i].OnError(error.Item1, error.Item2, error.Item3);
-				}
-			}
+			waiterBridge.OnError(error.Item1, error.Item2, error.Item3);
 		}
 	}
 }
