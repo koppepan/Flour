@@ -28,13 +28,16 @@ namespace Flour.Asset
 		public event Action<string, Exception> OnDownloadedError = delegate { };
 		public event Action<string, string, Exception> OnLoadedError = delegate { };
 
-		public WaiterBridge(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest, AddRequestDelegate addRequest, CleanRequestDelegate cleanRequest)
+		public WaiterBridge(AddRequestDelegate addRequest, CleanRequestDelegate cleanRequest)
+		{
+			addRequestDelegate = addRequest;
+			cleanRequestDelegate = cleanRequest;
+		}
+
+		public void SetManifest(AssetBundleManifest manifest, AssetBundleSizeManifest sizeManifest)
 		{
 			Manifest = manifest;
 			SizeManiefst = sizeManifest;
-
-			addRequestDelegate = addRequest;
-			cleanRequestDelegate = cleanRequest;
 		}
 
 		public void AddWaiter(string key, ContainsRequestDelegate containsRequest, GetRequestsDelegate getRequests, WaiterDispose dispose)

@@ -36,8 +36,12 @@ namespace Flour.Asset
 
 		public long GetSize(string assetBundleName)
 		{
+#if UNITY_EDITOR && USE_LOCAL_ASSET
+			return 0;
+#else
 			var ab = string.Intern(Path.Combine(Key, assetBundleName));
 			return bridge.SizeManiefst.GetSize(ab);
+#endif
 		}
 
 		protected virtual T GetAsset(UnityEngine.Object asset)

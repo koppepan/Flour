@@ -14,7 +14,15 @@ namespace Flour.Asset
 		readonly ParallelAssetBundleDownloader downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
 
-		WaiterBridge waiterBridge;
+		WaiterBridge _waiterBridge;
+		WaiterBridge waiterBridge
+		{
+			get
+			{
+				if (_waiterBridge == null) _waiterBridge = new WaiterBridge(AddRequest, CleanRequest);
+				return _waiterBridge;
+			}
+		}
 
 		AssetBundleManifest manifest;
 		AssetBundleSizeManifest sizeManifest;
@@ -46,6 +54,8 @@ namespace Flour.Asset
 			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, "AssetBundles"));
 			sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, "AssetBundleSize"));
 			Debug.Log("loaded AssetBundleManifest.");
+
+			waiterBridge.SetManifest(manifest, sizeManifest);
 #endif
 		}
 
@@ -67,10 +77,6 @@ namespace Flour.Asset
 
 		public void AddWaiter<T>(AssetWaiter<T> waiter) where T : UnityEngine.Object
 		{
-			if (waiterBridge == null)
-			{
-				waiterBridge = new WaiterBridge(manifest, sizeManifest, AddRequest, CleanRequest);
-			}
 			waiter.SetBridge(waiterBridge);
 		}
 
