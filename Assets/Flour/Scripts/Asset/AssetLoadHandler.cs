@@ -112,7 +112,13 @@ namespace Flour.Asset
 		}
 		public bool AllExist(string assetBundleName, string[] dependencies)
 		{
-			return ContainsKey(assetBundleName) && dependencies.All(x => ContainsKey(x));
+			if (!ContainsKey(assetBundleName)) return false;
+
+			for (int i = 0; i < dependencies.Length; i++)
+			{
+				if (!ContainsKey(dependencies[i])) return false;
+			}
+			return true;
 		}
 
 		public void Unload(string assetBundleName)

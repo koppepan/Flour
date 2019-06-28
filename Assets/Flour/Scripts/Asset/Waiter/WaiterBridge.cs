@@ -8,7 +8,7 @@ namespace Flour.Asset
 	internal class WaiterBridge
 	{
 		internal delegate void AddRequestDelegate(string assetBundleName, string[] dependencies);
-		internal delegate void CleanRequestDelegate(string assetBundleName, string[] dependencies);
+		internal delegate void CleanRequestDelegate(string assetBundleName);
 
 		internal delegate bool ContainsRequestDelegate(string assetBundleName);
 		internal delegate IEnumerable<IAssetRequest> GetRequestsDelegate(string assetBundleName);
@@ -53,9 +53,16 @@ namespace Flour.Asset
 		}
 
 		public void AddRequest(string assetBundleName, string[] dependencies) => addRequestDelegate(assetBundleName, dependencies);
-		public void CleanRequest(string assetBundleName, string[] dependencies) => cleanRequestDelegate(assetBundleName, dependencies);
+		public void CleanRequest(string assetBundleName, string[] dependencies)
+		{
+			if (!ContainsRequest(assetBundleName)) cleanRequestDelegate(assetBundleName);
+			for (int i = 0; i < dependencies.Length; i++)
+			{
+				if (!ContainsRequest(dependencies[i])) cleanRequestDelegate(dependencies[i]);
+			}
+		}
 
-		public bool ContainsRequest(string assetBundleName)
+		bool ContainsRequest(string assetBundleName)
 		{
 			foreach (var pair in containsRequestDelegates)
 			{

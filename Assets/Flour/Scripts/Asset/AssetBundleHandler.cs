@@ -82,7 +82,7 @@ namespace Flour.Asset
 
 		private void AddRequestInternal(string assetbundlePath)
 		{
-			if (assetLoadHandler.ContainsKey(assetbundlePath) || assetLoadHandler.ContainsKey(assetbundlePath))
+			if (assetLoadHandler.ContainsKey(assetbundlePath))
 			{
 				return;
 			}
@@ -94,16 +94,10 @@ namespace Flour.Asset
 			AddRequestInternal(assetBundleName);
 			for (int i = 0; i < dependencies.Length; i++) AddRequestInternal(dependencies[i]);
 		}
-		void CleanRequest(string assetBundleName, string[] dependencies)
+		void CleanRequest(string assetBundleName)
 		{
-			if (!waiterBridge.ContainsRequest(assetBundleName)) assetLoadHandler.Unload(assetBundleName);
-
-			for (int i = 0; i < dependencies.Length; i++)
-			{
-				if (!waiterBridge.ContainsRequest(dependencies[i])) assetLoadHandler.Unload(dependencies[i]);
-			}
+			assetLoadHandler.Unload(assetBundleName);
 		}
-
 
 		void OnCompleteDownload(Tuple<string, AssetBundle> asset)
 		{
@@ -112,22 +106,19 @@ namespace Flour.Asset
 			assetLoadHandler.AddAssetBundle(asset.Item1, asset.Item2);
 
 			var requests = waiterBridge.GetRequests(asset.Item1);
+			if (!requests.Any()) return;
 
-			if (requests.Any())
+			foreach (var req in requests)
 			{
-				foreach (var req in requests)
+				if (assetLoadHandler.AllExist(req.AssetBundleName, req.Dependencies))
 				{
-					if (assetLoadHandler.AllExist(req.AssetBundleName, req.Dependencies))
+					if (asset.Item2.GetAllScenePaths().Length > 0)
 					{
-						if (asset.Item2.GetAllScenePaths().Length > 0)
-						{
-							var scene = Path.GetFileNameWithoutExtension(asset.Item2.GetAllScenePaths()[0]);
-							waiterBridge.OnLoaded(asset.Item1, scene, null);
-						}
-						else
-						{
-							assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
-						}
+						waiterBridge.OnLoaded(asset.Item1, req.AssetName, null);
+					}
+					else
+					{
+						assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
 					}
 				}
 			}
