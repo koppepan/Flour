@@ -74,7 +74,7 @@ namespace Flour.Asset
 			var req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, new Subject<T>());
 			requests.Add(req);
 
-			bridge.AddRequest(req.AssetBundleName, req.Dependencies);
+			bridge.AddRequest(req.AssetBundleNames);
 			return req.subject;
 		}
 
@@ -82,7 +82,7 @@ namespace Flour.Asset
 		{
 			for (int i = 0; i < requests.Count; i++)
 			{
-				if (requests[i].AssetBundleName == assetBundleName || requests[i].Dependencies.Contains(assetBundleName))
+				if (requests[i].AssetBundleNames.Contains(assetBundleName))
 				{
 					return true;
 				}
@@ -104,7 +104,7 @@ namespace Flour.Asset
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.AssetBundleName == assetBundleName && req.AssetName == assetName)
+				if (req.AssetBundleNames[0] == assetBundleName && req.AssetName == assetName)
 				{
 					if (req.subject.HasObservers)
 					{
@@ -117,7 +117,7 @@ namespace Flour.Asset
 					}
 
 					requests.Remove(req);
-					bridge.CleanRequest(req.AssetBundleName, req.Dependencies);
+					bridge.CleanRequest(req.AssetBundleNames);
 				}
 			}
 		}
@@ -128,11 +128,11 @@ namespace Flour.Asset
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.AssetBundleName == assetBundleName)
+				if (req.AssetBundleNames[0] == assetBundleName)
 				{
 					req.subject.OnError(new Exception(assetBundleName, e));
 					requests.Remove(req);
-					bridge.CleanRequest(req.AssetBundleName, req.Dependencies);
+					bridge.CleanRequest(req.AssetBundleNames);
 				}
 			}
 		}
@@ -143,11 +143,11 @@ namespace Flour.Asset
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.AssetBundleName == assetBundleName && req.AssetName == assetName)
+				if (req.AssetBundleNames[0] == assetBundleName && req.AssetName == assetName)
 				{
 					req.subject.OnError(new Exception($"{assetBundleName}.{assetName}", e));
 					requests.Remove(req);
-					bridge.CleanRequest(req.AssetBundleName, req.Dependencies);
+					bridge.CleanRequest(req.AssetBundleNames);
 				}
 			}
 		}

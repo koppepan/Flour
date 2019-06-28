@@ -80,19 +80,16 @@ namespace Flour.Asset
 			waiter.SetBridge(waiterBridge);
 		}
 
-		private void AddRequestInternal(string assetbundlePath)
+		void AddRequest(string[] assetBundleNames)
 		{
-			if (assetLoadHandler.ContainsKey(assetbundlePath))
+			for (int i = 0; i < assetBundleNames.Length; i++)
 			{
-				return;
+				if (assetLoadHandler.ContainsKey(assetBundleNames[i]))
+				{
+					continue;
+				}
+				downloadHandler.AddRequest(new AssetBundleDownloader(assetBundleNames[i], manifest.GetAssetBundleHash(assetBundleNames[i])));
 			}
-			downloadHandler.AddRequest(new AssetBundleDownloader(assetbundlePath, manifest.GetAssetBundleHash(assetbundlePath)));
-		}
-
-		void AddRequest(string assetBundleName, string[] dependencies)
-		{
-			AddRequestInternal(assetBundleName);
-			for (int i = 0; i < dependencies.Length; i++) AddRequestInternal(dependencies[i]);
 		}
 		void CleanRequest(string assetBundleName)
 		{
@@ -110,7 +107,7 @@ namespace Flour.Asset
 
 			foreach (var req in requests)
 			{
-				if (assetLoadHandler.AllExist(req.AssetBundleName, req.Dependencies))
+				if (assetLoadHandler.AllExist(req.AssetBundleNames))
 				{
 					if (asset.Item2.GetAllScenePaths().Length > 0)
 					{
@@ -118,7 +115,7 @@ namespace Flour.Asset
 					}
 					else
 					{
-						assetLoadHandler.AddRequest(req.AssetBundleName, req.AssetName);
+						assetLoadHandler.AddRequest(asset.Item1, req.AssetName);
 					}
 				}
 			}

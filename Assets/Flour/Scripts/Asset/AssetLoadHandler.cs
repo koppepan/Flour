@@ -83,11 +83,11 @@ namespace Flour.Asset
 					var req = requests[i];
 					if (req.Item3.isDone)
 					{
-						requests.Remove(req);
-						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
-
 						loadedCount++;
 						UpdateProgress(0);
+
+						requests.Remove(req);
+						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
 					}
 				}
 
@@ -110,13 +110,11 @@ namespace Flour.Asset
 		{
 			return assetBundles.ContainsKey(path);
 		}
-		public bool AllExist(string assetBundleName, string[] dependencies)
+		public bool AllExist(string[] assetBundleNames)
 		{
-			if (!ContainsKey(assetBundleName)) return false;
-
-			for (int i = 0; i < dependencies.Length; i++)
+			for (int i = 0; i < assetBundleNames.Length; i++)
 			{
-				if (!ContainsKey(dependencies[i])) return false;
+				if (!ContainsKey(assetBundleNames[i])) return false;
 			}
 			return true;
 		}

@@ -7,7 +7,7 @@ namespace Flour.Asset
 {
 	internal class WaiterBridge
 	{
-		internal delegate void AddRequestDelegate(string assetBundleName, string[] dependencies);
+		internal delegate void AddRequestDelegate(string[] assetBundleNames);
 		internal delegate void CleanRequestDelegate(string assetBundleName);
 
 		internal delegate bool ContainsRequestDelegate(string assetBundleName);
@@ -20,8 +20,8 @@ namespace Flour.Asset
 		private AddRequestDelegate addRequestDelegate;
 		private CleanRequestDelegate cleanRequestDelegate;
 
-		private Dictionary<string, ContainsRequestDelegate> containsRequestDelegates = new Dictionary<string, ContainsRequestDelegate>();
-		private Dictionary<string, GetRequestsDelegate> getRequestsDelegates = new Dictionary<string, GetRequestsDelegate>();
+		private List<Tuple<string, ContainsRequestDelegate>> contains = new List<Tuple<string, ContainsRequestDelegate>>();
+		private List<Tuple<string, GetRequestsDelegate>> requests = new List<Tuple<string, GetRequestsDelegate>>();
 		private List<WaiterDispose> waiterDisposes = new List<WaiterDispose>();
 
 		public event Action<string, string, UnityEngine.Object> OnAssetLoaded = delegate { };
@@ -42,8 +42,8 @@ namespace Flour.Asset
 
 		public void AddWaiter(string key, ContainsRequestDelegate containsRequest, GetRequestsDelegate getRequests, WaiterDispose dispose)
 		{
-			containsRequestDelegates[key] = containsRequest;
-			getRequestsDelegates[key] = getRequests;
+			contains.Add(Tuple.Create(key, containsRequest));
+			requests.Add(Tuple.Create(key, getRequests));
 			waiterDisposes.Add(dispose);
 		}
 
@@ -52,31 +52,30 @@ namespace Flour.Asset
 			waiterDisposes.ForEach(x => x());
 		}
 
-		public void AddRequest(string assetBundleName, string[] dependencies) => addRequestDelegate(assetBundleName, dependencies);
-		public void CleanRequest(string assetBundleName, string[] dependencies)
+		public void AddRequest(string[] assetBundleNames) => addRequestDelegate(assetBundleNames);
+		public void CleanRequest(string[] assetBundleNames)
 		{
-			if (!ContainsRequest(assetBundleName)) cleanRequestDelegate(assetBundleName);
-			for (int i = 0; i < dependencies.Length; i++)
+			for (int i = 0; i < assetBundleNames.Length; i++)
 			{
-				if (!ContainsRequest(dependencies[i])) cleanRequestDelegate(dependencies[i]);
+				if (!ContainsRequest(assetBundleNames[i])) cleanRequestDelegate(assetBundleNames[i]);
 			}
 		}
 
 		bool ContainsRequest(string assetBundleName)
 		{
-			foreach (var pair in containsRequestDelegates)
+			for (int i = 0; i < contains.Count; i++)
 			{
-				if (assetBundleName.StartsWith(pair.Key) && pair.Value(assetBundleName)) return true;
+				if (assetBundleName.StartsWith(contains[i].Item1) && contains[i].Item2(assetBundleName)) return true;
 			}
 			return false;
 		}
 
 		public IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
 		{
-			foreach (var pair in getRequestsDelegates)
+			for (int i = 0; i < requests.Count; i++)
 			{
-				if (!assetBundleName.StartsWith(pair.Key)) continue;
-				return pair.Value(assetBundleName);
+				if (!assetBundleName.StartsWith(requests[i].Item1)) continue;
+				return requests[i].Item2(assetBundleName);
 			}
 			return Enumerable.Empty<IAssetRequest>();
 		}

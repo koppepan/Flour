@@ -123,10 +123,10 @@ namespace Flour.Net
 						}
 						else
 						{
-							downloadedObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
-
 							downloadedCount++;
 							UpdateProgress(0);
+
+							downloadedObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
 						}
 					}
 				}
