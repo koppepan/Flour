@@ -73,7 +73,12 @@ namespace Flour.Asset
 			}
 #endif
 
-			var req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, new Subject<T>());
+			var req = requests.FirstOrDefault(x => x.Equals(assetBundleName, assetName));
+			if (req != null)
+			{
+				return req.subject;
+			}
+			req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, new Subject<T>());
 			requests.Add(req);
 
 			bridge.AddRequest(req.AssetBundleNames);
