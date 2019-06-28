@@ -14,7 +14,7 @@ namespace Flour.Asset
 
 		WaiterBridge bridge;
 
-		public AssetWaiter(string key) => Key = key;
+		public AssetWaiter(string key) => Key = key.ToLower();
 
 		internal void SetBridge(WaiterBridge bridge)
 		{
@@ -56,6 +56,8 @@ namespace Flour.Asset
 
 		public virtual IObservable<T> LoadAsync(string assetBundleName, string assetName, string valiant = "")
 		{
+			assetBundleName = assetBundleName.ToLower();
+
 			if (!string.IsNullOrEmpty(valiant))
 			{
 				assetBundleName += $".{valiant}";
@@ -99,12 +101,12 @@ namespace Flour.Asset
 
 		void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset)
 		{
-			if (!assetBundleName.StartsWith(Key)) return;
+			if (!assetBundleName.StartsWith(Key, StringComparison.Ordinal)) return;
 
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.AssetBundleNames[0] == assetBundleName && req.AssetName == assetName)
+				if (req.Equals(assetBundleName, assetName))
 				{
 					if (req.subject.HasObservers)
 					{
@@ -123,12 +125,12 @@ namespace Flour.Asset
 		}
 		void OnError(string assetBundleName, Exception e)
 		{
-			if (!assetBundleName.StartsWith(Key)) return;
+			if (!assetBundleName.StartsWith(Key, StringComparison.Ordinal)) return;
 
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.AssetBundleNames[0] == assetBundleName)
+				if (req.Equals(assetBundleName))
 				{
 					req.subject.OnError(new Exception(assetBundleName, e));
 					requests.Remove(req);
@@ -138,12 +140,12 @@ namespace Flour.Asset
 		}
 		void OnError(string assetBundleName, string assetName, Exception e)
 		{
-			if (!assetBundleName.StartsWith(Key)) return;
+			if (!assetBundleName.StartsWith(Key, StringComparison.Ordinal)) return;
 
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.AssetBundleNames[0] == assetBundleName && req.AssetName == assetName)
+				if (req.Equals(assetBundleName, assetName))
 				{
 					req.subject.OnError(new Exception($"{assetBundleName}.{assetName}", e));
 					requests.Remove(req);

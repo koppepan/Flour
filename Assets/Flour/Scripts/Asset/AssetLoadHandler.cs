@@ -142,9 +142,9 @@ namespace Flour.Asset
 				Debug.LogWarning($"Missing AssetBundle for requested Asset => {path}");
 				return;
 			}
-			if (!requests.Any(x => x.Item1 == path && x.Item2 == assetName))
+			if (!requests.Any(x => x.Item1.Equals(path, StringComparison.Ordinal) && x.Item2.Equals(assetName, StringComparison.Ordinal)))
 			{
-				if (!assetBundles[path].GetAllAssetNames().Any(x => Path.GetFileNameWithoutExtension(x) == assetName))
+				if (!assetBundles[path].GetAllAssetNames().Any(x => Path.GetFileNameWithoutExtension(x).Equals(assetName, StringComparison.Ordinal)))
 				{
 					erroredSubject.OnNext(Tuple.Create(path, assetName, new Exception("no asset in AssetBundle.")));
 				}

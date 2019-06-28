@@ -93,8 +93,8 @@ namespace Flour.Net
 
 		public void AddRequest(IDownloader<T> downloader)
 		{
-			if (waitingList.Any(x => x.Path == downloader.Path)) return;
-			if (downloaders.Any(x => x.Path == downloader.Path)) return;
+			if (waitingList.Any(x => x.Path.Equals(downloader.Path, StringComparison.Ordinal))) return;
+			if (downloaders.Any(x => x.Path.Equals(downloader.Path, StringComparison.Ordinal))) return;
 
 			waitingList.Add(downloader);
 

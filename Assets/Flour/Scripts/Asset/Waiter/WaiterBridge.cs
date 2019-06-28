@@ -65,7 +65,7 @@ namespace Flour.Asset
 		{
 			for (int i = 0; i < contains.Count; i++)
 			{
-				if (assetBundleName.StartsWith(contains[i].Item1) && contains[i].Item2(assetBundleName)) return true;
+				if (assetBundleName.StartsWith(contains[i].Item1, StringComparison.Ordinal) && contains[i].Item2(assetBundleName)) return true;
 			}
 			return false;
 		}
@@ -74,7 +74,7 @@ namespace Flour.Asset
 		{
 			for (int i = 0; i < requests.Count; i++)
 			{
-				if (!assetBundleName.StartsWith(requests[i].Item1)) continue;
+				if (!assetBundleName.StartsWith(requests[i].Item1, StringComparison.Ordinal)) continue;
 				return requests[i].Item2(assetBundleName);
 			}
 			return Enumerable.Empty<IAssetRequest>();
