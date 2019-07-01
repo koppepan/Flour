@@ -15,7 +15,7 @@ namespace Example
 			handler = new AssetBundleHandler(baseUrl);
 
 			SceneWaiter = new SceneWaiter("scenes/");
-			SpriteWaiter = new SpriteAssetWaiter("icons/");
+			SpriteWaiter = new SpriteAssetWaiter("icons/", 50);
 		}
 
 		public void Dispose()
@@ -42,6 +42,7 @@ namespace Example
 
 		public void Compress()
 		{
+			SpriteWaiter.Compress();
 		}
 	}
 }
