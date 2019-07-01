@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using UniRx;
-
+using UniRx.Async;
 using Flour;
 
 namespace Example
@@ -34,6 +34,10 @@ namespace Example
 
 		async void Start()
 		{
+			Observable.FromEvent(
+				_ => Application.lowMemory += OnLowMemory,
+				_ => Application.lowMemory -= OnLowMemory).Subscribe().AddTo(this);
+
 			var sceneHandler = new SceneHandler();
 			var layerHandler = new LayerHandler();
 
@@ -74,6 +78,12 @@ namespace Example
 				h => UnityEditor.EditorApplication.pauseStateChanged += h,
 				h => UnityEditor.EditorApplication.pauseStateChanged -= h).Subscribe(PauseStateChanged).AddTo(this);
 #endif
+		}
+
+		private void OnLowMemory()
+		{
+			Debug.LogWarning("low memory");
+			appOperator.ResourceCompress().Forget();
 		}
 
 #if UNITY_EDITOR

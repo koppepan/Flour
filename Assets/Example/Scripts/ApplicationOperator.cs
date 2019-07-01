@@ -82,6 +82,13 @@ namespace Example
 			}
 		}
 
+		public async UniTask ResourceCompress()
+		{
+			assetHandler.Compress();
+			await Resources.UnloadUnusedAssets();
+			await UniTask.Run(() => GC.Collect(0, GCCollectionMode.Optimized));
+		}
+
 		public async UniTask LoadSceneAsync(SceneType sceneType, params object[] args)
 		{
 			if (sceneLoading)
@@ -97,8 +104,7 @@ namespace Example
 
 			async UniTask task()
 			{
-				await Resources.UnloadUnusedAssets();
-				await UniTask.Run(() => GC.Collect(0, GCCollectionMode.Optimized));
+				await ResourceCompress();
 				await fade.FadeOut();
 				sceneLoading = false;
 			}

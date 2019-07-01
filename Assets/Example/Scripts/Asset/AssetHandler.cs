@@ -39,5 +39,9 @@ namespace Example
 			handler.AddWaiter(SceneWaiter);
 			handler.AddWaiter(SpriteWaiter);
 		}
+
+		public void Compress()
+		{
+		}
 	}
 }
