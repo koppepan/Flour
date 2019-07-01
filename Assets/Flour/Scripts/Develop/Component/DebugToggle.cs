@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
 	[RequireComponent(typeof(Toggle))]
-	public class DebugToggle : MonoBehaviour, DebugDialog.IContent<bool>
+	class DebugToggle : MonoBehaviour, IContent<bool>
 	{
 		public void Setup(string title, System.Action<bool> onChanged)
 		{

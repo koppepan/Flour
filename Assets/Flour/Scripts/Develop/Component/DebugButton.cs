@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
 	[RequireComponent(typeof(Button))]
-	public class DebugButton : MonoBehaviour, DebugDialog.IContent<bool>
+	class DebugButton : MonoBehaviour, IContent<bool>
 	{
 		[SerializeField]
 		private Text titleText = default;

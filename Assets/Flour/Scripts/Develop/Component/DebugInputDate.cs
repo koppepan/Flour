@@ -3,9 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
-	public class DebugInputDate : MonoBehaviour, DebugDialog.IContent<DateTime>
+	class DebugInputDate : MonoBehaviour, IContent<DateTime>
 	{
 		[SerializeField] InputField inputField = default;
 

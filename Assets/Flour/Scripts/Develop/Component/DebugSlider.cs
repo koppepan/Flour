@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
-	public class DebugSlider : MonoBehaviour, DebugDialog.IContent<float>
+	class DebugSlider : MonoBehaviour, IContent<float>
 	{
 		[SerializeField]
 		private Slider slider = default;

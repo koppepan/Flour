@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
-	public class DebugKeypad : MonoBehaviour
+	class DebugKeypad : MonoBehaviour
 	{
 		[SerializeField]
 		private Text inputText = default;

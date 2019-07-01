@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Example
+namespace Flour.Develop
 {
-	class DebugFloatKeypad : DebugKeypad, DebugDialog.IContent<double>
+	class DebugFloatKeypad : DebugKeypad, IContent<double>
 	{
 		public void Setup(Action<double> onSelect)
 		{

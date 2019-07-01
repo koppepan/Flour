@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
 	[RequireComponent(typeof(InputField))]
-	public class DebugInputField : MonoBehaviour, DebugDialog.IContent<string>
+	class DebugInputField : MonoBehaviour, IContent<string>
 	{
 		public void Setup(System.Action<string> onEnter)
 		{

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
 	[RequireComponent(typeof(Text))]
-	public class DebugText : MonoBehaviour, DebugDialog.IContent<string>
+	class DebugText : MonoBehaviour, IContent<string>
 	{
 		public void Setup(string title)
 		{

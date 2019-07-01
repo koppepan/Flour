@@ -2,10 +2,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example
+namespace Flour.Develop
 {
 	[RequireComponent(typeof(Dropdown))]
-	public class DebugDropdown : MonoBehaviour, DebugDialog.IContent<System.Tuple<int, string>>
+	class DebugDropdown : MonoBehaviour, IContent<System.Tuple<int, string>>
 	{
 		public void Setup(string[] contents, string defaultValue, System.Action<int, string> onChanged)
 		{
