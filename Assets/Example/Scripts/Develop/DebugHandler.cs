@@ -36,6 +36,9 @@ namespace Example
 #elif UNITY_EDITOR || UNITY_STANDALONE
 			var mouseDownStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonDown(1));
 			var mouseUpStream = Observable.EveryUpdate().Where(_ => Input.GetMouseButtonUp(1));
+#else
+			var mouseDownStream = Observable.Empty<long>();
+			var mouseUpStream = Observable.Empty<long>();
 #endif
 
 			mouseDownStream
@@ -46,6 +49,8 @@ namespace Example
 				.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
 #elif UNITY_EDITOR || UNITY_STANDALONE
 				.Subscribe(_ => OpenDialog(Input.mousePosition))
+#else
+				.Subscribe()
 #endif
 				.AddTo(this);
 		}
