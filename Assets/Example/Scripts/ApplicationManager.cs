@@ -52,8 +52,7 @@ namespace Example
 			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
 			await fixedRepository.LoadAllAsync();
 
-			assetHandler = new AssetHandler("file://" + System.IO.Path.Combine(Application.dataPath, "../AssetBundles/"));
-			await assetHandler.LoadManifestAsync();
+			assetHandler = new AssetHandler("");
 
 			appOperator = new ApplicationOperator(
 				ApplicationQuit,
