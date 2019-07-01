@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 1942031539450733620}
   - component: {fileID: 1065776975069791671}
   - component: {fileID: -179448918350077760}
+  - component: {fileID: 6407924206050244334}
   m_Layer: 5
   m_Name: DebugDialog
   m_TagString: Untagged
@@ -263,6 +264,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   titleText: {fileID: 322400266855170219}
   closeButton: {fileID: 6135358969162471647}
+--- !u!114 &6407924206050244334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2654701526219477949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd5ab2a03b779646ad4ad06f5ea0252, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   textPrefab: {fileID: 3687383709783157837, guid: 7742f36dbc41dea42baec20ca91e5339,
     type: 3}
   buttonPrefab: {fileID: 2617436589000341481, guid: 927cde4d5950d424e92c87085e0073b1,
