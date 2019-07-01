@@ -69,11 +69,11 @@ namespace Example
 			return dialog;
 		}
 
-		private async void OpenDialog(Vector2 position)
+		public async void OpenDialog(Vector2 position)
 		{
 			var dialog = await Open("debug", position);
 
-			((AbstractScene)sceneHandler.CurrentScene).OpenDebugDialog(dialog);
+			((AbstractScene)sceneHandler.CurrentScene)?.OpenDebugDialog(dialog);
 			foreach (var s in sceneHandler.AdditiveScenes)
 			{
 				((AbstractScene)s).OpenDebugDialog(dialog);

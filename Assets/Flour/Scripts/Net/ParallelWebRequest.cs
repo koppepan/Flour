@@ -22,7 +22,7 @@ namespace Flour.Net
 	{
 		readonly WaitForSeconds waitForSeconds = new WaitForSeconds(0.1f);
 
-		readonly string baseUrl;
+		string baseUrl;
 
 		readonly int parallel;
 		readonly int timeout;
@@ -50,6 +50,8 @@ namespace Flour.Net
 			this.parallel = parallel;
 			this.timeout = timeout;
 		}
+
+		public void ChangeBaseUrl(string baseUrl) => this.baseUrl = baseUrl;
 
 		public void Dispose()
 		{

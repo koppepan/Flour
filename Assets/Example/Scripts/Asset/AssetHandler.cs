@@ -18,6 +18,8 @@ namespace Example
 			SpriteWaiter = new SpriteAssetWaiter("icons/", 50);
 		}
 
+		public void ChangeBaseUrl(string baseUrl) => handler.ChangeBaseUrl(baseUrl);
+
 		public void Dispose()
 		{
 			handler.Dispose();

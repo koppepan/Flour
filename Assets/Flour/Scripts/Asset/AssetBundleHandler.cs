@@ -9,7 +9,7 @@ namespace Flour.Asset
 {
 	public class AssetBundleHandler
 	{
-		readonly string baseUrl;
+		string baseUrl;
 
 		readonly ParallelAssetBundleDownloader downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
@@ -43,6 +43,12 @@ namespace Flour.Asset
 			assetLoadHandler = new AssetLoadHandler();
 			assetLoadHandler.LoadObservable.Subscribe(OnLoadedObject).AddTo(disposable);
 			assetLoadHandler.ErrorObservable.Subscribe(OnAssetLoadError).AddTo(disposable);
+		}
+
+		public void ChangeBaseUrl(string baseUrl)
+		{
+			this.baseUrl = baseUrl;
+			downloadHandler.ChangeBaseUrl(baseUrl);
 		}
 
 		public async UniTask LoadManifestAsync()
