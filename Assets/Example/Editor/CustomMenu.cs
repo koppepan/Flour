@@ -40,13 +40,27 @@ public class CustomMenu
 	[MenuItem("CustomMenu/AssetBundle Build/Android")] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
 	[MenuItem("CustomMenu/AssetBundle Build/iOS")] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
 
+	static string GetForlderName(BuildTarget buildTarget)
+	{
+		switch (buildTarget)
+		{
+			case BuildTarget.StandaloneWindows64: return "Windows";
+			case BuildTarget.StandaloneOSX: return "OSX";
+
+			case BuildTarget.Android:
+			case BuildTarget.iOS:
+				return buildTarget.ToString();
+
+			default: return "";
+		}
+	}
 	static void BuildAssetBundle(BuildTarget buildTarget)
 	{
-		var outputPath = System.IO.Path.Combine("AssetBundles", buildTarget.ToString());
+		var outputPath = System.IO.Path.Combine("AssetBundles", GetForlderName(buildTarget));
 
 		var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
 		var manifest = Flour.Build.BuildAssetBundle.Build(outputPath, buildTarget, options);
-		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, manifest);
-		Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, manifest);
+		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, GetForlderName(buildTarget), manifest);
+		Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, "AssetBundleSize", manifest);
 	}
 }

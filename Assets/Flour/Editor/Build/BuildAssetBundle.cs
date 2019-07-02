@@ -19,16 +19,16 @@ namespace Flour.Build
 			return manifest;
 		}
 
-		public static void CreateAssetBundleSizeManifest(string assetBundleDirectoryPath, AssetBundleManifest manifest)
+		public static void CreateAssetBundleSizeManifest(string directoryPath, string sizeFileName, AssetBundleManifest manifest)
 		{
 			var all = manifest.GetAllAssetBundles();
-			var assetBunldes = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
+			var assetBunldes = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
-			using (var sw = File.CreateText(Path.Combine(assetBundleDirectoryPath, "AssetBundleSize")))
+			using (var sw = File.CreateText(Path.Combine(directoryPath, sizeFileName)))
 			{
 				foreach (var ab in assetBunldes)
 				{
-					var name = ab.Remove(0, assetBundleDirectoryPath.Length + 1).Replace('\\', '/');
+					var name = ab.Remove(0, directoryPath.Length + 1).Replace('\\', '/');
 
 					if (name == "AssetBundles" || all.Contains(name))
 					{
@@ -40,16 +40,16 @@ namespace Flour.Build
 			Debug.Log($"done create AssetBundle size manifest");
 		}
 
-		public static void CleanUnnecessaryAssetBundles(string assetBundleDirectoryPath, AssetBundleManifest manifest)
+		public static void CleanUnnecessaryAssetBundles(string directoryPath, string manifestFileName, AssetBundleManifest manifest)
 		{
 			var all = manifest.GetAllAssetBundles();
-			var files = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
+			var files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
 			foreach (var f in files)
 			{
-				var name = f.Remove(0, assetBundleDirectoryPath.Length + 1).Replace('\\', '/');
+				var name = f.Remove(0, directoryPath.Length + 1).Replace('\\', '/');
 
-				if (name == "AssetBundles" || name == "AssetBundles.manifest")
+				if (name == manifestFileName || name == $"{manifestFileName}.manifest")
 				{
 					continue;
 				}
