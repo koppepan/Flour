@@ -49,7 +49,7 @@ namespace Example
 			var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
 			var manifest = Flour.Build.BuildAssetBundle.Build(outputPath, buildTarget, options);
 			Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, AssetHelper.GetAssetBundleFolderName(buildTarget), manifest);
-			Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, "AssetBundleSize", manifest);
+			Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, AssetHelper.AssetBundleSizeManifestName, manifest);
 		}
 	}
 }

@@ -12,13 +12,13 @@ namespace Example
 
 		public override async UniTask Load(params object[] args)
 		{
-			var config = (ServerList)(await Resources.LoadAsync<ServerList>("Config/ServerList"));
+			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
 
 			var folder = AssetHelper.GetAssetBundleFolderName(Application.platform);
 			var assetBundlePath = Path.Combine(config.list[0].assetBundle, folder);
 
 			AssetHandler.ChangeBaseUrl(assetBundlePath);
-			await AssetHandler.LoadManifestAsync(folder, "AssetBundleSize");
+			await AssetHandler.LoadManifestAsync(folder, AssetHelper.AssetBundleSizeManifestName);
 
 			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
 			await splash.Run();
