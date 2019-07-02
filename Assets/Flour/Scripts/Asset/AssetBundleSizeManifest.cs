@@ -14,7 +14,7 @@ namespace Flour.Asset
 
 		public long GetSize(string assetBundleName)
 		{
-			if (size.ContainsKey(assetBundleName))
+			if (!size.ContainsKey(assetBundleName))
 			{
 				Debug.LogWarning($"[AssetBundleSizeManifest] not found AssetBundleName => {assetBundleName}");
 				return 0;

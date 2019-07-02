@@ -39,15 +39,37 @@ namespace Flour.Asset
 			var split = request.downloadHandler.text.Split('\n');
 			for (int i = 0; i < split.Length; i++)
 			{
-				if (string.IsNullOrEmpty(split[i]))
-				{
-					continue;
-				}
+				if (string.IsNullOrEmpty(split[i])) continue;
+
 				var size = split[i].Split(' ');
 				dic[size[0]] = long.Parse(size[1]);
 			}
 
 			return new AssetBundleSizeManifest(dic);
+		}
+
+		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url)
+		{
+			var request = UnityWebRequest.Get(url);
+			await request.SendWebRequest();
+
+			if (request.isHttpError || request.isNetworkError)
+			{
+				Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
+				return null;
+			}
+
+			var dic = new Dictionary<string, uint>();
+			var split = request.downloadHandler.text.Split('\n');
+			for (int i = 0; i < split.Length; i++)
+			{
+				if (string.IsNullOrEmpty(split[i])) continue;
+
+				var crc = split[i].Split(' ');
+				dic[crc[0]] = uint.Parse(crc[1]);
+			}
+
+			return new AssetBundleCrcManifest(dic);
 		}
 	}
 }
