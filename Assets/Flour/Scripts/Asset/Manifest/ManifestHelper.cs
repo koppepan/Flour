@@ -42,7 +42,8 @@ namespace Flour.Asset
 				if (string.IsNullOrEmpty(split[i])) continue;
 
 				var size = split[i].Split(' ');
-				dic[size[0]] = long.Parse(size[1]);
+				var ab = string.Intern(size[0]);
+				dic[ab] = long.Parse(size[1]);
 			}
 
 			return new AssetBundleSizeManifest(dic);
@@ -66,7 +67,8 @@ namespace Flour.Asset
 				if (string.IsNullOrEmpty(split[i])) continue;
 
 				var crc = split[i].Split(' ');
-				dic[crc[0]] = uint.Parse(crc[1]);
+				var ab = string.Intern(crc[0]);
+				dic[ab] = uint.Parse(crc[1]);
 			}
 
 			return new AssetBundleCrcManifest(dic);
