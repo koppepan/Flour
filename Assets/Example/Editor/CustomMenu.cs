@@ -7,7 +7,7 @@ public class CustomMenu
 	[MenuItem("CustomMenu/Scene/Create Scene List", priority = 30)]
 	static void CreateSceneList()
 	{
-		SceneListCreator.Create(0);
+		SceneListCreator.Create("CustomMenu", 0);
 	}
 	#endregion
 
@@ -27,27 +27,11 @@ public class CustomMenu
 		Flour.Build.BuildClient.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { remove });
 	}
 
-	[MenuItem("CustomMenu/DefineSymbols/Add Debug Symbole", priority = 0)]
-	public static void AddDebugSymbole()
-	{
-		AddSymbol(DebugSymbole);
-	}
-	[MenuItem("CustomMenu/DefineSymbols/Remove Debug Symbole", priority = 1)]
-	public static void RemoveDebugSymbole()
-	{
-		RemoveSymbol(DebugSymbole);
-	}
+	[MenuItem("CustomMenu/DefineSymbols/Add Debug Symbole")] static void AddDebugSymbole() => AddSymbol(DebugSymbole);
+	[MenuItem("CustomMenu/DefineSymbols/Remove Debug Symbole")]	static void RemoveDebugSymbole() => RemoveSymbol(DebugSymbole);
 
-	[MenuItem("CustomMenu/DefineSymbols/Add UseLocalAsset Symbole", priority = 100)]
-	public static void AddUseLocalAssetSymbole()
-	{
-		AddSymbol(UseLocalAssetSymbol);
-	}
-	[MenuItem("CustomMenu/DefineSymbols/Remove UseLocalAsset Symbole", priority = 101)]
-	public static void RemoveUseLocalAssetSymbole()
-	{
-		RemoveSymbol(UseLocalAssetSymbol);
-	}
+	[MenuItem("CustomMenu/DefineSymbols/Add UseLocalAsset Symbole")] static void AddUseLocalAssetSymbole() => AddSymbol(UseLocalAssetSymbol);
+	[MenuItem("CustomMenu/DefineSymbols/Remove UseLocalAsset Symbole")] static void RemoveUseLocalAssetSymbole() => RemoveSymbol(UseLocalAssetSymbol);
 	#endregion
 
 

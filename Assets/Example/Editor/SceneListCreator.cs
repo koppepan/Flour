@@ -4,7 +4,7 @@ using UnityEditor;
 
 public static class SceneListCreator
 {
-	public static void Create(int priority, string namespaceName = "")
+	public static void Create(string menuTitle, int priority, string namespaceName = "")
 	{
 		string[] sceneDirs = { "Assets/Example/Scenes" };
 		string scriptDir = "Example/Editor";
@@ -39,7 +39,7 @@ public static class SceneListCreator
 				string[] splittedScenePath = scenePath.Split(new char[] { '/' });
 				string sceneName = splittedScenePath[splittedScenePath.Length - 1].Replace(".unity", "");
 
-				sw.WriteLine(tab + $"[MenuItem(\"CustomMenu/Scene/{sceneName}\", priority = {priority})]");
+				sw.WriteLine(tab + $"[MenuItem(\"{menuTitle}/Scene/{sceneName}\", priority = {priority})]");
 				sw.WriteLine(tab + $"public static void OpenScene{sceneName}()");
 				sw.WriteLine(tab + "{");
 
