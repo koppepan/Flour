@@ -35,9 +35,9 @@ namespace Example
 			return progress;
 		}
 
-		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName)
+		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName, string crcManifestName = "")
 		{
-			await handler.LoadManifestAsync(manifestName, sizeManifestName);
+			await handler.LoadManifestAsync(manifestName, sizeManifestName, crcManifestName);
 
 			handler.AddWaiter(SceneWaiter);
 			handler.AddWaiter(SpriteWaiter);

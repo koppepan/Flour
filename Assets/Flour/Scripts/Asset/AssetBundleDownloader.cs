@@ -16,12 +16,15 @@ namespace Flour.Asset
 		public UnityWebRequest Request { get; private set; }
 
 		Hash128 hash;
+		uint crc;
 
-		public AssetBundleDownloader(string path, Hash128 hash)
+		public AssetBundleDownloader(string path, Hash128 hash, uint crc = 0)
 		{
 			Path = path;
 			Request = null;
+
 			this.hash = hash;
+			this.crc = crc;
 		}
 
 		public void Send(string baseUrl, int timeout)
@@ -30,7 +33,7 @@ namespace Flour.Asset
 
 			Caching.ClearOtherCachedVersions(cachedAb.name, cachedAb.hash);
 
-			Request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, Path), cachedAb);
+			Request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, Path), cachedAb, crc);
 			Request.timeout = timeout;
 			Request.SendWebRequest();
 		}

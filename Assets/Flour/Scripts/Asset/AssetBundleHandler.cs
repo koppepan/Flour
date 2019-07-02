@@ -26,6 +26,7 @@ namespace Flour.Asset
 
 		AssetBundleManifest manifest;
 		AssetBundleSizeManifest sizeManifest;
+		AssetBundleCrcManifest crcManifest;
 
 		CompositeDisposable disposable = new CompositeDisposable();
 
@@ -51,7 +52,7 @@ namespace Flour.Asset
 			downloadHandler.ChangeBaseUrl(baseUrl);
 		}
 
-		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName)
+		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName, string crcManifestName = "")
 		{
 #if UNITY_EDITOR && USE_LOCAL_ASSET
 			await UniTask.DelayFrame(1);
@@ -59,6 +60,11 @@ namespace Flour.Asset
 #else
 			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
 			sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
+
+			if (!string.IsNullOrEmpty(crcManifestName))
+			{
+				crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName));
+			}
 			Debug.Log("loaded AssetBundleManifest.");
 
 			waiterBridge.SetManifest(manifest, sizeManifest);
@@ -94,7 +100,9 @@ namespace Flour.Asset
 				{
 					continue;
 				}
-				downloadHandler.AddRequest(new AssetBundleDownloader(assetBundleNames[i], manifest.GetAssetBundleHash(assetBundleNames[i])));
+				var hash = manifest.GetAssetBundleHash(assetBundleNames[i]);
+				var crc = crcManifest == null ? 0 : crcManifest.GetCrc(assetBundleNames[i]);
+				downloadHandler.AddRequest(new AssetBundleDownloader(assetBundleNames[i], hash, crc));
 			}
 		}
 		void CleanRequest(string assetBundleName)
