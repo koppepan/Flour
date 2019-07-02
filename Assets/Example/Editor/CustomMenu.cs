@@ -51,14 +51,18 @@ public class CustomMenu
 	#endregion
 
 
-	[MenuItem("CustomMenu/AssetBundles Build")]
-	public static void BuildAssetBundle()
+	[MenuItem("CustomMenu/AssetBundle Build/Windows")] public static void BuildAssetBundleForWindows() => BuildAssetBundle(BuildTarget.StandaloneWindows64);
+	[MenuItem("CustomMenu/AssetBundle Build/OSX")] public static void BuildAssetBundleForOSX() => BuildAssetBundle(BuildTarget.StandaloneOSX);
+	[MenuItem("CustomMenu/AssetBundle Build/Android")] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
+	[MenuItem("CustomMenu/AssetBundle Build/iOS")] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
+
+	static void BuildAssetBundle(BuildTarget buildTarget)
 	{
-		var outputPath = "AssetBundles";
+		var outputPath = System.IO.Path.Combine("AssetBundles", buildTarget.ToString());
 
 		var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
-		Flour.Build.BuildAssetBundle.Build(outputPath, options);
-		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath);
-		Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath);
+		var manifest = Flour.Build.BuildAssetBundle.Build(outputPath, buildTarget, options);
+		Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, manifest);
+		Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, manifest);
 	}
 }

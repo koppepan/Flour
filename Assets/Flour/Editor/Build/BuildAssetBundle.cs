@@ -7,23 +7,21 @@ namespace Flour.Build
 {
 	public static class BuildAssetBundle
 	{
-		public static void Build(string outputPath, BuildAssetBundleOptions options = BuildAssetBundleOptions.None)
+		public static AssetBundleManifest Build(string outputPath, BuildTarget buildTarget, BuildAssetBundleOptions options = BuildAssetBundleOptions.None)
 		{
-			if (!Directory.Exists(outputPath))
-			{
-				Directory.CreateDirectory(outputPath);
-			}
+			if (!Directory.Exists(outputPath)) Directory.CreateDirectory(outputPath);
 
 			AssetDatabase.RemoveUnusedAssetBundleNames();
-			BuildPipeline.BuildAssetBundles(outputPath, options, BuildTarget.StandaloneWindows64);
+			var manifest = BuildPipeline.BuildAssetBundles(outputPath, options, buildTarget);
 
-			Debug.Log("done build AssetBundles");
+			Debug.Log($"done build {buildTarget} AssetBundles");
+
+			return manifest;
 		}
 
-		public static void CreateAssetBundleSizeManifest(string assetBundleDirectoryPath)
+		public static void CreateAssetBundleSizeManifest(string assetBundleDirectoryPath, AssetBundleManifest manifest)
 		{
-			AssetDatabase.RemoveUnusedAssetBundleNames();
-			var all = AssetDatabase.GetAllAssetBundleNames();
+			var all = manifest.GetAllAssetBundles();
 			var assetBunldes = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
 			using (var sw = File.CreateText(Path.Combine(assetBundleDirectoryPath, "AssetBundleSize")))
@@ -39,18 +37,17 @@ namespace Flour.Build
 				}
 			}
 
-			Debug.Log("done build AssetBundle size manifest");
+			Debug.Log($"done create AssetBundle size manifest");
 		}
 
-		public static void CleanUnnecessaryAssetBundles(string outputPath)
+		public static void CleanUnnecessaryAssetBundles(string assetBundleDirectoryPath, AssetBundleManifest manifest)
 		{
-			AssetDatabase.RemoveUnusedAssetBundleNames();
-			var all = AssetDatabase.GetAllAssetBundleNames();
-			var files = Directory.GetFiles(outputPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
+			var all = manifest.GetAllAssetBundles();
+			var files = Directory.GetFiles(assetBundleDirectoryPath, "*", SearchOption.AllDirectories).Where(x => Path.GetExtension(x) != ".manifest");
 
 			foreach (var f in files)
 			{
-				var name = f.Remove(0, outputPath.Length + 1).Replace('\\', '/');
+				var name = f.Remove(0, assetBundleDirectoryPath.Length + 1).Replace('\\', '/');
 
 				if (name == "AssetBundles" || name == "AssetBundles.manifest")
 				{
@@ -63,6 +60,8 @@ namespace Flour.Build
 					FileDelete(f + ".manifest");
 				}
 			}
+
+			Debug.Log("done clean unnecessary AssetBundles.");
 		}
 
 		private static void FileDelete(string path)
