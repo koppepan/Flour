@@ -16,13 +16,6 @@ namespace Example
 		ILayerHandler LayerHandler { get; }
 	}
 
-	public interface IAssetHandler
-	{
-		LoadProgress GetProgress(int downloadCount, int assetCount);
-		Flour.Asset.SceneWaiter SceneWaiter { get; }
-		Flour.Asset.SpriteAssetWaiter SpriteWaiter { get; }
-	}
-
 	public interface IInputBinder
 	{
 		bool Binded { get; }

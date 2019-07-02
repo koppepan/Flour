@@ -23,7 +23,7 @@ namespace Example
 
 		readonly Action onApplicationQuit;
 
-		private readonly AssetHandler assetHandler;
+		readonly AssetHandler assetHandler;
 
 		readonly SceneHandler sceneHandler;
 		readonly LayerHandler layerHandler;
