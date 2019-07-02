@@ -1,38 +1,41 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 
-public class SceneList
+namespace Example
 {
-	[MenuItem("CustomMenu/Scene/00_Start", priority = 0)]
-	public static void OpenScene00_Start()
+	public class SceneList
 	{
-		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+		[MenuItem("CustomMenu/Scene/00_Start", priority = 0)]
+		public static void OpenScene00_Start()
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/00_Start.unity");
+			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+			{
+				EditorSceneManager.OpenScene("Assets/Example/Scenes/00_Start.unity");
+			}
 		}
-	}
-	[MenuItem("CustomMenu/Scene/01_Title", priority = 0)]
-	public static void OpenScene01_Title()
-	{
-		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+		[MenuItem("CustomMenu/Scene/01_Title", priority = 0)]
+		public static void OpenScene01_Title()
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/01_Title.unity");
+			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+			{
+				EditorSceneManager.OpenScene("Assets/Example/Scenes/01_Title.unity");
+			}
 		}
-	}
-	[MenuItem("CustomMenu/Scene/10_OutGame", priority = 0)]
-	public static void OpenScene10_OutGame()
-	{
-		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+		[MenuItem("CustomMenu/Scene/10_OutGame", priority = 0)]
+		public static void OpenScene10_OutGame()
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/10_OutGame.unity");
+			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+			{
+				EditorSceneManager.OpenScene("Assets/Example/Scenes/10_OutGame.unity");
+			}
 		}
-	}
-	[MenuItem("CustomMenu/Scene/20_InGame", priority = 0)]
-	public static void OpenScene20_InGame()
-	{
-		if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+		[MenuItem("CustomMenu/Scene/20_InGame", priority = 0)]
+		public static void OpenScene20_InGame()
 		{
-			EditorSceneManager.OpenScene("Assets/Example/Scenes/20_InGame.unity");
+			if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+			{
+				EditorSceneManager.OpenScene("Assets/Example/Scenes/20_InGame.unity");
+			}
 		}
 	}
 }
