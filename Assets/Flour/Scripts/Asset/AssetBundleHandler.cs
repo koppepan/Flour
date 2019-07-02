@@ -51,14 +51,14 @@ namespace Flour.Asset
 			downloadHandler.ChangeBaseUrl(baseUrl);
 		}
 
-		public async UniTask LoadManifestAsync()
+		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName)
 		{
 #if UNITY_EDITOR && USE_LOCAL_ASSET
 			await UniTask.DelayFrame(1);
 			Debug.Log("use editor local asset");
 #else
-			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, "AssetBundles"));
-			sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, "AssetBundleSize"));
+			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
+			sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
 			Debug.Log("loaded AssetBundleManifest.");
 
 			waiterBridge.SetManifest(manifest, sizeManifest);

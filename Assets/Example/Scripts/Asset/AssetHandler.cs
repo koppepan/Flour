@@ -1,4 +1,5 @@
-﻿using UniRx.Async;
+﻿using UnityEngine;
+using UniRx.Async;
 using Flour.Asset;
 
 namespace Example
@@ -34,9 +35,9 @@ namespace Example
 			return progress;
 		}
 
-		public async UniTask LoadManifestAsync()
+		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName)
 		{
-			await handler.LoadManifestAsync();
+			await handler.LoadManifestAsync(manifestName, sizeManifestName);
 
 			handler.AddWaiter(SceneWaiter);
 			handler.AddWaiter(SpriteWaiter);
