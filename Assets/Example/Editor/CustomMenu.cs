@@ -44,12 +44,14 @@ namespace Example
 
 		static void BuildAssetBundle(BuildTarget buildTarget)
 		{
-			var outputPath = System.IO.Path.Combine("AssetBundles", AssetHelper.GetAssetBundleFolderName(buildTarget));
+			var assetBundleFolder = AssetHelper.GetAssetBundleFolderName(buildTarget);
+			var outputPath = System.IO.Path.Combine("AssetBundles", assetBundleFolder);
 
 			var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
 			var manifest = Flour.Build.BuildAssetBundle.Build(outputPath, buildTarget, options);
-			Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, AssetHelper.GetAssetBundleFolderName(buildTarget), manifest);
+			Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, assetBundleFolder, manifest);
 			Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, AssetHelper.AssetBundleSizeManifestName, manifest);
+			Flour.Build.BuildAssetBundle.CreateAssetBundleCrcManifest(outputPath, AssetHelper.AssetBundleCrcManifestName, manifest);
 		}
 	}
 }

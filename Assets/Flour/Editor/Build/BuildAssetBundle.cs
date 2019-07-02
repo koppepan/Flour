@@ -14,7 +14,7 @@ namespace Flour.Build
 			AssetDatabase.RemoveUnusedAssetBundleNames();
 			var manifest = BuildPipeline.BuildAssetBundles(outputPath, options, buildTarget);
 
-			Debug.Log($"done build {buildTarget} AssetBundles");
+			Debug.Log($"done build {buildTarget} AssetBundles.");
 
 			return manifest;
 		}
@@ -37,7 +37,25 @@ namespace Flour.Build
 				}
 			}
 
-			Debug.Log($"done create AssetBundle size manifest");
+			Debug.Log("done create AssetBundle size manifest.");
+		}
+
+		public static void CreateAssetBundleCrcManifest(string directoryPath, string crcFileName, AssetBundleManifest manifest)
+		{
+			var all = manifest.GetAllAssetBundles();
+
+			using (var sw = File.CreateText(Path.Combine(directoryPath, crcFileName)))
+			{
+				for (int i = 0; i < all.Length; i++)
+				{
+					if (BuildPipeline.GetCRCForAssetBundle(Path.Combine(directoryPath, all[i]), out uint crc))
+					{
+						sw.WriteLine($"{all[i]} {crc}");
+					}
+				}
+			}
+
+			Debug.Log("done create AssetBundle crc manifest.");
 		}
 
 		public static void CleanUnnecessaryAssetBundles(string directoryPath, string manifestFileName, AssetBundleManifest manifest)

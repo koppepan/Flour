@@ -9,6 +9,7 @@ namespace Example
 	public static class AssetHelper
 	{
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
+		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
 
 #if UNITY_EDITOR
 		public static string GetAssetBundleFolderName(BuildTarget buildTarget)
