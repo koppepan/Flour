@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UniRx;
 using UniRx.Async;
 using Flour;
 
@@ -39,6 +40,8 @@ namespace Example
 
 		private bool sceneLoading = false;
 
+		private IDisposable disposable;
+
 		public ApplicationOperator(
 			Action onApplicationQuit,
 			AssetHandler assetHandler,
@@ -55,12 +58,17 @@ namespace Example
 			this.layerHandler = layerHandler;
 
 			this.subLayerRepositories = subLayerRepositories;
+
+			disposable = this.assetHandler.ErrorObservable.Subscribe(OnAssetLoadError);
 		}
 
 		public void Dispose()
 		{
 			UserPrefs.Dispose();
 			TemporaryData.Dispose();
+
+			disposable?.Dispose();
+			disposable = null;
 		}
 
 		public void ApplicationPause(bool pause) => sceneHandler.ApplicationPause(pause);
@@ -175,6 +183,12 @@ namespace Example
 		public async UniTask<T> AddLayerOverlappingAsync<T>(LayerType layer, SubLayerType subLayer) where T : AbstractSubLayer
 		{
 			return await AddLayerAsync<T>(layer, subLayer, true);
+		}
+
+
+		private void OnAssetLoadError(Flour.Asset.LoadError error)
+		{
+			Debug.LogError(error.ToString());
 		}
 	}
 }
