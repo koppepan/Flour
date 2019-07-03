@@ -30,8 +30,12 @@ namespace Flour.Asset
 
 		CompositeDisposable disposable = new CompositeDisposable();
 
+		Subject<LoadError> errorSubject = new Subject<LoadError>();
+
 		public IReactiveProperty<float> DownloadProgress { get { return downloadHandler.Progress; } }
 		public IReactiveProperty<float> AssetLoadProgress { get { return assetLoadHandler.Progress; } }
+
+		public IObservable<LoadError> ErrorObservable { get { return errorSubject; } }
 
 		public AssetBundleHandler(string baseUrl)
 		{
@@ -76,6 +80,7 @@ namespace Flour.Asset
 			downloadHandler.Dispose();
 			assetLoadHandler.Dispose();
 
+			errorSubject.Dispose();
 			waiterBridge.Dispose();
 
 			AssetBundle.UnloadAllAssetBundles(true);
@@ -135,11 +140,6 @@ namespace Flour.Asset
 			}
 		}
 
-		void OnDownloadError(Tuple<string, long, string> error)
-		{
-			waiterBridge.OnError(error.Item1, new Exception(error.Item3));
-		}
-
 		void OnLoadedObject(Tuple<string, string, UnityEngine.Object> asset)
 		{
 			//Debug.Log($"loaded Asset => {asset.Item1}.{asset.Item2}");
@@ -147,9 +147,22 @@ namespace Flour.Asset
 			waiterBridge.OnLoaded(asset.Item1, asset.Item2, asset.Item3);
 		}
 
-		void OnAssetLoadError(Tuple<string, string, Exception> error)
+		void OnDownloadError(Tuple<string, long, string> error)
 		{
-			waiterBridge.OnError(error.Item1, error.Item2, error.Item3);
+			waiterBridge.OnError(error.Item1);
+
+			var type = ErrorType.DownloadError;
+			if (400 <= error.Item2 && error.Item2 < 500) type = ErrorType.ClientError;
+			else if (500 <= error.Item2 && error.Item2 < 600) type = ErrorType.ServerError;
+
+			errorSubject.OnNext(new LoadError(type, error.Item1, "", new Exception(error.Item3)));
+		}
+
+		void OnAssetLoadError(Tuple<ErrorType, string, string, string> error)
+		{
+			waiterBridge.OnError(error.Item2, error.Item3);
+
+			errorSubject.OnNext(new LoadError(error.Item1, error.Item2, error.Item3, new Exception(error.Item4)));
 		}
 	}
 }

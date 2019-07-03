@@ -16,10 +16,10 @@ namespace Flour.Asset
 		readonly List<Tuple<string, string, AssetBundleRequest>> requests = new List<Tuple<string, string, AssetBundleRequest>>();
 
 		readonly Subject<Tuple<string, string, UnityEngine.Object>> loadedSubject = new Subject<Tuple<string, string, UnityEngine.Object>>();
-		readonly Subject<Tuple<string, string, Exception>> erroredSubject = new Subject<Tuple<string, string, Exception>>();
+		readonly Subject<Tuple<ErrorType, string, string, string>> erroredSubject = new Subject<Tuple<ErrorType, string, string, string>>();
 
 		internal IObservable<Tuple<string, string, UnityEngine.Object>> LoadObservable { get { return loadedSubject; } }
-		internal IObservable<Tuple<string, string, Exception>> ErrorObservable { get { return erroredSubject; } }
+		internal IObservable<Tuple<ErrorType, string, string, string>> ErrorObservable { get { return erroredSubject; } }
 
 		CompositeDisposable updateDisposables;
 
@@ -139,14 +139,14 @@ namespace Flour.Asset
 		{
 			if (!ContainsKey(path))
 			{
-				Debug.LogWarning($"Missing AssetBundle for requested Asset => {path}");
+				erroredSubject.OnNext(Tuple.Create(ErrorType.MissingAssetBundle, path, assetName, $"Missing AssetBundle for requested Asset => {path}"));
 				return;
 			}
 			if (!requests.Any(x => x.Item1.Equals(path, StringComparison.Ordinal) && x.Item2.Equals(assetName, StringComparison.Ordinal)))
 			{
 				if (!assetBundles[path].GetAllAssetNames().Any(x => Path.GetFileNameWithoutExtension(x).Equals(assetName, StringComparison.Ordinal)))
 				{
-					erroredSubject.OnNext(Tuple.Create(path, assetName, new Exception("no asset in AssetBundle.")));
+					erroredSubject.OnNext(Tuple.Create(ErrorType.NotFoundAsset, path, assetName, "no asset in AssetBundle."));
 				}
 				else
 				{

@@ -25,8 +25,8 @@ namespace Flour.Asset
 		private List<WaiterDispose> waiterDisposes = new List<WaiterDispose>();
 
 		public event Action<string, string, UnityEngine.Object> OnAssetLoaded = delegate { };
-		public event Action<string, Exception> OnDownloadedError = delegate { };
-		public event Action<string, string, Exception> OnLoadedError = delegate { };
+		public event Action<string> OnDownloadedError = delegate { };
+		public event Action<string, string> OnLoadedError = delegate { };
 
 		public WaiterBridge(AddRequestDelegate addRequest, CleanRequestDelegate cleanRequest)
 		{
@@ -81,7 +81,7 @@ namespace Flour.Asset
 		}
 
 		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset) => OnAssetLoaded.Invoke(assetBundleName, assetName, asset);
-		public void OnError(string assetBundleName, Exception e) => OnDownloadedError.Invoke(assetBundleName, e);
-		public void OnError(string assetBundleName, string assetName, Exception e) => OnLoadedError.Invoke(assetBundleName, assetName, e);
+		public void OnError(string assetBundleName) => OnDownloadedError.Invoke(assetBundleName);
+		public void OnError(string assetBundleName, string assetName) => OnLoadedError.Invoke(assetBundleName, assetName);
 	}
 }

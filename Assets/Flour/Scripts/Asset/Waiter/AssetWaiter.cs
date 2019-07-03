@@ -111,52 +111,24 @@ namespace Flour.Asset
 			for (int i = requests.Count - 1; i >= 0; i--)
 			{
 				var req = requests[i];
-				if (req.Equals(assetBundleName, assetName))
-				{
-					if (req.subject.HasObservers)
-					{
-						req.subject.OnNext(GetAsset(asset));
-						req.subject.OnCompleted();
-					}
-					else
-					{
-						req.subject.Dispose();
-					}
+				if (!req.Equals(assetBundleName, assetName)) continue;
 
-					requests.Remove(req);
-					bridge.CleanRequest(req.AssetBundleNames);
+				if (req.subject.HasObservers)
+				{
+					req.subject.OnNext(asset == null ? null : GetAsset(asset));
+					req.subject.OnCompleted();
 				}
+				else
+				{
+					req.subject.Dispose();
+				}
+
+				requests.Remove(req);
+				bridge.CleanRequest(req.AssetBundleNames);
 			}
 		}
-		void OnError(string assetBundleName, Exception e)
-		{
-			if (!assetBundleName.StartsWith(Key, StringComparison.Ordinal)) return;
 
-			for (int i = requests.Count - 1; i >= 0; i--)
-			{
-				var req = requests[i];
-				if (req.Equals(assetBundleName))
-				{
-					req.subject.OnError(new Exception(assetBundleName, e));
-					requests.Remove(req);
-					bridge.CleanRequest(req.AssetBundleNames);
-				}
-			}
-		}
-		void OnError(string assetBundleName, string assetName, Exception e)
-		{
-			if (!assetBundleName.StartsWith(Key, StringComparison.Ordinal)) return;
-
-			for (int i = requests.Count - 1; i >= 0; i--)
-			{
-				var req = requests[i];
-				if (req.Equals(assetBundleName, assetName))
-				{
-					req.subject.OnError(new Exception($"{assetBundleName}.{assetName}", e));
-					requests.Remove(req);
-					bridge.CleanRequest(req.AssetBundleNames);
-				}
-			}
-		}
+		void OnError(string assetBundleName) => OnLoaded(assetBundleName, "", null);
+		void OnError(string assetBundleName, string assetName) => OnLoaded(assetBundleName, assetName, null);
 	}
 }

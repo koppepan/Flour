@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using System;
 using UniRx.Async;
 using Flour.Asset;
 
@@ -10,6 +10,8 @@ namespace Example
 
 		public SceneWaiter SceneWaiter { get; private set; }
 		public SpriteAssetWaiter SpriteWaiter { get; private set; }
+
+		public IObservable<LoadError> ErrorObservable { get { return handler.ErrorObservable; } }
 
 		public AssetHandler(string baseUrl)
 		{

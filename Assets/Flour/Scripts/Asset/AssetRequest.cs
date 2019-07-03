@@ -39,7 +39,8 @@ namespace Flour.Asset
 		}
 		public bool Equals(string assetBundleName, string assetName)
 		{
-			return AssetBundleNames[0].Equals(assetBundleName, StringComparison.Ordinal) && AssetName.Equals(assetName, StringComparison.Ordinal);
+			var hit = Equals(assetBundleName);
+			return string.IsNullOrEmpty(assetName) ? hit : hit && AssetName.Equals(assetName, StringComparison.Ordinal);
 		}
 	}
 }
