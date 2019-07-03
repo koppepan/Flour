@@ -155,7 +155,7 @@ namespace Flour.Asset
 			if (400 <= error.Item2 && error.Item2 < 500) type = ErrorType.ClientError;
 			else if (500 <= error.Item2 && error.Item2 < 600) type = ErrorType.ServerError;
 
-			errorSubject.OnNext(new LoadError(type, error.Item1, "", new Exception(error.Item3)));
+			errorSubject.OnNext(new LoadError(type, error.Item2, error.Item1, new Exception(error.Item3)));
 		}
 
 		void OnAssetLoadError(Tuple<ErrorType, string, string, string> error)
