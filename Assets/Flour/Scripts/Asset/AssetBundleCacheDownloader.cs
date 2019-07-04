@@ -25,13 +25,14 @@ namespace Flour.Asset
 			Load,
 			Completed,
 		};
-		
+
 		public string FilePath { get; private set; }
 
 		public bool IsDone { get { return currentState == State.Completed; } }
-		public bool IsError { get { return request == null ? false : request.isHttpError || request.isNetworkError; } }
-		public long ResponseCode { get { return request == null ? -1 : request.responseCode; } }
-		public string Error { get { return request?.error; } }
+
+		public bool IsError { get; private set; }
+		public long ResponseCode { get; private set; }
+		public string Error { get; private set; }
 
 		public float Progress
 		{
@@ -66,6 +67,12 @@ namespace Flour.Asset
 
 		public void Send(string baseUrl, int timeout)
 		{
+			if (!hash.isValid)
+			{
+				SetError(true, 404, "doesn't exist in the AssetBundleManifest");
+				return;
+			}
+
 			if (File.Exists(cachePath))
 			{
 				InvokeLoadStream();
@@ -92,6 +99,13 @@ namespace Flour.Asset
 			}).Forget();
 		}
 
+		private void SetError(bool isError, long responseCode, string error)
+		{
+			IsError = isError;
+			ResponseCode = responseCode;
+			Error = error;
+		}
+
 		private void InvokeLoadStream()
 		{
 			asyncOperation = AssetBundle.LoadFromStreamAsync(new FileStream(cachePath, FileMode.Open));
@@ -105,6 +119,14 @@ namespace Flour.Asset
 			{
 				if (currentState == State.Download)
 				{
+					SetError(request.isHttpError || request.isNetworkError, request.responseCode, request.error);
+
+					if (IsError)
+					{
+						currentState = State.Completed;
+						return;
+					}
+
 					InvokeLoadStream();
 				}
 				else if (currentState == State.Load)
