@@ -52,7 +52,7 @@ namespace Example
 			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
 			await fixedRepository.LoadAllAsync();
 
-			assetHandler = new AssetHandler("");
+			assetHandler = new AssetHandler("", System.IO.Path.Combine(Application.temporaryCachePath, "assets"));
 
 			appOperator = new ApplicationOperator(
 				ApplicationQuit,
