@@ -106,9 +106,13 @@ namespace Flour.Asset
 		}
 
 
-		public bool ContainsKey(string path)
+		public bool ContainsKey(params string[] paths)
 		{
-			return assetBundles.ContainsKey(path);
+			for (int i = 0; i < paths.Length; i++)
+			{
+				if (!assetBundles.ContainsKey(paths[i])) return false;
+			}
+			return true;
 		}
 		public bool AllExist(string[] assetBundleNames)
 		{
@@ -122,6 +126,10 @@ namespace Flour.Asset
 		public void Unload(string assetBundleName)
 		{
 			if (!assetBundles.ContainsKey(assetBundleName))
+			{
+				return;
+			}
+			if (requests.Any(x => x.Item1.Equals(assetBundleName, StringComparison.Ordinal)))
 			{
 				return;
 			}

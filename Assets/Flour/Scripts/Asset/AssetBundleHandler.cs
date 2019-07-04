@@ -122,8 +122,14 @@ namespace Flour.Asset
 			waiter.SetBridge(waiterBridge);
 		}
 
-		void AddRequest(string[] assetBundleNames)
+		void AddRequest(string[] assetBundleNames, string assetName)
 		{
+			if (assetLoadHandler.ContainsKey(assetBundleNames))
+			{
+				assetLoadHandler.AddRequest(assetBundleNames[0], assetName);
+				return;
+			}
+
 			for (int i = 0; i < assetBundleNames.Length; i++)
 			{
 				if (assetLoadHandler.ContainsKey(assetBundleNames[i]))
@@ -146,7 +152,7 @@ namespace Flour.Asset
 
 			assetLoadHandler.AddAssetBundle(asset.Item1, asset.Item2);
 
-			var requests = waiterBridge.GetRequests(asset.Item1);
+			var requests = waiterBridge.GetRequests(asset.Item1).SelectMany(x => x);
 			if (!requests.Any()) return;
 
 			foreach (var req in requests)
@@ -159,7 +165,7 @@ namespace Flour.Asset
 					}
 					else
 					{
-						assetLoadHandler.AddRequest(asset.Item1, req.AssetName);
+						assetLoadHandler.AddRequest(req.AssetBundleNames[0], req.AssetName);
 					}
 				}
 			}

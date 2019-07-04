@@ -7,7 +7,7 @@ namespace Flour.Asset
 {
 	internal class WaiterBridge
 	{
-		internal delegate void AddRequestDelegate(string[] assetBundleNames);
+		internal delegate void AddRequestDelegate(string[] assetBundleNames, string assetName);
 		internal delegate void CleanRequestDelegate(string assetBundleName);
 
 		internal delegate bool ContainsRequestDelegate(string assetBundleName);
@@ -21,7 +21,7 @@ namespace Flour.Asset
 		private CleanRequestDelegate cleanRequestDelegate;
 
 		private List<Tuple<string, ContainsRequestDelegate>> contains = new List<Tuple<string, ContainsRequestDelegate>>();
-		private List<Tuple<string, GetRequestsDelegate>> requests = new List<Tuple<string, GetRequestsDelegate>>();
+		private List<GetRequestsDelegate> requests = new List<GetRequestsDelegate>();
 		private List<WaiterDispose> waiterDisposes = new List<WaiterDispose>();
 
 		public event Action<string, string, UnityEngine.Object> OnAssetLoaded = delegate { };
@@ -43,7 +43,7 @@ namespace Flour.Asset
 		public void AddWaiter(string key, ContainsRequestDelegate containsRequest, GetRequestsDelegate getRequests, WaiterDispose dispose)
 		{
 			contains.Add(Tuple.Create(key, containsRequest));
-			requests.Add(Tuple.Create(key, getRequests));
+			requests.Add(getRequests);
 			waiterDisposes.Add(dispose);
 		}
 
@@ -52,7 +52,7 @@ namespace Flour.Asset
 			waiterDisposes.ForEach(x => x());
 		}
 
-		public void AddRequest(string[] assetBundleNames) => addRequestDelegate(assetBundleNames);
+		public void AddRequest(string[] assetBundleNames, string assetName) => addRequestDelegate(assetBundleNames, assetName);
 		public void CleanRequest(string[] assetBundleNames)
 		{
 			for (int i = 0; i < assetBundleNames.Length; i++)
@@ -70,14 +70,12 @@ namespace Flour.Asset
 			return false;
 		}
 
-		public IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
+		public IEnumerable<IEnumerable<IAssetRequest>> GetRequests(string assetBundleName)
 		{
 			for (int i = 0; i < requests.Count; i++)
 			{
-				if (!assetBundleName.StartsWith(requests[i].Item1, StringComparison.Ordinal)) continue;
-				return requests[i].Item2(assetBundleName);
+				yield return requests[i].Invoke(assetBundleName);
 			}
-			return Enumerable.Empty<IAssetRequest>();
 		}
 
 		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset) => OnAssetLoaded.Invoke(assetBundleName, assetName, asset);
