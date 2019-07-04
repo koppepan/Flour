@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
@@ -54,6 +55,8 @@ namespace Flour.Asset
 
 		UnityWebRequest request = null;
 		FileStream fileStream = null;
+		SeekableAesStream aesStream = null;
+
 		State currentState = State.Wait;
 		AsyncOperation asyncOperation = null;
 
@@ -119,7 +122,8 @@ namespace Flour.Asset
 				return;
 			}
 			fileStream = new FileStream(cachePath, FileMode.Open);
-			asyncOperation = AssetBundle.LoadFromStreamAsync(fileStream);
+			aesStream = new SeekableAesStream(fileStream, "password", Encoding.UTF8.GetBytes(FilePath));
+			asyncOperation = AssetBundle.LoadFromStreamAsync(aesStream);
 			currentState = State.Load;
 		}
 
@@ -155,6 +159,7 @@ namespace Flour.Asset
 		{
 			request?.Dispose();
 			fileStream?.Dispose();
+			aesStream?.Dispose();
 		}
 	}
 
