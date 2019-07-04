@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEditor;
 
@@ -17,6 +18,28 @@ namespace Flour.Build
 			Debug.Log($"done build {buildTarget} AssetBundles.");
 
 			return manifest;
+		}
+
+		public static void BuildEncrypt(string srcPath, string outputPath, string password, AssetBundleManifest manifest)
+		{
+			if (!Directory.Exists(outputPath)) Directory.CreateDirectory(outputPath);
+
+			foreach (var name in manifest.GetAllAssetBundles())
+			{
+				var folder = Path.Combine(outputPath, Path.GetDirectoryName(name));
+				if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+				var uniqueSalt = Encoding.UTF8.GetBytes(name);
+
+				var data = File.ReadAllBytes($"{srcPath}/{name}");
+				using (var baseStream = new FileStream($"{outputPath}/{name}", FileMode.OpenOrCreate))
+				{
+					var cryptor = new SeekableAesStream(baseStream, password, uniqueSalt);
+					cryptor.Write(data, 0, data.Length);
+				}
+			}
+
+			Debug.Log($"done build Encrypt AssetBundles.");
 		}
 
 		public static void CreateAssetBundleSizeManifest(string directoryPath, string sizeFileName, AssetBundleManifest manifest)
@@ -78,6 +101,16 @@ namespace Flour.Build
 					FileDelete(f + ".manifest");
 				}
 			}
+
+			var directoreis = Directory.GetDirectories(directoryPath);
+			for (int i = 0; i < directoreis.Length; i++)
+			{
+				if (Directory.GetFiles(directoreis[i]).Length == 0)
+				{
+					Directory.Delete(directoreis[i]);
+				}
+			}
+
 
 			Debug.Log("done clean unnecessary AssetBundles.");
 		}

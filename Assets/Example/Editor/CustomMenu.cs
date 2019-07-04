@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using System.IO;
+using UnityEngine;
 using UnityEditor;
 
 namespace Example
@@ -42,16 +44,34 @@ namespace Example
 		[MenuItem("CustomMenu/AssetBundle Build/Android")] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
 		[MenuItem("CustomMenu/AssetBundle Build/iOS")] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
 
-		static void BuildAssetBundle(BuildTarget buildTarget)
+		[MenuItem("CustomMenu/AssetBundle Build/Encrypt Windows")] public static void BuildEncryptAssetBundleForWindows() => BuildEncryptAssetBundle(BuildTarget.StandaloneWindows64);
+		[MenuItem("CustomMenu/AssetBundle Build/Encrypt OSX")] public static void BuildEncryptAssetBundleForOSX() => BuildEncryptAssetBundle(BuildTarget.StandaloneOSX);
+		[MenuItem("CustomMenu/AssetBundle Build/Encrypt Android")] public static void BuildEncryptAssetBundleForAndroid() => BuildEncryptAssetBundle(BuildTarget.Android);
+		[MenuItem("CustomMenu/AssetBundle Build/Encrypt iOS")] public static void BuildEncryptAssetBundleForiOS() => BuildEncryptAssetBundle(BuildTarget.iOS);
+
+		static AssetBundleManifest BuildAssetBundle(BuildTarget buildTarget)
 		{
 			var assetBundleFolder = AssetHelper.GetAssetBundleFolderName(buildTarget);
-			var outputPath = System.IO.Path.Combine("AssetBundles", assetBundleFolder);
+			var outputPath = Path.Combine("AssetBundles", assetBundleFolder);
 
 			var options = BuildAssetBundleOptions.ChunkBasedCompression | BuildAssetBundleOptions.DeterministicAssetBundle;
 			var manifest = Flour.Build.BuildAssetBundle.Build(outputPath, buildTarget, options);
+
 			Flour.Build.BuildAssetBundle.CleanUnnecessaryAssetBundles(outputPath, assetBundleFolder, manifest);
 			Flour.Build.BuildAssetBundle.CreateAssetBundleSizeManifest(outputPath, AssetHelper.AssetBundleSizeManifestName, manifest);
 			Flour.Build.BuildAssetBundle.CreateAssetBundleCrcManifest(outputPath, AssetHelper.AssetBundleCrcManifestName, manifest);
+
+			return manifest;
+		}
+
+		static void BuildEncryptAssetBundle(BuildTarget buildTarget)
+		{
+			var manifest = BuildAssetBundle(buildTarget);
+
+			var srcPath = Path.Combine("AssetBundles", AssetHelper.GetAssetBundleFolderName(buildTarget));
+			var cryptoPath = Path.Combine("AssetBundles", AssetHelper.GetEncryptAssetBundleFolderName(buildTarget));
+
+			Flour.Build.BuildAssetBundle.BuildEncrypt(srcPath, cryptoPath, "password", manifest);
 		}
 	}
 }

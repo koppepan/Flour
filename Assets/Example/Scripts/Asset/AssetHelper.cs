@@ -30,6 +30,11 @@ namespace Example
 					return "";
 			}
 		}
+
+		public static string GetEncryptAssetBundleFolderName(BuildTarget buildTarget)
+		{
+			return "E" + GetAssetBundleFolderName(buildTarget);
+		}
 #endif
 
 		public static string GetAssetBundleFolderName(RuntimePlatform platform)
@@ -53,6 +58,11 @@ namespace Example
 				default:
 					return "";
 			}
+		}
+
+		public static string GetEncryptAssetBundleFolderName(RuntimePlatform platform)
+		{
+			return "E" + GetAssetBundleFolderName(platform);
 		}
 	}
 }
