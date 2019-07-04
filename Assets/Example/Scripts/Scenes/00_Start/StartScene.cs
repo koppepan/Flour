@@ -14,7 +14,7 @@ namespace Example
 		{
 			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
 
-			var folder = AssetHelper.GetAssetBundleFolderName(Application.platform);
+			var folder = AssetHelper.GetEncryptAssetBundleFolderName(Application.platform);
 			var assetBundlePath = Path.Combine(config.list[0].assetBundle, folder);
 
 			AssetHandler.ChangeBaseUrl(assetBundlePath);

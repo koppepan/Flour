@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.IO;
+using System.Security;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
@@ -10,7 +11,9 @@ namespace Flour.Asset
 	public class AssetBundleHandler
 	{
 		string baseUrl;
+
 		readonly string cachePath;
+		readonly SecureString password;
 
 		readonly Net.ParallelWebRequest<AssetBundle> downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
@@ -46,15 +49,18 @@ namespace Flour.Asset
 			cachePath = "";
 			addRequest = CreateRequest;
 
-			downloadHandler = new ParallelAssetBundleCacheDownloader(baseUrl, Path.Combine(Application.temporaryCachePath, "assets"), 5, 20);
+			downloadHandler = new ParallelAssetBundleDownloader(baseUrl, 5, 20);
 			assetLoadHandler = new AssetLoadHandler();
 
 			Initialize();
 		}
-		public AssetBundleHandler(string baseUrl, string cachePath)
+		public AssetBundleHandler(string baseUrl, string cachePath, SecureString password)
 		{
 			this.baseUrl = baseUrl;
+
 			this.cachePath = cachePath;
+			this.password = password;
+
 			addRequest = CreateCacheRequest;
 
 			downloadHandler = new ParallelAssetBundleCacheDownloader(baseUrl, cachePath, 5, 20);
@@ -73,7 +79,10 @@ namespace Flour.Asset
 		}
 
 		private Net.IDownloader<AssetBundle> CreateRequest(string assetBundleName, Hash128 hash, uint crc) => new AssetBundleDownloader(assetBundleName, hash, crc);
-		private Net.IDownloader<AssetBundle> CreateCacheRequest(string assetBundleName, Hash128 hash, uint crc) => new AssetBundleCacheDownloader(assetBundleName, cachePath, hash, crc);
+		private Net.IDownloader<AssetBundle> CreateCacheRequest(string assetBundleName, Hash128 hash, uint crc)
+		{
+			return new AssetBundleCacheDownloader(assetBundleName, cachePath, password, hash, crc);
+		}
 
 		public void ChangeBaseUrl(string baseUrl)
 		{

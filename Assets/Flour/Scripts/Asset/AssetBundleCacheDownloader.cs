@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Text;
+using System.Security;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniRx.Async;
@@ -49,9 +51,11 @@ namespace Flour.Asset
 			}
 		}
 
-		string cachePath;
-		Hash128 hash;
-		uint crc;
+		readonly string cachePath;
+		readonly SecureString password;
+
+		readonly Hash128 hash;
+		readonly uint crc;
 
 		UnityWebRequest request = null;
 		FileStream fileStream = null;
@@ -60,10 +64,11 @@ namespace Flour.Asset
 		State currentState = State.Wait;
 		AsyncOperation asyncOperation = null;
 
-		public AssetBundleCacheDownloader(string path, string cachePath, Hash128 hash, uint crc = 0)
+		public AssetBundleCacheDownloader(string path, string cachePath, SecureString password, Hash128 hash, uint crc = 0)
 		{
 			FilePath = path;
 
+			this.password = password;
 			this.cachePath = Path.Combine(cachePath, $"{FilePath}.{hash}");
 			this.hash = hash;
 			this.crc = crc;
@@ -122,7 +127,9 @@ namespace Flour.Asset
 				return;
 			}
 			fileStream = new FileStream(cachePath, FileMode.Open);
-			aesStream = new SeekableAesStream(fileStream, "password", Encoding.UTF8.GetBytes(FilePath));
+
+			var pass = Marshal.PtrToStringUni(Marshal.SecureStringToGlobalAllocUnicode(password));
+			aesStream = new SeekableAesStream(fileStream, pass, Encoding.UTF8.GetBytes(FilePath));
 			asyncOperation = AssetBundle.LoadFromStreamAsync(aesStream);
 			currentState = State.Load;
 		}

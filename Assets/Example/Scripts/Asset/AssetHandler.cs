@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security;
 using UnityEngine;
 using UniRx.Async;
 using Flour.Asset;
@@ -7,7 +8,6 @@ namespace Example
 {
 	public class AssetHandler
 	{
-		readonly bool crypto;
 		private AssetBundleHandler handler;
 
 		public SceneWaiter SceneWaiter { get; private set; }
@@ -21,10 +21,9 @@ namespace Example
 			handler = new AssetBundleHandler(baseUrl);
 			CreateWaiter();
 		}
-		public AssetHandler(string baseUrl, string cachePath)
+		public AssetHandler(string baseUrl, string cachePath, SecureString password)
 		{
-			crypto = true;
-			handler = new AssetBundleHandler(baseUrl, cachePath);
+			handler = new AssetBundleHandler(baseUrl, cachePath, password);
 			CreateWaiter();
 		}
 
@@ -55,10 +54,6 @@ namespace Example
 		public async UniTask LoadManifestAsync()
 		{
 			var manifest = AssetHelper.GetAssetBundleFolderName(Application.platform);
-			if (crypto)
-			{
-				manifest = AssetHelper.GetEncryptAssetBundleFolderName(Application.platform);
-			}
 			var sizeManifest = AssetHelper.AssetBundleSizeManifestName;
 
 			await handler.LoadManifestAsync(manifest, sizeManifest, "");
