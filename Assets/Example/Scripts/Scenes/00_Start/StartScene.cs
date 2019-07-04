@@ -18,7 +18,7 @@ namespace Example
 			var assetBundlePath = Path.Combine(config.list[0].assetBundle, folder);
 
 			AssetHandler.ChangeBaseUrl(assetBundlePath);
-			await AssetHandler.LoadManifestAsync(folder, AssetHelper.AssetBundleSizeManifestName);
+			await AssetHandler.LoadManifestAsync();
 
 			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
 			await splash.Run();

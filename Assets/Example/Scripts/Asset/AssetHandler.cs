@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UniRx.Async;
 using Flour.Asset;
 
@@ -6,6 +7,7 @@ namespace Example
 {
 	public class AssetHandler
 	{
+		readonly bool crypto;
 		private AssetBundleHandler handler;
 
 		public SceneWaiter SceneWaiter { get; private set; }
@@ -21,6 +23,7 @@ namespace Example
 		}
 		public AssetHandler(string baseUrl, string cachePath)
 		{
+			crypto = true;
 			handler = new AssetBundleHandler(baseUrl, cachePath);
 			CreateWaiter();
 		}
@@ -49,9 +52,16 @@ namespace Example
 			return progress;
 		}
 
-		public async UniTask LoadManifestAsync(string manifestName, string sizeManifestName, string crcManifestName = "")
+		public async UniTask LoadManifestAsync()
 		{
-			await handler.LoadManifestAsync(manifestName, sizeManifestName, crcManifestName);
+			var manifest = AssetHelper.GetAssetBundleFolderName(Application.platform);
+			if (crypto)
+			{
+				manifest = AssetHelper.GetEncryptAssetBundleFolderName(Application.platform);
+			}
+			var sizeManifest = AssetHelper.AssetBundleSizeManifestName;
+
+			await handler.LoadManifestAsync(manifest, sizeManifest, "");
 
 			handler.AddWaiter(SceneWaiter);
 			handler.AddWaiter(PrefabWaiter);
