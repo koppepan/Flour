@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using UniRx;
 using UniRx.Async;
 using Flour.Config;
@@ -13,11 +12,8 @@ namespace Example
 		public override async UniTask Load(params object[] args)
 		{
 			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
+			AssetHandler.ChangeBaseUrl(config.list[0].assetBundle);
 
-			var folder = AssetHelper.GetEncryptAssetBundleFolderName(Application.platform);
-			var assetBundlePath = Path.Combine(config.list[0].assetBundle, folder);
-
-			AssetHandler.ChangeBaseUrl(assetBundlePath);
 			await AssetHandler.LoadManifestAsync();
 
 			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);

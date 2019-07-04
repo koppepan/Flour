@@ -8,6 +8,7 @@ namespace Example
 {
 	public class AssetHandler
 	{
+		readonly bool encrypt;
 		private AssetBundleHandler handler;
 
 		public SceneWaiter SceneWaiter { get; private set; }
@@ -18,16 +19,23 @@ namespace Example
 
 		public AssetHandler(string baseUrl)
 		{
+			encrypt = false;
 			handler = new AssetBundleHandler(baseUrl);
 			CreateWaiter();
 		}
 		public AssetHandler(string baseUrl, string cachePath, SecureString password)
 		{
+			encrypt = true;
 			handler = new AssetBundleHandler(baseUrl, cachePath, password);
 			CreateWaiter();
 		}
 
-		public void ChangeBaseUrl(string baseUrl) => handler.ChangeBaseUrl(baseUrl);
+		public void ChangeBaseUrl(string baseUrl)
+		{
+			var platform = Application.platform;
+			var folder = encrypt ? AssetHelper.GetEncryptAssetBundleFolderName(platform) : AssetHelper.GetAssetBundleFolderName(platform);
+			handler.ChangeBaseUrl(System.IO.Path.Combine(baseUrl, folder));
+		}
 
 		public void Dispose()
 		{
