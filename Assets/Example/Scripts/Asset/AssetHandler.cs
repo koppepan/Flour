@@ -9,6 +9,7 @@ namespace Example
 		private AssetBundleHandler handler;
 
 		public SceneWaiter SceneWaiter { get; private set; }
+		public GameObjectWaiter PrefabWaiter { get; private set; }
 		public SpriteAssetWaiter SpriteWaiter { get; private set; }
 
 		public IObservable<LoadError> ErrorObservable { get { return handler.ErrorObservable; } }
@@ -34,6 +35,8 @@ namespace Example
 		private void CreateWaiter()
 		{
 			SceneWaiter = new SceneWaiter("scenes/");
+
+			PrefabWaiter = new GameObjectWaiter("prefabs/", 50);
 			SpriteWaiter = new SpriteAssetWaiter("icons/", 50);
 		}
 
@@ -51,11 +54,13 @@ namespace Example
 			await handler.LoadManifestAsync(manifestName, sizeManifestName, crcManifestName);
 
 			handler.AddWaiter(SceneWaiter);
+			handler.AddWaiter(PrefabWaiter);
 			handler.AddWaiter(SpriteWaiter);
 		}
 
 		public void Compress()
 		{
+			PrefabWaiter.Compress();
 			SpriteWaiter.Compress();
 		}
 	}
