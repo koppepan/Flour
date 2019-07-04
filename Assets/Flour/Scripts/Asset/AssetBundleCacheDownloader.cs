@@ -105,6 +105,9 @@ namespace Flour.Asset
 			IsError = isError;
 			ResponseCode = responseCode;
 			Error = error;
+
+			currentState = State.Completed;
+			Dispose();
 		}
 
 		private void InvokeLoadStream()
@@ -139,6 +142,7 @@ namespace Flour.Asset
 				}
 				else if (currentState == State.Load)
 				{
+					Dispose();
 					currentState = State.Completed;
 				}
 			}
