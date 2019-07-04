@@ -53,6 +53,7 @@ namespace Flour.Asset
 		uint crc;
 
 		UnityWebRequest request = null;
+		FileStream fileStream = null;
 		State currentState = State.Wait;
 		AsyncOperation asyncOperation = null;
 
@@ -108,7 +109,14 @@ namespace Flour.Asset
 
 		private void InvokeLoadStream()
 		{
-			asyncOperation = AssetBundle.LoadFromStreamAsync(new FileStream(cachePath, FileMode.Open));
+			if (!File.Exists(cachePath))
+			{
+				SetError(true, 404, "file not found in cache");
+				currentState = State.Completed;
+				return;
+			}
+			fileStream = new FileStream(cachePath, FileMode.Open);
+			asyncOperation = AssetBundle.LoadFromStreamAsync(fileStream);
 			currentState = State.Load;
 		}
 
@@ -142,6 +150,7 @@ namespace Flour.Asset
 		public void Dispose()
 		{
 			request?.Dispose();
+			fileStream?.Dispose();
 		}
 	}
 
