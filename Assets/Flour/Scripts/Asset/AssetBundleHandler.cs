@@ -10,8 +10,9 @@ namespace Flour.Asset
 	public class AssetBundleHandler
 	{
 		string baseUrl;
+		readonly string cachePath;
 
-		readonly ParallelAssetBundleDownloader downloadHandler;
+		readonly Net.ParallelWebRequest<AssetBundle> downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
 
 		WaiterBridge _waiterBridge;
@@ -23,6 +24,8 @@ namespace Flour.Asset
 				return _waiterBridge;
 			}
 		}
+
+		Func<string, Hash128, uint, Net.IDownloader<AssetBundle>> addRequest;
 
 		AssetBundleManifest manifest;
 		AssetBundleSizeManifest sizeManifest;
@@ -40,15 +43,37 @@ namespace Flour.Asset
 		public AssetBundleHandler(string baseUrl)
 		{
 			this.baseUrl = baseUrl;
+			cachePath = "";
+			addRequest = CreateRequest;
 
-			downloadHandler = new ParallelAssetBundleDownloader(baseUrl, 5, 20);
+			downloadHandler = new ParallelAssetBundleCacheDownloader(baseUrl, Path.Combine(Application.temporaryCachePath, "assets"), 5, 20);
+			assetLoadHandler = new AssetLoadHandler();
+
+			Initialize();
+		}
+		public AssetBundleHandler(string baseUrl, string cachePath)
+		{
+			this.baseUrl = baseUrl;
+			this.cachePath = cachePath;
+			addRequest = CreateCacheRequest;
+
+			downloadHandler = new ParallelAssetBundleCacheDownloader(baseUrl, cachePath, 5, 20);
+			assetLoadHandler = new AssetLoadHandler();
+
+			Initialize();
+		}
+
+		private void Initialize()
+		{
 			downloadHandler.DownloadedObservable.Subscribe(OnCompleteDownload).AddTo(disposable);
 			downloadHandler.ErroredObservable.Subscribe(OnDownloadError).AddTo(disposable);
 
-			assetLoadHandler = new AssetLoadHandler();
 			assetLoadHandler.LoadObservable.Subscribe(OnLoadedObject).AddTo(disposable);
 			assetLoadHandler.ErrorObservable.Subscribe(OnAssetLoadError).AddTo(disposable);
 		}
+
+		private Net.IDownloader<AssetBundle> CreateRequest(string assetBundleName, Hash128 hash, uint crc) => new AssetBundleDownloader(assetBundleName, hash, crc);
+		private Net.IDownloader<AssetBundle> CreateCacheRequest(string assetBundleName, Hash128 hash, uint crc) => new AssetBundleCacheDownloader(assetBundleName, cachePath, hash, crc);
 
 		public void ChangeBaseUrl(string baseUrl)
 		{
@@ -107,7 +132,7 @@ namespace Flour.Asset
 				}
 				var hash = manifest.GetAssetBundleHash(assetBundleNames[i]);
 				var crc = crcManifest == null ? 0 : crcManifest.GetCrc(assetBundleNames[i]);
-				downloadHandler.AddRequest(new AssetBundleDownloader(assetBundleNames[i], hash, crc));
+				downloadHandler.AddRequest(addRequest(assetBundleNames[i], hash, crc));
 			}
 		}
 		void CleanRequest(string assetBundleName)

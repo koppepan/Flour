@@ -16,9 +16,12 @@ namespace Example
 		public AssetHandler(string baseUrl)
 		{
 			handler = new AssetBundleHandler(baseUrl);
-
-			SceneWaiter = new SceneWaiter("scenes/");
-			SpriteWaiter = new SpriteAssetWaiter("icons/", 50);
+			CreateWaiter();
+		}
+		public AssetHandler(string baseUrl, string cachePath)
+		{
+			handler = new AssetBundleHandler(baseUrl, cachePath);
+			CreateWaiter();
 		}
 
 		public void ChangeBaseUrl(string baseUrl) => handler.ChangeBaseUrl(baseUrl);
@@ -26,6 +29,12 @@ namespace Example
 		public void Dispose()
 		{
 			handler.Dispose();
+		}
+
+		private void CreateWaiter()
+		{
+			SceneWaiter = new SceneWaiter("scenes/");
+			SpriteWaiter = new SpriteAssetWaiter("icons/", 50);
 		}
 
 		public LoadProgress GetProgress(int downloadCount, int assetCount)
