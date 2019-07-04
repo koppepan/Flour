@@ -1,4 +1,5 @@
-﻿using UnityEngine.Networking;
+﻿using System.IO;
+using UnityEngine.Networking;
 
 namespace Flour.Net
 {
@@ -11,28 +12,37 @@ namespace Flour.Net
 
 	public struct FileDownloader : IDownloader<string>
 	{
-		public string Path { get; private set; }
-		public UnityWebRequest Request { get; private set; }
+		public string FilePath { get; private set; }
+
+		public bool IsDone { get { return request.isDone; } }
+		public bool IsError { get { return request.isHttpError || request.isNetworkError; } }
+		public long ResponseCode { get { return request.responseCode; } }
+		public string Error { get { return request.error; } }
+
+		public float Progress { get { return request.downloadProgress; } }
+
+		UnityWebRequest request;
 
 		public FileDownloader(string path)
 		{
-			Path = path;
-			Request = null;
+			FilePath = path;
+			request = null;
 		}
 
 		public void Send(string baseUrl, int timeout)
 		{
-			Request = UnityWebRequest.Get(System.IO.Path.Combine(baseUrl, Path));
-			Request.timeout = timeout;
-			Request.SendWebRequest();
+			request = UnityWebRequest.Get(Path.Combine(baseUrl, FilePath));
+			request.timeout = timeout;
+			request.SendWebRequest();
 		}
+		public void Update() { }
 		public string GetContent()
 		{
-			return Request.downloadHandler.text;
+			return request.downloadHandler.text;
 		}
 		public void Dispose()
 		{
-			Request.Dispose();
+			request.Dispose();
 		}
 	}
 }

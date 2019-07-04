@@ -10,18 +10,24 @@ namespace Flour.Asset
 		}
 	}
 
-	internal struct AssetBundleDownloader : Net.IDownloader<AssetBundle>
+	internal class AssetBundleDownloader : Net.IDownloader<AssetBundle>
 	{
-		public string Path { get; private set; }
-		public UnityWebRequest Request { get; private set; }
+		public string FilePath { get; private set; }
 
+		public bool IsDone { get { return request.isDone; } }
+		public bool IsError { get { return request.isHttpError || request.isNetworkError; } }
+		public long ResponseCode { get { return request.responseCode; } }
+		public string Error { get { return request.error; } }
+
+		public float Progress { get { return request.downloadProgress; } }
+
+		UnityWebRequest request = null;
 		Hash128 hash;
 		uint crc;
 
 		public AssetBundleDownloader(string path, Hash128 hash, uint crc = 0)
 		{
-			Path = path;
-			Request = null;
+			FilePath = path;
 
 			this.hash = hash;
 			this.crc = crc;
@@ -29,21 +35,22 @@ namespace Flour.Asset
 
 		public void Send(string baseUrl, int timeout)
 		{
-			var cachedAb = new CachedAssetBundle(Path, hash);
+			var cachedAb = new CachedAssetBundle(FilePath, hash);
 
 			Caching.ClearOtherCachedVersions(cachedAb.name, cachedAb.hash);
 
-			Request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, Path), cachedAb, crc);
-			Request.timeout = timeout;
-			Request.SendWebRequest();
+			request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, FilePath), cachedAb, crc);
+			request.timeout = timeout;
+			request.SendWebRequest();
 		}
+		public void Update() { }
 		public AssetBundle GetContent()
 		{
-			return DownloadHandlerAssetBundle.GetContent(Request);
+			return DownloadHandlerAssetBundle.GetContent(request);
 		}
 		public void Dispose()
 		{
-			Request?.Dispose();
+			request?.Dispose();
 		}
 	}
 }

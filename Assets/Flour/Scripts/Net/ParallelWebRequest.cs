@@ -3,17 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Networking;
 using UniRx;
 
 namespace Flour.Net
 {
 	public interface IDownloader<T>
 	{
-		string Path { get; }
-		UnityWebRequest Request { get; }
+		string FilePath { get; }
+
+		bool IsDone { get; }
+		bool IsError { get; }
+
+		long ResponseCode { get; }
+		string Error { get; }
+		float Progress { get; }
 
 		void Send(string baseUrl, int timeout);
+		void Update();
 		T GetContent();
 		void Dispose();
 	}
@@ -95,8 +101,8 @@ namespace Flour.Net
 
 		public void AddRequest(IDownloader<T> downloader)
 		{
-			if (waitingList.Any(x => x.Path.Equals(downloader.Path, StringComparison.Ordinal))) return;
-			if (downloaders.Any(x => x.Path.Equals(downloader.Path, StringComparison.Ordinal))) return;
+			if (waitingList.Any(x => x.FilePath.Equals(downloader.FilePath, StringComparison.Ordinal))) return;
+			if (downloaders.Any(x => x.FilePath.Equals(downloader.FilePath, StringComparison.Ordinal))) return;
 
 			waitingList.Add(downloader);
 
@@ -115,20 +121,21 @@ namespace Flour.Net
 				for (int i = downloaders.Count - 1; i >= 0; i--)
 				{
 					var d = downloaders[i];
-					if (d.Request.isDone || (d.Request.isHttpError || d.Request.isNetworkError))
+					d.Update();
+					if (d.IsDone || d.IsError)
 					{
 						downloaders.Remove(d);
 
-						if (d.Request.isHttpError || d.Request.isNetworkError)
+						if (d.IsError)
 						{
-							erroredObserver.OnNext(Tuple.Create(d.Path, d.Request.responseCode, d.Request.error));
+							erroredObserver.OnNext(Tuple.Create(d.FilePath, d.ResponseCode, d.Error));
 						}
 						else
 						{
 							downloadedCount++;
 							UpdateProgress(0);
 
-							downloadedObserver.OnNext(Tuple.Create(d.Path, d.GetContent()));
+							downloadedObserver.OnNext(Tuple.Create(d.FilePath, d.GetContent()));
 						}
 					}
 				}
@@ -151,7 +158,7 @@ namespace Flour.Net
 			float currentProgress = 0;
 			for (int i = 0; i < downloaders.Count; i++)
 			{
-				currentProgress += downloaders[i].Request.downloadProgress;
+				currentProgress += downloaders[i].Progress;
 			}
 
 			progress.Value = downloadedCount + currentProgress;
