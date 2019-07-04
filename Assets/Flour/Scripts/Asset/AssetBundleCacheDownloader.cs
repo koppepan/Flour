@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
+using UniRx.Async;
 
 namespace Flour.Asset
 {
@@ -16,42 +16,110 @@ namespace Flour.Asset
 		}
 	}
 
-	internal struct AssetBundleCacheDownloader : Net.IDownloader<AssetBundle>
+	internal class AssetBundleCacheDownloader : Net.IDownloader<AssetBundle>
 	{
-		public string Path { get; private set; }
-		public UnityWebRequest Request { get; private set; }
+		private enum State
+		{
+			Wait,
+			Download,
+			Load,
+			Completed,
+		};
+		
+		public string FilePath { get; private set; }
+
+		public bool IsDone { get { return currentState == State.Completed; } }
+		public bool IsError { get { return request == null ? false : request.isHttpError || request.isNetworkError; } }
+		public long ResponseCode { get { return request == null ? -1 : request.responseCode; } }
+		public string Error { get { return request?.error; } }
+
+		public float Progress
+		{
+			get
+			{
+				switch (currentState)
+				{
+					case State.Download: return asyncOperation.progress * 0.5f;
+					case State.Load: return 0.5f + (asyncOperation.progress * 0.5f);
+					case State.Completed: return 1;
+					default: return 0;
+				}
+			}
+		}
 
 		string cachePath;
 		Hash128 hash;
 		uint crc;
 
+		UnityWebRequest request = null;
+		State currentState = State.Wait;
+		AsyncOperation asyncOperation = null;
+
 		public AssetBundleCacheDownloader(string path, string cachePath, Hash128 hash, uint crc = 0)
 		{
-			Path = path;
-			Request = null;
+			FilePath = path;
 
-			this.cachePath = cachePath;
+			this.cachePath = Path.Combine(cachePath, $"{FilePath}.{hash}");
 			this.hash = hash;
 			this.crc = crc;
 		}
 
 		public void Send(string baseUrl, int timeout)
 		{
-			//var cachedAb = new CachedAssetBundle(Path, hash);
-			//Request = UnityWebRequestAssetBundle.GetAssetBundle(System.IO.Path.Combine(baseUrl, Path), cachedAb, crc);
+			if (File.Exists(cachePath))
+			{
+				InvokeLoadStream();
+			}
+			else
+			{
+				request = new UnityWebRequest(Path.Combine(baseUrl, FilePath), UnityWebRequest.kHttpVerbGET, new AssetBundleDownloadHandler(cachePath), null);
+				request.timeout = timeout;
 
-			Request = new UnityWebRequest(System.IO.Path.Combine(baseUrl, Path), UnityWebRequest.kHttpVerbGET, new AssetBundleDownloadHandler(System.IO.Path.Combine(cachePath, Path)), null);
+				asyncOperation = request.SendWebRequest();
+				currentState = State.Download;
+			}
 
-			Request.timeout = timeout;
-			Request.SendWebRequest();
+			UniTask.Run(() =>
+			{
+				var files = Directory.GetFiles(Path.GetDirectoryName(cachePath), $"{Path.GetFileNameWithoutExtension(cachePath)}.*");
+				for (int i = 0; i < files.Length; i++)
+				{
+					if (!Path.GetFullPath(files[i]).Equals(Path.GetFullPath(cachePath), System.StringComparison.Ordinal))
+					{
+						File.Delete(files[i]);
+					}
+				}
+			}).Forget();
+		}
+
+		private void InvokeLoadStream()
+		{
+			asyncOperation = AssetBundle.LoadFromStreamAsync(new FileStream(cachePath, FileMode.Open));
+			currentState = State.Load;
+		}
+
+		public void Update()
+		{
+			if (currentState == State.Completed || asyncOperation == null) return;
+			if (asyncOperation.isDone)
+			{
+				if (currentState == State.Download)
+				{
+					InvokeLoadStream();
+				}
+				else if (currentState == State.Load)
+				{
+					currentState = State.Completed;
+				}
+			}
 		}
 		public AssetBundle GetContent()
 		{
-			return AssetBundle.LoadFromStream(new FileStream(System.IO.Path.Combine(cachePath, Path), FileMode.Open));
+			return ((AssetBundleCreateRequest)asyncOperation).assetBundle;
 		}
 		public void Dispose()
 		{
-			Request?.Dispose();
+			request?.Dispose();
 		}
 	}
 
