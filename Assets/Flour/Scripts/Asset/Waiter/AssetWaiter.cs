@@ -100,7 +100,7 @@ namespace Flour.Asset
 		{
 			for (int i = 0; i < requests.Count; i++)
 			{
-				if (requests[i].Containts(assetBundleName)) yield return requests[i];
+				if (string.IsNullOrEmpty(assetBundleName) || requests[i].Containts(assetBundleName)) yield return requests[i];
 			}
 		}
 

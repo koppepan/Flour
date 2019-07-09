@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using UniRx;
 
 namespace Example
@@ -18,10 +19,6 @@ namespace Example
 
 		private CompositeDisposable disposables = new CompositeDisposable();
 
-		public LoadProgress(int downloadCount)
-		{
-			this.downloadCount = this.assetCount = downloadCount;
-		}
 		public LoadProgress(int downloadCount, int assetCount)
 		{
 			this.downloadCount = downloadCount;
@@ -33,7 +30,7 @@ namespace Example
 			disposables.Dispose();
 		}
 
-		public void SetObservable(IReactiveProperty<float> download, IReactiveProperty<float> assetLoad)
+		public void SetObservable(IObservable<float> download, IObservable<float> assetLoad)
 		{
 			download.Subscribe(UpdateDownloadProgress).AddTo(disposables);
 			assetLoad.Subscribe(UpdateAssetLoadProgress).AddTo(disposables);
@@ -53,7 +50,11 @@ namespace Example
 
 		private void UpdateProgress()
 		{
-			var value = (downloadProgress + assetLoadProgress) * 0.5f;
+			var d = downloadCount == 0 ? 1 : downloadProgress / downloadCount;
+			var a = assetCount == 0 ? 1 : assetLoadProgress / assetCount;
+			var value = Mathf.Clamp01((d + a) * 0.5f);
+
+			ProgressValue = value;
 			Progress.Invoke(value);
 
 			if (value == 1)

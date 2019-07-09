@@ -38,8 +38,8 @@ namespace Flour.Asset
 
 		Subject<LoadError> errorSubject = new Subject<LoadError>();
 
-		public IReactiveProperty<float> DownloadProgress { get { return downloadHandler.Progress; } }
-		public IReactiveProperty<float> AssetLoadProgress { get { return assetLoadHandler.Progress; } }
+		public IObservable<float> DownloadedCount { get { return downloadHandler.DownloadedCount; } }
+		public IObservable<float> AssetLoadedCount { get { return assetLoadHandler.LoadedCount; } }
 
 		public IObservable<LoadError> ErrorObservable { get { return errorSubject; } }
 
@@ -120,6 +120,13 @@ namespace Flour.Asset
 			AssetBundle.UnloadAllAssetBundles(true);
 		}
 
+		public Tuple<int, int> GetRequestCount()
+		{
+			var requests = waiterBridge.GetRequests().SelectMany(x => x);
+			var abCount = requests.SelectMany(x => x.AssetBundleNames).Distinct().Count();
+			var assetCount = requests.Select(x => x.AssetName).Distinct().Count();
+			return Tuple.Create(abCount, assetCount);
+		}
 		public void ResetProgressCount()
 		{
 			downloadHandler.ResetProgressCount();

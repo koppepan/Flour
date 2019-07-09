@@ -50,12 +50,13 @@ namespace Example
 			SpriteWaiter = new SpriteAssetWaiter("icons/", 50);
 		}
 
-		public LoadProgress GetProgress(int downloadCount, int assetCount)
+		public LoadProgress GetProgress()
 		{
 			handler.ResetProgressCount();
+			var count = handler.GetRequestCount();
 
-			var progress = new LoadProgress(downloadCount, assetCount);
-			progress.SetObservable(handler.DownloadProgress, handler.AssetLoadProgress);
+			var progress = new LoadProgress(count.Item1, count.Item2);
+			progress.SetObservable(handler.DownloadedCount, handler.AssetLoadedCount);
 			return progress;
 		}
 

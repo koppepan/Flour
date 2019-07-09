@@ -46,8 +46,8 @@ namespace Flour.Net
 
 		CompositeDisposable updateDisposable;
 
-		private FloatReactiveProperty progress = new FloatReactiveProperty(0);
-		public IReactiveProperty<float> Progress { get { return progress; } }
+		private FloatReactiveProperty downloadedCountProperty = new FloatReactiveProperty(0);
+		public IReactiveProperty<float> DownloadedCount { get { return downloadedCountProperty; } }
 
 		public ParallelWebRequest(string baseUrl, int parallel, int timeout)
 		{
@@ -132,10 +132,10 @@ namespace Flour.Net
 						}
 						else
 						{
+							downloadedObserver.OnNext(Tuple.Create(d.FilePath, d.GetContent()));
+
 							downloadedCount++;
 							UpdateProgress(0);
-
-							downloadedObserver.OnNext(Tuple.Create(d.FilePath, d.GetContent()));
 						}
 					}
 				}
@@ -158,10 +158,11 @@ namespace Flour.Net
 			float currentProgress = 0;
 			for (int i = 0; i < downloaders.Count; i++)
 			{
+				if (downloaders[i].IsDone || downloaders[i].IsError) continue;
 				currentProgress += downloaders[i].Progress;
 			}
 
-			progress.Value = downloadedCount + currentProgress;
+			downloadedCountProperty.Value = downloadedCount + currentProgress;
 		}
 	}
 }

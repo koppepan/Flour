@@ -24,9 +24,8 @@ namespace Flour.Asset
 		CompositeDisposable updateDisposables;
 
 		int loadedCount = 0;
-
-		private FloatReactiveProperty progress = new FloatReactiveProperty(0);
-		public IReactiveProperty<float> Progress { get { return progress; } }
+		private FloatReactiveProperty loadedCountProperty = new FloatReactiveProperty(0);
+		public IReactiveProperty<float> LoadedCount { get { return loadedCountProperty; } }
 
 		public void Dispose()
 		{
@@ -83,11 +82,11 @@ namespace Flour.Asset
 					var req = requests[i];
 					if (req.Item3.isDone)
 					{
-						loadedCount++;
-						UpdateProgress(0);
-
 						requests.Remove(req);
 						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
+
+						loadedCount++;
+						UpdateProgress(0);
 					}
 				}
 
@@ -100,9 +99,10 @@ namespace Flour.Asset
 			float currentProgress = 0;
 			for (int i = 0; i < requests.Count; i++)
 			{
+				if (requests[i].Item3.isDone) continue;
 				currentProgress += requests[i].Item3.progress;
 			}
-			progress.Value = loadedCount + currentProgress;
+			loadedCountProperty.Value = loadedCount + currentProgress;
 		}
 
 

@@ -77,6 +77,13 @@ namespace Flour.Asset
 				yield return requests[i].Invoke(assetBundleName);
 			}
 		}
+		public IEnumerable<IEnumerable<IAssetRequest>> GetRequests()
+		{
+			for (int i = 0; i < requests.Count; i++)
+			{
+				yield return requests[i].Invoke("");
+			}
+		}
 
 		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset) => OnAssetLoaded.Invoke(assetBundleName, assetName, asset);
 		public void OnError(string assetBundleName) => OnDownloadedError.Invoke(assetBundleName);
