@@ -11,7 +11,7 @@ namespace Flour.Asset
 		internal delegate void CleanRequestDelegate(string assetBundleName);
 
 		internal delegate bool ContainsRequestDelegate(string assetBundleName);
-		internal delegate IEnumerable<IAssetRequest> GetRequestsDelegate(string assetBundleName);
+		internal delegate IEnumerable<IAssetRequest> FindRequestsDelegate(string assetBundleName);
 		internal delegate void WaiterDispose();
 
 		public AssetBundleManifest Manifest { get; private set; }
@@ -21,7 +21,7 @@ namespace Flour.Asset
 		private CleanRequestDelegate cleanRequestDelegate;
 
 		private List<Tuple<string, ContainsRequestDelegate>> contains = new List<Tuple<string, ContainsRequestDelegate>>();
-		private List<GetRequestsDelegate> requests = new List<GetRequestsDelegate>();
+		private List<FindRequestsDelegate> requests = new List<FindRequestsDelegate>();
 		private List<WaiterDispose> waiterDisposes = new List<WaiterDispose>();
 
 		public event Action<string, string, UnityEngine.Object> OnAssetLoaded = delegate { };
@@ -40,7 +40,7 @@ namespace Flour.Asset
 			SizeManiefst = sizeManifest;
 		}
 
-		public void AddWaiter(string key, ContainsRequestDelegate containsRequest, GetRequestsDelegate getRequests, WaiterDispose dispose)
+		public void AddWaiter(string key, ContainsRequestDelegate containsRequest, FindRequestsDelegate getRequests, WaiterDispose dispose)
 		{
 			contains.Add(Tuple.Create(key, containsRequest));
 			requests.Add(getRequests);
@@ -70,19 +70,9 @@ namespace Flour.Asset
 			return false;
 		}
 
-		public IEnumerable<IEnumerable<IAssetRequest>> GetRequests(string assetBundleName)
+		public IEnumerable<IAssetRequest> FindRequests(string assetBundleName = "")
 		{
-			for (int i = 0; i < requests.Count; i++)
-			{
-				yield return requests[i].Invoke(assetBundleName);
-			}
-		}
-		public IEnumerable<IEnumerable<IAssetRequest>> GetRequests()
-		{
-			for (int i = 0; i < requests.Count; i++)
-			{
-				yield return requests[i].Invoke("");
-			}
+			return requests.SelectMany(x => x.Invoke(assetBundleName));
 		}
 
 		public void OnLoaded(string assetBundleName, string assetName, UnityEngine.Object asset) => OnAssetLoaded.Invoke(assetBundleName, assetName, asset);

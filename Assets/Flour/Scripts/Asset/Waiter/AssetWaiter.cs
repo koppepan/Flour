@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UniRx;
 
 namespace Flour.Asset
@@ -24,7 +23,7 @@ namespace Flour.Asset
 			this.bridge.OnDownloadedError += OnError;
 			this.bridge.OnLoadedError += OnError;
 
-			this.bridge.AddWaiter(Key, ContainsRequest, GetRequests, Dispose);
+			this.bridge.AddWaiter(Key, ContainsRequest, FindRequests, Dispose);
 		}
 
 		internal void Dispose()
@@ -73,7 +72,7 @@ namespace Flour.Asset
 			}
 #endif
 
-			var req = requests.FirstOrDefault(x => x.Equals(assetBundleName, assetName));
+			var req = FindOrDefault(assetBundleName, assetName);
 			if (req != null)
 			{
 				return req.subject;
@@ -85,18 +84,24 @@ namespace Flour.Asset
 			return req.subject;
 		}
 
+		Request<T> FindOrDefault(string assetBundleName, string assetName)
+		{
+			for (int i = 0; i < requests.Count; i++)
+			{
+				if (requests[i].Equals(assetBundleName, assetName)) return requests[i];
+			}
+			return null;
+		}
+
 		bool ContainsRequest(string assetBundleName)
 		{
 			for (int i = 0; i < requests.Count; i++)
 			{
-				if (requests[i].AssetBundleNames.Contains(assetBundleName))
-				{
-					return true;
-				}
+				if (requests[i].Containts(assetBundleName)) return true;
 			}
 			return false;
 		}
-		IEnumerable<IAssetRequest> GetRequests(string assetBundleName)
+		IEnumerable<IAssetRequest> FindRequests(string assetBundleName)
 		{
 			for (int i = 0; i < requests.Count; i++)
 			{

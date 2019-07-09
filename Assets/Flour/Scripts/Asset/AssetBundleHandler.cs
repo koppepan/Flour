@@ -122,7 +122,7 @@ namespace Flour.Asset
 
 		public Tuple<int, int> GetRequestCount()
 		{
-			var requests = waiterBridge.GetRequests().SelectMany(x => x);
+			var requests = waiterBridge.FindRequests();
 			var abCount = requests.SelectMany(x => x.AssetBundleNames).Distinct().Count();
 			var assetCount = requests.Select(x => x.AssetName).Distinct().Count();
 			return Tuple.Create(abCount, assetCount);
@@ -168,7 +168,7 @@ namespace Flour.Asset
 
 			assetLoadHandler.AddAssetBundle(asset.Item1, asset.Item2);
 
-			var requests = waiterBridge.GetRequests(asset.Item1).SelectMany(x => x);
+			var requests = waiterBridge.FindRequests(asset.Item1);
 			if (!requests.Any()) return;
 
 			foreach (var req in requests)

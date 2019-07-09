@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UniRx;
 
 namespace Flour.Asset
@@ -31,7 +30,17 @@ namespace Flour.Asset
 			this.subject = subject;
 		}
 
-		public bool Containts(string assetBundleName) => AssetBundleNames.Contains(assetBundleName);
+		public bool Containts(string assetBundleName)
+		{
+			for (int i = 0; i < AssetBundleNames.Length; i++)
+			{
+				if (AssetBundleNames[i].Equals(assetBundleName, StringComparison.Ordinal))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 
 		public bool Equals(string assetBundleName)
 		{
