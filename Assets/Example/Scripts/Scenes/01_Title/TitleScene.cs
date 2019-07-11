@@ -1,4 +1,6 @@
-﻿using UniRx.Async;
+﻿using UnityEngine;
+using UniRx.Async;
+using Flour.Config;
 
 namespace Example
 {
@@ -9,6 +11,13 @@ namespace Example
 		{
 			titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
 			titleLayer.Setup(GotoOutGame);
+		}
+		public override async void Open()
+		{
+			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
+			AssetHandler.ChangeBaseUrl(config.list[0].assetBundle);
+
+			await AssetHandler.LoadManifestAsync();
 		}
 		public override async UniTask Unload()
 		{

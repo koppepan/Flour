@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using UniRx;
-using UniRx.Async;
-using Flour.Config;
+﻿using UniRx.Async;
 
 namespace Example
 {
@@ -11,18 +8,13 @@ namespace Example
 
 		public override async UniTask Load(params object[] args)
 		{
-			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
-			AssetHandler.ChangeBaseUrl(config.list[0].assetBundle);
-
-			await AssetHandler.LoadManifestAsync();
-
 			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
 			await splash.Run();
 		}
 
-		public override void Open()
+		public override async void Open()
 		{
-			SceneHandler.LoadSceneAsync(SceneType.Title);
+			await SceneHandler.LoadSceneAsync(SceneType.Title);
 		}
 
 		public override async UniTask Unload()
