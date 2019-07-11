@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
@@ -52,11 +53,8 @@ namespace Example
 			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
 			await fixedRepository.LoadAllAsync();
 
-			//var password = "password";
-			//System.Security.SecureString pass = new System.Security.SecureString();
-			//for (int i = 0; i < password.Length; i++) pass.AppendChar(password[i]);
-
-			//assetHandler = new AssetHandler("", System.IO.Path.Combine(Application.temporaryCachePath, "assets"), pass);
+			//var pass = await GetPassword();
+			//assetHandler = new AssetHandler("", AssetHelper.CacheAssetPath, pass);
 
 			assetHandler = new AssetHandler("");
 
@@ -83,6 +81,17 @@ namespace Example
 				h => UnityEditor.EditorApplication.pauseStateChanged += h,
 				h => UnityEditor.EditorApplication.pauseStateChanged -= h).Subscribe(PauseStateChanged).AddTo(this);
 #endif
+		}
+
+		private async UniTask<SecureString> GetPassword()
+		{
+			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>("Config/SecureParameter") as Flour.Config.SecureParameter;
+
+			SecureString pass = new SecureString();
+			for (int i = 0; i < param.Password.Length; i++) pass.AppendChar(param.Password[i]);
+
+			Resources.UnloadAsset(param);
+			return pass;
 		}
 
 		private void OnLowMemory()

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,6 +11,8 @@ namespace Example
 	{
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
 		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
+
+		public static string CacheAssetPath { get { return Path.Combine(Application.temporaryCachePath, "assets"); } }
 
 #if UNITY_EDITOR
 		public static string GetAssetBundleFolderName(BuildTarget buildTarget)
