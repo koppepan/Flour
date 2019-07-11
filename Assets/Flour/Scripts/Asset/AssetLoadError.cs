@@ -9,6 +9,7 @@ namespace Flour.Asset
 		ClientError,
 		ServerError,
 
+		MissingManifest,
 		MissingAssetBundle,
 		NotFoundAsset,
 	}

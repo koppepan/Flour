@@ -78,14 +78,20 @@ namespace Flour.Asset
 			await UniTask.DelayFrame(1);
 			Debug.Log("use editor local asset");
 #else
-			var result = await LoadManifestAsyncInternal(baseUrl, manifestName, sizeManifestName, crcManifestName);
-			manifest = result.Item1;
-			sizeManifest = result.Item2;
-			crcManifest = result.Item3;
+			try
+			{
+				var result = await LoadManifestAsyncInternal(baseUrl, manifestName, sizeManifestName, crcManifestName);
+				manifest = result.Item1;
+				sizeManifest = result.Item2;
+				crcManifest = result.Item3;
 
-			Debug.Log("loaded AssetBundleManifest.");
-
-			waiterBridge.SetManifest(manifest, sizeManifest);
+				Debug.Log("loaded AssetBundleManifest.");
+				waiterBridge.SetManifest(manifest, sizeManifest);
+			}
+			catch (Exception e)
+			{
+				errorSubject.OnNext(new LoadError(ErrorType.MissingManifest, 0, "AssetBundleManifest", e));
+			}
 #endif
 		}
 

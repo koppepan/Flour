@@ -40,5 +40,9 @@ namespace Example
 	{
 		static readonly AttributeCache<SceneType, string> cache = new AttributeCache<SceneType, string>();
 		public static string ToJpnName(this SceneType type) => cache[type];
+		public static bool TryGetKey (string name, out SceneType key)
+		{
+			return cache.TryGetKey(name, out key);
+		}
 	}
 }

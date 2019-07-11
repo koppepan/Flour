@@ -24,8 +24,7 @@ namespace Flour.Asset
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
-					Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
-					return null;
+					throw new ApplicationException($"download AssetBundleManifest in Error. => {request.error}");
 				}
 				return await LoadManifestAsync(DownloadHandlerAssetBundle.GetContent(request));
 			}
@@ -37,8 +36,7 @@ namespace Flour.Asset
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
-					Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
-					return null;
+					throw new ApplicationException($"download AssetBundleManifest in Error. => {request.error}");
 				}
 
 				using (var ms = new MemoryStream(request.downloadHandler.data))
@@ -93,8 +91,7 @@ namespace Flour.Asset
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
-					Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
-					return null;
+					throw new ApplicationException($"download AssetBundle Size Manifest in Error. => {request.error}");
 				}
 				return CreateSizeManifest(request.downloadHandler.text);
 			}
@@ -105,8 +102,7 @@ namespace Flour.Asset
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
-					Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
-					return null;
+					throw new ApplicationException($"download AssetBundle Size Manifest in Error. => {request.error}");
 				}
 				var body = await DecryptAsync(request.downloadHandler.data, password, fileName);
 				return CreateSizeManifest(body);
@@ -125,8 +121,7 @@ namespace Flour.Asset
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
-					Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
-					return null;
+					throw new ApplicationException($"download AssetBundle crc Manifest in Error. => {request.error}");
 				}
 				return CreateCrcManifest(request.downloadHandler.text);
 			}
@@ -137,8 +132,7 @@ namespace Flour.Asset
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
-					Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
-					return null;
+					throw new ApplicationException($"download AssetBundle crc Manifest in Error. => {request.error}");
 				}
 
 				var body = await DecryptAsync(request.downloadHandler.data, password, fileName);
