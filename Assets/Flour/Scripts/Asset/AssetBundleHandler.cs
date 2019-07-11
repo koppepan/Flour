@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.IO;
-using System.Security;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
@@ -13,11 +11,12 @@ namespace Flour.Asset
 	{
 		string baseUrl;
 
-		readonly string cachePath;
-		readonly SecureString password;
-
 		readonly Net.ParallelWebRequest<AssetBundle> downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
+
+		AssetBundleManifest manifest;
+		AssetBundleSizeManifest sizeManifest;
+		AssetBundleCrcManifest crcManifest;
 
 		WaiterBridge _waiterBridge;
 		WaiterBridge waiterBridge
@@ -28,12 +27,6 @@ namespace Flour.Asset
 				return _waiterBridge;
 			}
 		}
-
-		Func<string, Hash128, uint, Net.IDownloader<AssetBundle>> addRequest;
-
-		AssetBundleManifest manifest;
-		AssetBundleSizeManifest sizeManifest;
-		AssetBundleCrcManifest crcManifest;
 
 		CompositeDisposable disposable = new CompositeDisposable();
 
@@ -47,25 +40,16 @@ namespace Flour.Asset
 		public AssetBundleHandler(string baseUrl)
 		{
 			this.baseUrl = baseUrl;
-			cachePath = "";
-			password = null;
-			addRequest = CreateRequest;
 
 			downloadHandler = new ParallelAssetBundleDownloader(baseUrl, 5, 20);
 			assetLoadHandler = new AssetLoadHandler();
 
 			Initialize();
 		}
-		public AssetBundleHandler(string baseUrl, string cachePath, SecureString password)
+		internal AssetBundleHandler(string baseUrl, Net.ParallelWebRequest<AssetBundle> downloader)
 		{
 			this.baseUrl = baseUrl;
-
-			this.cachePath = cachePath;
-			this.password = password;
-
-			addRequest = CreateCacheRequest;
-
-			downloadHandler = new ParallelAssetBundleCacheDownloader(baseUrl, cachePath, 5, 20);
+			downloadHandler = downloader;
 			assetLoadHandler = new AssetLoadHandler();
 
 			Initialize();
@@ -80,11 +64,7 @@ namespace Flour.Asset
 			assetLoadHandler.ErrorObservable.Subscribe(OnAssetLoadError).AddTo(disposable);
 		}
 
-		private Net.IDownloader<AssetBundle> CreateRequest(string assetBundleName, Hash128 hash, uint crc) => new AssetBundleDownloader(assetBundleName, hash, crc);
-		private Net.IDownloader<AssetBundle> CreateCacheRequest(string assetBundleName, Hash128 hash, uint crc)
-		{
-			return new AssetBundleCacheDownloader(assetBundleName, cachePath, password, hash, crc);
-		}
+		protected virtual Net.IDownloader<AssetBundle> CreateRequest(string assetBundleName, Hash128 hash, uint crc) => new AssetBundleDownloader(assetBundleName, hash, crc);
 
 		public void ChangeBaseUrl(string baseUrl)
 		{
@@ -98,33 +78,28 @@ namespace Flour.Asset
 			await UniTask.DelayFrame(1);
 			Debug.Log("use editor local asset");
 #else
+			var result = await LoadManifestAsyncInternal(baseUrl, manifestName, sizeManifestName, crcManifestName);
+			manifest = result.Item1;
+			sizeManifest = result.Item2;
+			crcManifest = result.Item3;
 
-			if (!string.IsNullOrEmpty(cachePath) && password != null)
-			{
-				var pass = Marshal.PtrToStringUni(Marshal.SecureStringToGlobalAllocUnicode(password));
-
-				manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName), manifestName, pass);
-				sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName), sizeManifestName, pass);
-				if (!string.IsNullOrEmpty(crcManifestName))
-				{
-					crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName), crcManifestName, pass);
-				}
-			}
-			else
-			{
-				manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
-				sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
-				if (!string.IsNullOrEmpty(crcManifestName))
-				{
-					crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName));
-				}
-			}
-
-			
 			Debug.Log("loaded AssetBundleManifest.");
 
 			waiterBridge.SetManifest(manifest, sizeManifest);
 #endif
+		}
+
+		protected virtual async UniTask<Tuple<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>> LoadManifestAsyncInternal(string baseUrl, string manifestName, string sizeManifestName, string crcManifestName)
+		{
+			var manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
+			var sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
+
+			if (!string.IsNullOrEmpty(crcManifestName))
+			{
+				var crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName));
+				return Tuple.Create(manifest, sizeManifest, crcManifest);
+			}
+			return Tuple.Create<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>(manifest, sizeManifest, null);
 		}
 
 		public void Dispose()
@@ -172,7 +147,7 @@ namespace Flour.Asset
 				}
 				var hash = manifest.GetAssetBundleHash(assetBundleNames[i]);
 				var crc = crcManifest == null ? 0 : crcManifest.GetCrc(assetBundleNames[i]);
-				downloadHandler.AddRequest(addRequest(assetBundleNames[i], hash, crc));
+				downloadHandler.AddRequest(CreateRequest(assetBundleNames[i], hash, crc));
 			}
 		}
 		void CleanRequest(string assetBundleName)

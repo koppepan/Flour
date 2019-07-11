@@ -26,7 +26,7 @@ namespace Example
 		public AssetHandler(string baseUrl, string cachePath, SecureString password)
 		{
 			encrypt = true;
-			handler = new AssetBundleHandler(baseUrl, cachePath, password);
+			handler = new SecureAssetBundleHandler(baseUrl, cachePath, password);
 			CreateWaiter();
 		}
 
