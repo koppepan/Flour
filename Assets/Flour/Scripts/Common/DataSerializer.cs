@@ -1,7 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using UnityEngine.Assertions;
 
 namespace Flour

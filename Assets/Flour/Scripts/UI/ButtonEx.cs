@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace Flour.UI
 {
@@ -119,7 +119,7 @@ namespace Flour.UI
 				}
 			}
 			excutedHold = false;
-		} 
+		}
 
 
 		private void Click()

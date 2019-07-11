@@ -5,7 +5,7 @@ using UniRx;
 
 namespace Flour.Asset
 {
-	public class AssetCacheWaiter<T> : AssetWaiter<T> where T : UnityEngine.Object  
+	public class AssetCacheWaiter<T> : AssetWaiter<T> where T : UnityEngine.Object
 	{
 		readonly int compressCount;
 		readonly Dictionary<string, T> cache = new Dictionary<string, T>();

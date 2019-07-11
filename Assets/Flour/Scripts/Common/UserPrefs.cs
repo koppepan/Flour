@@ -31,7 +31,7 @@ namespace Flour
 			PlayerPrefs.SetString(LastTimeUserKey, UserKey);
 			PlayerPrefs.Save();
 		}
-		
+
 
 		private string GetKey(TKey key) => $"{UserKey}:{key.GetHashCode()}";
 		private string GetKey(string userKey, TKey key) => $"{userKey}:{key.GetHashCode()}";

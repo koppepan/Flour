@@ -1,11 +1,11 @@
-﻿using System.Text;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace Flour
 {
 	public class Encryptor : System.IDisposable
 	{
-		RijndaelManaged rijndael;
+		readonly RijndaelManaged rijndael;
 
 		public Encryptor(string pass, string salt)
 		{

@@ -10,7 +10,7 @@ namespace Flour
 
 		public static void Add<T>(GameObject obj)
 		{
-			if(dontDestroyObjects.ContainsKey(typeof(T)))
+			if (dontDestroyObjects.ContainsKey(typeof(T)))
 			{
 				UnityEngine.Object.Destroy(obj);
 				return;
@@ -21,7 +21,7 @@ namespace Flour
 
 		public static void Remove<T>()
 		{
-			if(dontDestroyObjects.ContainsKey(typeof(T)))
+			if (dontDestroyObjects.ContainsKey(typeof(T)))
 			{
 				return;
 			}

@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UniRx;
+using UnityEngine;
 
 namespace Flour.Net
 {
@@ -46,7 +46,7 @@ namespace Flour.Net
 
 		CompositeDisposable updateDisposable;
 
-		private FloatReactiveProperty downloadedCountProperty = new FloatReactiveProperty(0);
+		private readonly FloatReactiveProperty downloadedCountProperty = new FloatReactiveProperty(0);
 		public IReactiveProperty<float> DownloadedCount { get { return downloadedCountProperty; } }
 
 		public ParallelWebRequest(string baseUrl, int parallel, int timeout)

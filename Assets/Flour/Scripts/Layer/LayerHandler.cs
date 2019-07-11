@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UniRx.Async;
 
 namespace Flour.Layer
 {
 	public sealed class LayerHandler<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
-		SortedList<int, TLayerKey> layerOrder = new SortedList<int, TLayerKey>();
+		readonly SortedList<int, TLayerKey> layerOrder = new SortedList<int, TLayerKey>();
 		readonly Dictionary<TLayerKey, Layer<TLayerKey, TSubKey>> layers = new Dictionary<TLayerKey, Layer<TLayerKey, TSubKey>>();
 
 		readonly SafeAreaHandler<TLayerKey> safeAreaHandler;

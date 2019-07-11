@@ -1,7 +1,7 @@
 ﻿using System;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
-using UniRx.Async;
 
 namespace Flour.Layer
 {
@@ -50,7 +50,7 @@ namespace Flour.Layer
 				Raycaster.enabled = value;
 			}
 		}
-		
+
 		public float Alpha
 		{
 			get

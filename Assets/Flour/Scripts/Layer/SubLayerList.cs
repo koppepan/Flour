@@ -6,8 +6,8 @@ namespace Flour.Layer
 {
 	internal sealed class SubLayerList<TLayerKey, TSubKey> where TLayerKey : struct where TSubKey : struct
 	{
-		List<AbstractSubLayer<TLayerKey, TSubKey>> subLayers = new List<AbstractSubLayer<TLayerKey, TSubKey>>();
-		Transform subLayerParent;
+		readonly List<AbstractSubLayer<TLayerKey, TSubKey>> subLayers = new List<AbstractSubLayer<TLayerKey, TSubKey>>();
+		readonly Transform subLayerParent;
 
 		public IList<AbstractSubLayer<TLayerKey, TSubKey>> SubLayers { get { return subLayers; } }
 

@@ -5,7 +5,7 @@ namespace Flour.Asset
 {
 	public class AssetBundleCrcManifest
 	{
-		Dictionary<string, uint> crc;
+		readonly Dictionary<string, uint> crc;
 
 		public AssetBundleCrcManifest(Dictionary<string, uint> crc)
 		{

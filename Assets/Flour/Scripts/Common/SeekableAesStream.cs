@@ -6,9 +6,9 @@ namespace Flour
 {
 	public class SeekableAesStream : Stream
 	{
-		private Stream baseStream;
-		private AesManaged aes;
-		private ICryptoTransform encryptor;
+		private readonly Stream baseStream;
+		private readonly AesManaged aes;
+		private readonly ICryptoTransform encryptor;
 		public bool autoDisposeBaseStream { get; set; } = true;
 
 		/// <param name="salt">//** WARNING **: MUST be unique for each stream otherwise there is NO security</param>

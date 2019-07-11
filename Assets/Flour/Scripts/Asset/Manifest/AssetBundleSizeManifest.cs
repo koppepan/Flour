@@ -5,7 +5,7 @@ namespace Flour.Asset
 {
 	public class AssetBundleSizeManifest
 	{
-		Dictionary<string, long> size;
+		readonly Dictionary<string, long> size;
 
 		public AssetBundleSizeManifest(Dictionary<string, long> size)
 		{

@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UniRx.Async;
+﻿using UniRx.Async;
+using UnityEngine;
 
 namespace Flour.Scene
 {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Networking;
-using UniRx.Async;
 
 namespace Flour.Asset
 {

@@ -1,20 +1,17 @@
 ﻿using System.IO;
-using System.Text;
-using System.Security;
 using System.Runtime.InteropServices;
+using System.Security;
+using System.Text;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Networking;
-using UniRx.Async;
 
 namespace Flour.Asset
 {
 	internal class ParallelAssetBundleCacheDownloader : Net.ParallelWebRequest<AssetBundle>
 	{
-		readonly string cachePath;
-
 		public ParallelAssetBundleCacheDownloader(string baseUrl, string cachePath, int parallel, int timeout) : base(baseUrl, parallel, timeout)
 		{
-			this.cachePath = cachePath;
 			if (!Directory.Exists(cachePath)) Directory.CreateDirectory(cachePath);
 		}
 	}
