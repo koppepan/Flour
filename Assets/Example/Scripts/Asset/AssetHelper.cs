@@ -12,6 +12,7 @@ namespace Example
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
 		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
 
+		public static string SecureParameterPath { get { return "Config/SecureParameter"; } }
 		public static string CacheAssetPath { get { return Path.Combine(Application.temporaryCachePath, "assets"); } }
 
 #if UNITY_EDITOR

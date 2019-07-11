@@ -87,7 +87,7 @@ namespace Example
 
 		private async UniTask<SecureString> GetPassword()
 		{
-			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>("Config/SecureParameter") as Flour.Config.SecureParameter;
+			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(AssetHelper.SecureParameterPath) as Flour.Config.SecureParameter;
 
 			SecureString pass = new SecureString();
 			for (int i = 0; i < param.Password.Length; i++) pass.AppendChar(param.Password[i]);
