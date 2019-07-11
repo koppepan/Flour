@@ -20,32 +20,35 @@ namespace Flour.Asset
 
 		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string url)
 		{
-			var request = await UnityWebRequestAssetBundle.GetAssetBundle(url).SendWebRequest();
-			if (request.isHttpError || request.isNetworkError)
+			using (var request = await UnityWebRequestAssetBundle.GetAssetBundle(url).SendWebRequest())
 			{
-				Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
-				return null;
+				if (request.isHttpError || request.isNetworkError)
+				{
+					Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
+					return null;
+				}
+				return await LoadManifestAsync(DownloadHandlerAssetBundle.GetContent(request));
 			}
-
-			return await LoadManifestAsync(DownloadHandlerAssetBundle.GetContent(request));
 		}
 
 		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string url, string fileName, string password)
 		{
-			var request = await UnityWebRequest.Get(url).SendWebRequest();
-			if (request.isHttpError || request.isNetworkError)
+			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
-				Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
-				return null;
-			}
-
-			using (var ms = new MemoryStream(request.downloadHandler.data))
-			{
-				using (var aes = new SeekableAesStream(ms, password, Encoding.UTF8.GetBytes(fileName)))
+				if (request.isHttpError || request.isNetworkError)
 				{
-					var loadReq = AssetBundle.LoadFromStreamAsync(aes);
-					await loadReq;
-					return await LoadManifestAsync(loadReq.assetBundle);
+					Debug.LogError($"download AssetBundleManifest in Error. => {request.error}");
+					return null;
+				}
+
+				using (var ms = new MemoryStream(request.downloadHandler.data))
+				{
+					using (var aes = new SeekableAesStream(ms, password, Encoding.UTF8.GetBytes(fileName)))
+					{
+						var loadReq = AssetBundle.LoadFromStreamAsync(aes);
+						await loadReq;
+						return await LoadManifestAsync(loadReq.assetBundle);
+					}
 				}
 			}
 		}
@@ -86,25 +89,28 @@ namespace Flour.Asset
 		}
 		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url)
 		{
-			var request = await UnityWebRequest.Get(url).SendWebRequest();
-			if (request.isHttpError || request.isNetworkError)
+			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
-				Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
-				return null;
+				if (request.isHttpError || request.isNetworkError)
+				{
+					Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
+					return null;
+				}
+				return CreateSizeManifest(request.downloadHandler.text);
 			}
-			return CreateSizeManifest(request.downloadHandler.text);
 		}
 		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url, string fileName, string password)
 		{
-			var request = await UnityWebRequest.Get(url).SendWebRequest();
-			if (request.isHttpError || request.isNetworkError)
+			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
-				Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
-				return null;
+				if (request.isHttpError || request.isNetworkError)
+				{
+					Debug.LogError($"download AssetBundle Size Manifest in Error. => {request.error}");
+					return null;
+				}
+				var body = await DecryptAsync(request.downloadHandler.data, password, fileName);
+				return CreateSizeManifest(body);
 			}
-
-			var body = await DecryptAsync(request.downloadHandler.data, password, fileName);
-			return CreateSizeManifest(body);
 		}
 
 
@@ -115,25 +121,29 @@ namespace Flour.Asset
 		}
 		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url)
 		{
-			var request = await UnityWebRequest.Get(url).SendWebRequest();
-			if (request.isHttpError || request.isNetworkError)
+			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
-				Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
-				return null;
+				if (request.isHttpError || request.isNetworkError)
+				{
+					Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
+					return null;
+				}
+				return CreateCrcManifest(request.downloadHandler.text);
 			}
-			return CreateCrcManifest(request.downloadHandler.text);
 		}
 		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url, string fileName, string password)
 		{
-			var request = await UnityWebRequest.Get(url).SendWebRequest();
-			if (request.isHttpError || request.isNetworkError)
+			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
-				Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
-				return null;
-			}
+				if (request.isHttpError || request.isNetworkError)
+				{
+					Debug.LogError($"download AssetBundle crc Manifest in Error. => {request.error}");
+					return null;
+				}
 
-			var body = await DecryptAsync(request.downloadHandler.data, password, fileName);
-			return CreateCrcManifest(body);
+				var body = await DecryptAsync(request.downloadHandler.data, password, fileName);
+				return CreateCrcManifest(body);
+			}
 		}
 	}
 }
