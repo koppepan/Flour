@@ -68,10 +68,14 @@ namespace Example
 		{
 			var manifest = BuildAssetBundle(buildTarget);
 
+			var manifestName = AssetHelper.GetAssetBundleFolderName(buildTarget);
+
 			var srcPath = Path.Combine("AssetBundles", AssetHelper.GetAssetBundleFolderName(buildTarget));
 			var cryptoPath = Path.Combine("AssetBundles", AssetHelper.GetEncryptAssetBundleFolderName(buildTarget));
 
-			Flour.Build.BuildAssetBundle.BuildEncrypt(srcPath, cryptoPath, "password", manifest);
+			Flour.Build.BuildAssetBundle.BuildEncrypt(srcPath, cryptoPath,
+				manifestName, AssetHelper.AssetBundleSizeManifestName, AssetHelper.AssetBundleCrcManifestName
+				, "password", manifest);
 		}
 	}
 }

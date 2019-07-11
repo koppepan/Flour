@@ -20,26 +20,41 @@ namespace Flour.Build
 			return manifest;
 		}
 
-		public static void BuildEncrypt(string srcPath, string outputPath, string password, AssetBundleManifest manifest)
+		public static void BuildEncrypt(string srcPath, string outputPath, string manifestName, string sizeManifestName, string crcManifestName, string password, AssetBundleManifest manifest)
 		{
 			if (!Directory.Exists(outputPath)) Directory.CreateDirectory(outputPath);
 
 			foreach (var name in manifest.GetAllAssetBundles())
 			{
-				var folder = Path.Combine(outputPath, Path.GetDirectoryName(name));
-				if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-
-				var uniqueSalt = Encoding.UTF8.GetBytes(name);
-
-				var data = File.ReadAllBytes($"{srcPath}/{name}");
-				using (var baseStream = new FileStream($"{outputPath}/{name}", FileMode.OpenOrCreate))
-				{
-					var cryptor = new SeekableAesStream(baseStream, password, uniqueSalt);
-					cryptor.Write(data, 0, data.Length);
-				}
+				BuildEncrypt(srcPath, outputPath, name, password);
 			}
 
+			BuildEncrypt(srcPath, outputPath, manifestName, password);
+			BuildEncrypt(srcPath, outputPath, sizeManifestName, password);
+			BuildEncrypt(srcPath, outputPath, crcManifestName, password);
+
 			Debug.Log($"done build Encrypt AssetBundles.");
+		}
+
+		private static void BuildEncrypt(string srcPath, string outputPath, string name, string password)
+		{
+			var folder = Path.Combine(outputPath, Path.GetDirectoryName(name));
+			if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+			if (!File.Exists(Path.Combine(srcPath, name)))
+			{
+				Debug.LogWarning($"not found src file => {name}");
+				return;
+			}
+
+			var uniqueSalt = Encoding.UTF8.GetBytes(name);
+
+			var data = File.ReadAllBytes($"{srcPath}/{name}");
+			using (var baseStream = new FileStream($"{outputPath}/{name}", FileMode.OpenOrCreate))
+			{
+				var cryptor = new SeekableAesStream(baseStream, password, uniqueSalt);
+				cryptor.Write(data, 0, data.Length);
+			}
 		}
 
 		public static void CreateAssetBundleSizeManifest(string directoryPath, string sizeFileName, AssetBundleManifest manifest)
