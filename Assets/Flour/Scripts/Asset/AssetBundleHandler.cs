@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.IO;
-using UnityEngine;
+using System.Linq;
 using UniRx;
 using UniRx.Async;
+using UnityEngine;
 
 namespace Flour.Asset
 {
@@ -46,7 +46,7 @@ namespace Flour.Asset
 
 			Initialize();
 		}
-		internal AssetBundleHandler(string baseUrl, Net.ParallelWebRequest<AssetBundle> downloader)
+		protected AssetBundleHandler(string baseUrl, Net.ParallelWebRequest<AssetBundle> downloader)
 		{
 			this.baseUrl = baseUrl;
 			downloadHandler = downloader;
