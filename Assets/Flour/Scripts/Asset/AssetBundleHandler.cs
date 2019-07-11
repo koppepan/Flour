@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Security;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UniRx;
 using UniRx.Async;
@@ -47,6 +48,7 @@ namespace Flour.Asset
 		{
 			this.baseUrl = baseUrl;
 			cachePath = "";
+			password = null;
 			addRequest = CreateRequest;
 
 			downloadHandler = new ParallelAssetBundleDownloader(baseUrl, 5, 20);
@@ -96,13 +98,29 @@ namespace Flour.Asset
 			await UniTask.DelayFrame(1);
 			Debug.Log("use editor local asset");
 #else
-			manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
-			sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
 
-			if (!string.IsNullOrEmpty(crcManifestName))
+			if (!string.IsNullOrEmpty(cachePath) && password != null)
 			{
-				crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName));
+				var pass = Marshal.PtrToStringUni(Marshal.SecureStringToGlobalAllocUnicode(password));
+
+				manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName), manifestName, pass);
+				sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName), sizeManifestName, pass);
+				if (!string.IsNullOrEmpty(crcManifestName))
+				{
+					crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName), crcManifestName, pass);
+				}
 			}
+			else
+			{
+				manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
+				sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
+				if (!string.IsNullOrEmpty(crcManifestName))
+				{
+					crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName));
+				}
+			}
+
+			
 			Debug.Log("loaded AssetBundleManifest.");
 
 			waiterBridge.SetManifest(manifest, sizeManifest);
