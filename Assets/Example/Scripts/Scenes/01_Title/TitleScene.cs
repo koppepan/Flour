@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using UniRx.Async;
-using Flour.Config;
+﻿using UniRx.Async;
 
 namespace Example
 {
@@ -22,8 +20,7 @@ namespace Example
 		}
 		public override async UniTask Unload()
 		{
-			titleLayer.Close();
-			await base.Unload();
+			await titleLayer.CloseWait();
 		}
 
 		public override void OnBack()

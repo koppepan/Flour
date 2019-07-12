@@ -14,14 +14,9 @@ namespace Example
 			await SceneHandler.LoadSceneAsync(SceneType.Title);
 		}
 
-		public override void Open()
-		{
-		}
-
 		public override async UniTask Unload()
 		{
-			splash.Close();
-			await base.Unload();
+			await splash.CloseWait();
 		}
 	}
 }

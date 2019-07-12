@@ -12,8 +12,7 @@ namespace Example
 		}
 		public override async UniTask Unload()
 		{
-			footer.Close();
-			await base.Unload();
+			await footer.CloseWait();
 		}
 
 		public override void OnBack()

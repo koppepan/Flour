@@ -22,10 +22,10 @@ namespace Example
 			footerLayer.Setup(OpenSubLayer);
 		}
 
-		public void Close()
+		public async UniTask CloseWait()
 		{
-			currentLayer?.Close();
-			footerLayer.Close();
+			var task = currentLayer == null ? UniTask.Delay(0) : currentLayer.CloseWait();
+			await UniTask.WhenAll(task, footerLayer.CloseWait());
 		}
 
 		async void OpenSubLayer(SubLayerType subLayerType)
