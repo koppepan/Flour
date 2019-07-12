@@ -13,6 +13,7 @@ namespace Example
 		{
 			base.OnOpen();
 			panel = GetComponent<Image>();
+			panel.color = Color.clear;
 		}
 
 		private IEnumerator Fade(float time, Color to)
