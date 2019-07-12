@@ -7,6 +7,7 @@ namespace Example
 	public class TitleScene : AbstractScene
 	{
 		TitleLayer titleLayer;
+
 		public override async UniTask Load(params object[] args)
 		{
 			titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
@@ -16,6 +17,7 @@ namespace Example
 		{
 			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
 			AssetHandler.ChangeBaseUrl(config.list[0].assetBundle);
+			Resources.UnloadAsset(config);
 
 			await AssetHandler.LoadManifestAsync();
 		}
