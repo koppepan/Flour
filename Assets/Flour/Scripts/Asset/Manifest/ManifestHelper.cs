@@ -26,7 +26,11 @@ namespace Flour.Asset
 				{
 					throw new ApplicationException($"download AssetBundleManifest in Error. => {request.error}");
 				}
-				return await LoadManifestAsync(DownloadHandlerAssetBundle.GetContent(request));
+				var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
+				var manifest = await LoadManifestAsync(assetBundle);
+				assetBundle.Unload(false);
+
+				return manifest;
 			}
 		}
 
@@ -45,7 +49,10 @@ namespace Flour.Asset
 					{
 						var loadReq = AssetBundle.LoadFromStreamAsync(aes);
 						await loadReq;
-						return await LoadManifestAsync(loadReq.assetBundle);
+						var manifest = await LoadManifestAsync(loadReq.assetBundle);
+						loadReq.assetBundle.Unload(false);
+
+						return manifest;
 					}
 				}
 			}
