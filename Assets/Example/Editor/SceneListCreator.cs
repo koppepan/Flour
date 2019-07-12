@@ -6,14 +6,25 @@ namespace Example
 {
 	public static class SceneListCreator
 	{
-		public static void Create(string menuTitle, int priority, string namespaceName = "")
+		public static void Create(string sceneDirectory, string outputDirectory, string menuTitle, int priority, string namespaceName = "")
 		{
-			string[] sceneDirs = { "Assets/Example/Scenes" };
-			string scriptDir = "Example/Editor";
 			string scriptName = "SceneList.cs";
 
-			string scriptFilePath = Path.Combine(Application.dataPath, scriptDir, scriptName);
-			string scriptAssetPath = Path.Combine("Assets", scriptDir, scriptName);
+			string[] sceneDirs = { Path.Combine("Assets", sceneDirectory) };
+			if (!Directory.Exists(sceneDirs[0]))
+			{
+				Debug.LogError($"not exists scene directory => {sceneDirs[0]}");
+				return;
+			}
+
+			string scriptFilePath = Path.Combine(Application.dataPath, outputDirectory, scriptName);
+			if (!Directory.Exists(Path.GetDirectoryName(scriptFilePath)))
+			{
+				Debug.LogError($"not exists output directory => {Path.GetDirectoryName(scriptFilePath)}");
+				return;
+			}
+
+			string scriptAssetPath = Path.Combine("Assets", outputDirectory, scriptName);
 
 			string[] sceneGUIDs = AssetDatabase.FindAssets("t:Scene", sceneDirs);
 			string tab = "";
