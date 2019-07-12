@@ -24,7 +24,6 @@ namespace Example
 		readonly SubLayerType[] FixedSubLayers = new SubLayerType[] { SubLayerType.Blackout, SubLayerType.Footer };
 
 		private ApplicationOperator appOperator;
-		private AssetHandler assetHandler;
 
 		private void Awake()
 		{
@@ -54,9 +53,9 @@ namespace Example
 
 #if USE_SECURE_ASSET
 			var pass = await AssetHelper.GetPasswordAsync();
-			assetHandler = new AssetHandler("", AssetHelper.CacheAssetPath, pass);
+			var assetHandler = new AssetHandler("", AssetHelper.CacheAssetPath, pass);
 #else
-			assetHandler = new AssetHandler("");
+			var assetHandler = new AssetHandler("");
 #endif
 
 			appOperator = new ApplicationOperator(
@@ -112,8 +111,6 @@ namespace Example
 		private void OnApplicationQuit()
 		{
 			appOperator.Dispose();
-			assetHandler.Dispose();
-
 			DontDestroyObjectList.Clear();
 		}
 
