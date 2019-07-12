@@ -2,29 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
-using UniRx.Async;
-using Flour;
 
 namespace Example
 {
-	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
-	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
-
 	public class DebugHandler : MonoBehaviour
 	{
-		SceneHandler sceneHandler;
-		LayerHandler layerHandler;
+		const int LogCacheCount = 50;
 
-		SubLayerSourceRepository repository;
-
+		DebugDialogCreator creator;
 		readonly Dictionary<LogType, List<Tuple<string, string>>> logMap = new Dictionary<LogType, List<Tuple<string, string>>>();
 
-		public void Initialize(SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
+		public void Initialize(DebugDialogCreator creator)
 		{
-			this.sceneHandler = sceneHandler;
-			this.layerHandler = layerHandler;
-
-			this.repository = repository;
+			this.creator = creator;
 
 			Observable.FromEvent(
 				h => Application.logMessageReceived += LogMessageReceived,
@@ -55,29 +45,9 @@ namespace Example
 				.AddTo(this);
 		}
 
-		private async UniTask<DebugDialog> Open(string title, Vector2 position)
+		public void OpenDialog(Vector2 position)
 		{
-			var prefab = await repository.LoadAsync<DebugDialog>(SubLayerType.DebugDialog);
-
-			var dialog = layerHandler.Add(LayerType.Debug, SubLayerType.DebugDialog, prefab, true);
-			if (dialog != null)
-			{
-				dialog.Setup(title, Open);
-				dialog.GetComponent<RectTransform>().SetAlignment(TextAnchor.UpperCenter);
-				dialog.transform.position = position;
-			}
-			return dialog;
-		}
-
-		public async void OpenDialog(Vector2 position)
-		{
-			var dialog = await Open("debug", position);
-
-			((AbstractScene)sceneHandler.CurrentScene)?.OpenDebugDialog(dialog);
-			foreach (var s in sceneHandler.AdditiveScenes)
-			{
-				((AbstractScene)s).OpenDebugDialog(dialog);
-			}
+			creator.OpenDebugDialog(position);
 		}
 
 		private void LogMessageReceived(string body, string stackTrace, LogType logType)
@@ -92,7 +62,7 @@ namespace Example
 			}
 			logMap[logType].Add(Tuple.Create(body, stackTrace));
 
-			if (logMap[logType].Count >= 50)
+			if (logMap[logType].Count >= LogCacheCount)
 			{
 				logMap[logType].RemoveAt(0);
 			}

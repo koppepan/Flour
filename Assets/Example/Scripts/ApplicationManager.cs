@@ -123,7 +123,7 @@ namespace Example
 			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
 
 			var debugHandler = new GameObject("DebugHandler", typeof(DebugHandler)).GetComponent<DebugHandler>();
-			debugHandler.Initialize(sceneHandler, layerHandler, SubLayerSourceRepository.CreateDebug());
+			debugHandler.Initialize(new DebugDialogCreator(sceneHandler, layerHandler, SubLayerSourceRepository.CreateDebug()));
 
 			DontDestroyObjectList.Add<DebugHandler>(debugHandler.gameObject);
 #endif
