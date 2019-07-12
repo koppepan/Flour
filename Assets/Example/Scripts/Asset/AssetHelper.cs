@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Security;
 using UnityEngine;
 using UniRx.Async;
 using Flour;
+using Flour.Config;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,89 +14,65 @@ namespace Example
 {
 	public static class AssetHelper
 	{
-		static readonly string EncryptAssetFolderNameFormat = "E{0}";
-
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
 		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
 
-		static readonly string SecureParameterPath = "Config/SecureParameter";
-
 		public static string CacheAssetPath { get { return Path.Combine(Application.temporaryCachePath, "assets"); } }
-
-#if UNITY_EDITOR
-		public static string GetAssetBundleFolderName(BuildTarget buildTarget)
-		{
-			switch (buildTarget)
-			{
-				case BuildTarget.StandaloneWindows64:
-					return "Windows";
-
-				case BuildTarget.StandaloneOSX:
-					return "OSX";
-
-				case BuildTarget.Android:
-				case BuildTarget.iOS:
-					return buildTarget.ToString();
-
-				default:
-					return "";
-			}
-		}
-
-		public static string GetEncryptAssetBundleFolderName(BuildTarget buildTarget)
-		{
-			return string.Format(EncryptAssetFolderNameFormat, GetAssetBundleFolderName(buildTarget));
-		}
-#endif
 
 		public static string GetAssetBundleFolderName(RuntimePlatform platform)
 		{
 			switch (platform)
 			{
 				case RuntimePlatform.WindowsEditor:
-				case RuntimePlatform.WindowsPlayer:
-					return "Windows";
-
+				case RuntimePlatform.WindowsPlayer: return "Windows";
 				case RuntimePlatform.OSXEditor:
-				case RuntimePlatform.OSXPlayer:
-					return "OSX";
-
-				case RuntimePlatform.Android:
-					return "Android";
-
-				case RuntimePlatform.IPhonePlayer:
-					return "iOS";
-
-				default:
-					return "";
+				case RuntimePlatform.OSXPlayer: return "OSX";
+				case RuntimePlatform.Android: return "Android";
+				case RuntimePlatform.IPhonePlayer: return "iOS";
+				default: return "unknown";
 			}
 		}
 
-		public static string GetEncryptAssetBundleFolderName(RuntimePlatform platform)
+		public static string GetEncryptAssetBundleFolderName(RuntimePlatform platform) => $"E{GetAssetBundleFolderName(platform)}";
+
+
+#if UNITY_EDITOR
+		public static string GetAssetBundleFolderName(BuildTarget buildTarget)
 		{
-			return string.Format(EncryptAssetFolderNameFormat, GetAssetBundleFolderName(platform));
+			switch (buildTarget)
+			{
+				case BuildTarget.StandaloneWindows64: return "Windows";
+				case BuildTarget.StandaloneOSX: return "OSX";
+				case BuildTarget.Android: return "Android";
+				case BuildTarget.iOS: return "iOS";
+				default: return "unknown";
+			}
 		}
+
+		public static string GetEncryptAssetBundleFolderName(BuildTarget buildTarget) => $"E{GetAssetBundleFolderName(buildTarget)}";
+#endif
 
 		public static async UniTask<SecureString> GetPasswordAsync()
 		{
-			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(SecureParameterPath) as Flour.Config.SecureParameter;
-
-			SecureString pass = new SecureString().Set(param.Password);
-
+			var param = (SecureParameter)await Resources.LoadAsync<SecureParameter>("Config/SecureParameter");
 			Resources.UnloadAsset(param);
-
-			return pass;
+			return new SecureString().Set(param.Password);
 		}
 
 #if UNITY_EDITOR
 		public static async UniTask<string> GetPlainTextPasswordAsync()
 		{
-			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(SecureParameterPath) as Flour.Config.SecureParameter;
-			var pass = param.Password;
+			var param = (SecureParameter)await Resources.LoadAsync<SecureParameter>("Config/SecureParameter");
 			Resources.UnloadAsset(param);
-
-			return pass;
+			return param.Password;
 		}
 #endif
+
+		public static async UniTask<List<ConnectInfomation>> LoadServerListAsync()
+		{
+			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
+			Resources.UnloadAsset(config);
+			return config.list;
+		}
 	}
 }

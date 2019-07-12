@@ -15,9 +15,8 @@ namespace Example
 		}
 		public override async void Open()
 		{
-			var config = (ServerList)await Resources.LoadAsync<ServerList>("Config/ServerList");
-			AssetHandler.ChangeBaseUrl(config.list[0].assetBundle);
-			Resources.UnloadAsset(config);
+			var connectList = await AssetHelper.LoadServerListAsync();
+			AssetHandler.ChangeBaseUrl(connectList[0].assetBundle);
 
 			await AssetHandler.LoadManifestAsync();
 		}
