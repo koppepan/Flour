@@ -51,7 +51,7 @@ namespace Example
 			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
 			await fixedRepository.LoadAllAsync();
 
-#if USE_SECURE_ASSET
+#if !USE_LOCAL_ASSET && USE_SECURE_ASSET
 			var pass = await AssetHelper.GetPasswordAsync();
 			var assetHandler = new AssetHandler("", AssetHelper.CacheAssetPath, pass);
 #else
