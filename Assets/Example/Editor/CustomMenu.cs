@@ -19,6 +19,7 @@ namespace Example
 		#region DefineSymbols
 		private static readonly string DebugSymbole = "DEBUG_BUILD";
 		private static readonly string UseLocalAssetSymbol = "USE_LOCAL_ASSET";
+		private static readonly string UseSecureAssetSymbol = "USE_SECURE_ASSET";
 
 		static void AddSymbol(string add)
 		{
@@ -31,11 +32,14 @@ namespace Example
 			Flour.Build.BuildClient.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { remove });
 		}
 
-		[MenuItem("CustomMenu/DefineSymbols/Add Debug Symbole")] static void AddDebugSymbole() => AddSymbol(DebugSymbole);
-		[MenuItem("CustomMenu/DefineSymbols/Remove Debug Symbole")] static void RemoveDebugSymbole() => RemoveSymbol(DebugSymbole);
+		[MenuItem("CustomMenu/DefineSymbols/Debug/Add")] static void AddDebugSymbole() => AddSymbol(DebugSymbole);
+		[MenuItem("CustomMenu/DefineSymbols/Debug/Remove")] static void RemoveDebugSymbole() => RemoveSymbol(DebugSymbole);
 
-		[MenuItem("CustomMenu/DefineSymbols/Add UseLocalAsset Symbole")] static void AddUseLocalAssetSymbole() => AddSymbol(UseLocalAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/Remove UseLocalAsset Symbole")] static void RemoveUseLocalAssetSymbole() => RemoveSymbol(UseLocalAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Add")] static void AddUseLocalAssetSymbole() => AddSymbol(UseLocalAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Remove")] static void RemoveUseLocalAssetSymbole() => RemoveSymbol(UseLocalAssetSymbol);
+
+		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Add")] static void AddUseSecureAssetSymbole() => AddSymbol(UseSecureAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Remove")] static void RemoveUseSecureAssetSymbole() => RemoveSymbol(UseSecureAssetSymbol);
 		#endregion
 
 
