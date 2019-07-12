@@ -11,23 +11,16 @@ namespace Example
 		readonly bool encrypt;
 		private AssetBundleHandler handler;
 
-		public SceneWaiter SceneWaiter { get; private set; }
-		public AssetCacheWaiter<GameObject> PrefabWaiter { get; private set; }
-		public AssetCacheWaiter<Sprite> SpriteWaiter { get; private set; }
+		public AssetWaiter<UnityEngine.Object> SceneWaiter { get; private set; } = new AssetWaiter<UnityEngine.Object>("scenes/");
+		public AssetCacheWaiter<GameObject> PrefabWaiter { get; private set; } = new AssetCacheWaiter<GameObject>("prefabs/", 50);
+		public AssetCacheWaiter<Sprite> SpriteWaiter { get; private set; } = new AssetCacheWaiter<Sprite>("icons/", 50);
 
 		public IObservable<LoadError> ErrorObservable { get { return handler.ErrorObservable; } }
 
-		public AssetHandler(string baseUrl)
+		public AssetHandler(string baseUrl, string cachePath = "", SecureString password = null)
 		{
-			encrypt = false;
-			handler = new AssetBundleHandler(baseUrl);
-			CreateWaiter();
-		}
-		public AssetHandler(string baseUrl, string cachePath, SecureString password)
-		{
-			encrypt = true;
-			handler = new SecureAssetBundleHandler(baseUrl, cachePath, password);
-			CreateWaiter();
+			encrypt = !string.IsNullOrEmpty(cachePath) && password != null;
+			handler = !encrypt ? new AssetBundleHandler(baseUrl) : new SecureAssetBundleHandler(baseUrl, cachePath, password);
 		}
 
 		public void ChangeBaseUrl(string baseUrl)
@@ -40,14 +33,6 @@ namespace Example
 		public void Dispose()
 		{
 			handler.Dispose();
-		}
-
-		private void CreateWaiter()
-		{
-			SceneWaiter = new SceneWaiter("scenes/");
-
-			PrefabWaiter = new AssetCacheWaiter<GameObject>("prefabs/", 50);
-			SpriteWaiter = new AssetCacheWaiter<Sprite>("icons/", 50);
 		}
 
 		public LoadProgress GetProgress()
