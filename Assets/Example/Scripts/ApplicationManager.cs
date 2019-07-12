@@ -54,7 +54,7 @@ namespace Example
 			await fixedRepository.LoadAllAsync();
 
 #if USE_SECURE_ASSET
-			var pass = await GetPassword();
+			var pass = await AssetHelper.GetPasswordAsync();
 			assetHandler = new AssetHandler("", AssetHelper.CacheAssetPath, pass);
 #else
 			assetHandler = new AssetHandler("");
@@ -83,17 +83,6 @@ namespace Example
 				h => UnityEditor.EditorApplication.pauseStateChanged += h,
 				h => UnityEditor.EditorApplication.pauseStateChanged -= h).Subscribe(PauseStateChanged).AddTo(this);
 #endif
-		}
-
-		private async UniTask<SecureString> GetPassword()
-		{
-			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(AssetHelper.SecureParameterPath) as Flour.Config.SecureParameter;
-
-			SecureString pass = new SecureString();
-			for (int i = 0; i < param.Password.Length; i++) pass.AppendChar(param.Password[i]);
-
-			Resources.UnloadAsset(param);
-			return pass;
 		}
 
 		private void OnLowMemory()

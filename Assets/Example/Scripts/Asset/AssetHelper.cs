@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Security;
 using UnityEngine;
+using UniRx.Async;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,7 +14,8 @@ namespace Example
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
 		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
 
-		public static string SecureParameterPath { get { return "Config/SecureParameter"; } }
+		static readonly string SecureParameterPath = "Config/SecureParameter";
+
 		public static string CacheAssetPath { get { return Path.Combine(Application.temporaryCachePath, "assets"); } }
 
 #if UNITY_EDITOR
@@ -68,5 +71,28 @@ namespace Example
 		{
 			return "E" + GetAssetBundleFolderName(platform);
 		}
+
+		public static async UniTask<SecureString> GetPasswordAsync()
+		{
+			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(SecureParameterPath) as Flour.Config.SecureParameter;
+
+			SecureString pass = new SecureString();
+			for (int i = 0; i < param.Password.Length; i++) pass.AppendChar(param.Password[i]);
+
+			Resources.UnloadAsset(param);
+
+			return pass;
+		}
+
+#if UNITY_EDITOR
+		public static async UniTask<string> GetPlainTextPasswordAsync()
+		{
+			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(SecureParameterPath) as Flour.Config.SecureParameter;
+			var pass = param.Password;
+			Resources.UnloadAsset(param);
+
+			return pass;
+		}
+#endif
 	}
 }

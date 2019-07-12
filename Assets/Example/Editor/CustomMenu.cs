@@ -64,19 +64,18 @@ namespace Example
 			return manifest;
 		}
 
-		static void BuildEncryptAssetBundle(BuildTarget buildTarget)
+		static async void BuildEncryptAssetBundle(BuildTarget buildTarget)
 		{
 			var manifest = BuildAssetBundle(buildTarget);
 
 			var manifestName = AssetHelper.GetAssetBundleFolderName(buildTarget);
-			var password = Resources.Load<Flour.Config.SecureParameter>(AssetHelper.SecureParameterPath).Password;
+			var password = await AssetHelper.GetPlainTextPasswordAsync();
 
 			var srcPath = Path.Combine("AssetBundles", AssetHelper.GetAssetBundleFolderName(buildTarget));
 			var cryptoPath = Path.Combine("AssetBundles", AssetHelper.GetEncryptAssetBundleFolderName(buildTarget));
 
 			Flour.Build.BuildAssetBundle.BuildEncrypt(srcPath, cryptoPath,
-				manifestName, AssetHelper.AssetBundleSizeManifestName, AssetHelper.AssetBundleCrcManifestName
-				, password, manifest);
+				manifestName, AssetHelper.AssetBundleSizeManifestName, AssetHelper.AssetBundleCrcManifestName, password, manifest);
 		}
 	}
 }
