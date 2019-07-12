@@ -10,11 +10,12 @@ namespace Example
 		{
 			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
 			await splash.Run();
+
+			await SceneHandler.LoadSceneAsync(SceneType.Title);
 		}
 
-		public override async void Open()
+		public override void Open()
 		{
-			await SceneHandler.LoadSceneAsync(SceneType.Title);
 		}
 
 		public override async UniTask Unload()

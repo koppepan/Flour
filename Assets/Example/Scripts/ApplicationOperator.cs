@@ -1,14 +1,16 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using Flour;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UniRx;
 using UniRx.Async;
-using Flour;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Example
 {
-	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
 	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
+	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
 
 	public sealed class ApplicationOperator : IDisposable, IOperationBundler, ISceneHandler, ILayerHandler
 	{
@@ -31,14 +33,15 @@ namespace Example
 
 		readonly SubLayerSourceRepository[] subLayerRepositories;
 
+		bool sceneLoading = false;
+		readonly Queue<Tuple<SceneType, object[]>> sceneTransitionQueue = new Queue<Tuple<SceneType, object[]>>();
+
 		public UserPrefs<SaveKey> UserPrefs { get; private set; } = new UserPrefs<SaveKey>();
 		public TemporaryData<TemporaryKey> TemporaryData { get; private set; } = new TemporaryData<TemporaryKey>();
 
 		public IInputBinder InputBinder { get; private set; } = new UIInputBinder();
 		public ISceneHandler SceneHandler { get { return this; } }
 		public ILayerHandler LayerHandler { get { return this; } }
-
-		private bool sceneLoading = false;
 
 		private IDisposable disposable;
 
@@ -99,9 +102,14 @@ namespace Example
 
 		public async UniTask LoadSceneAsync(SceneType sceneType, params object[] args)
 		{
+			// 同じSceneを連続でLoadしようとしてるので無視
+			if (sceneTransitionQueue.Count > 0 && sceneTransitionQueue.Last().Item1 == sceneType) return;
+
+			// 別のシーンがLoad中なのでQueueに詰めるだけ
 			if (sceneLoading)
 			{
-				throw new Exception("another scene load is running.");
+				sceneTransitionQueue.Enqueue(Tuple.Create(sceneType, args));
+				return;
 			}
 
 			sceneLoading = true;
@@ -112,7 +120,9 @@ namespace Example
 
 			async UniTask task()
 			{
+				if (sceneTransitionQueue.Count > 0) return;
 				await ResourceCompress();
+				if (sceneTransitionQueue.Count > 0) return;
 				await fade.FadeOut();
 				sceneLoading = false;
 			}
@@ -121,6 +131,13 @@ namespace Example
 			await sceneHandler.LoadAsync(sceneType.ToJpnName(), Tuple.Create<IOperationBundler, AssetHandler>(this, assetHandler), task, args);
 
 			InputBinder.Unbind();
+
+			if (sceneTransitionQueue.Count > 0)
+			{
+				sceneLoading = false;
+				var next = sceneTransitionQueue.Dequeue();
+				await LoadSceneAsync(next.Item1, next.Item2);
+			}
 		}
 		public async UniTask AddSceneAsync(string sceneName, params object[] args)
 		{
