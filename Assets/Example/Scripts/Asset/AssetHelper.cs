@@ -2,6 +2,7 @@
 using System.Security;
 using UnityEngine;
 using UniRx.Async;
+using Flour;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -78,8 +79,7 @@ namespace Example
 		{
 			var param = await Resources.LoadAsync<Flour.Config.SecureParameter>(SecureParameterPath) as Flour.Config.SecureParameter;
 
-			SecureString pass = new SecureString();
-			for (int i = 0; i < param.Password.Length; i++) pass.AppendChar(param.Password[i]);
+			SecureString pass = new SecureString().Set(param.Password);
 
 			Resources.UnloadAsset(param);
 

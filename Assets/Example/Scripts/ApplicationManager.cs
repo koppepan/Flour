@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Flour;
+using System;
 using System.Linq;
-using System.Security;
-using UnityEngine;
 using UniRx;
 using UniRx.Async;
-using Flour;
+using UnityEngine;
 
 namespace Example
 {
-	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
 	using LayerHandler = Flour.Layer.LayerHandler<LayerType, SubLayerType>;
+	using SceneHandler = Flour.Scene.SceneHandler<Tuple<IOperationBundler, AssetHandler>>;
 
 	public sealed class ApplicationManager : MonoBehaviour
 	{
@@ -68,7 +67,7 @@ namespace Example
 				SubLayerSourceRepository.Create(EnumExtension.ToEnumerable<SubLayerType>(x => !FixedSubLayers.Contains(x)), 10),
 				fixedRepository
 				);
-		
+
 			await appOperator.LoadSceneAsync(SceneType.Start);
 
 			// AndroidのBackKey対応

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security;
 using System.Text;
 using UniRx.Async;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace Flour.Asset
 			}
 		}
 
-		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string url, string fileName, string password)
+		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string url, string fileName, SecureString password)
 		{
 			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
@@ -45,7 +46,7 @@ namespace Flour.Asset
 
 				using (var ms = new MemoryStream(request.downloadHandler.data))
 				{
-					using (var aes = new SeekableAesStream(ms, password, Encoding.UTF8.GetBytes(fileName)))
+					using (var aes = new SeekableAesStream(ms, password.ToPlainText(), Encoding.UTF8.GetBytes(fileName)))
 					{
 						var loadReq = AssetBundle.LoadFromStreamAsync(aes);
 						await loadReq;
@@ -73,11 +74,11 @@ namespace Flour.Asset
 			return dic;
 		}
 
-		private static async UniTask<string> DecryptAsync(byte[] bytes, string password, string salt)
+		private static async UniTask<string> DecryptAsync(byte[] bytes, SecureString password, string salt)
 		{
 			using (var ms = new MemoryStream(bytes))
 			{
-				using (var aes = new SeekableAesStream(ms, password, Encoding.UTF8.GetBytes(salt)))
+				using (var aes = new SeekableAesStream(ms, password.ToPlainText(), Encoding.UTF8.GetBytes(salt)))
 				{
 					using (var sr = new StreamReader(aes))
 					{
@@ -103,7 +104,7 @@ namespace Flour.Asset
 				return CreateSizeManifest(request.downloadHandler.text);
 			}
 		}
-		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url, string fileName, string password)
+		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url, string fileName, SecureString password)
 		{
 			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{
@@ -133,7 +134,7 @@ namespace Flour.Asset
 				return CreateCrcManifest(request.downloadHandler.text);
 			}
 		}
-		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url, string fileName, string password)
+		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url, string fileName, SecureString password)
 		{
 			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
 			{

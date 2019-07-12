@@ -125,8 +125,7 @@ namespace Flour.Asset
 			}
 			fileStream = new FileStream(cachePath, FileMode.Open);
 
-			var pass = Marshal.PtrToStringUni(Marshal.SecureStringToGlobalAllocUnicode(password));
-			aesStream = new SeekableAesStream(fileStream, pass, Encoding.UTF8.GetBytes(FilePath));
+			aesStream = new SeekableAesStream(fileStream, password.ToPlainText(), Encoding.UTF8.GetBytes(FilePath));
 			asyncOperation = AssetBundle.LoadFromStreamAsync(aesStream);
 			currentState = State.Load;
 		}
