@@ -25,11 +25,13 @@ namespace Example
 
 		public async UniTask FadeIn(float time = 0.2f)
 		{
+			if (panel.color == Color.black) return;
 			panel.color = Color.clear;
 			await Fade(time, Color.black);
 		}
 		public async UniTask FadeOut(float time = 0.2f)
 		{
+			if (panel.color == Color.clear) return;
 			panel.color = Color.black;
 			await Fade(time, Color.clear);
 			await CloseWait();
