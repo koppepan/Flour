@@ -28,9 +28,8 @@ namespace Flour.Asset
 			}
 		}
 
-		CompositeDisposable disposable = new CompositeDisposable();
-
-		Subject<LoadError> errorSubject = new Subject<LoadError>();
+		private readonly CompositeDisposable disposable = new CompositeDisposable();
+		private readonly Subject<LoadError> errorSubject = new Subject<LoadError>();
 
 		public IObservable<float> DownloadedCount { get { return downloadHandler.DownloadedCount; } }
 		public IObservable<float> AssetLoadedCount { get { return assetLoadHandler.LoadedCount; } }
@@ -53,6 +52,19 @@ namespace Flour.Asset
 			assetLoadHandler = new AssetLoadHandler();
 
 			Initialize();
+		}
+
+		public void Dispose()
+		{
+			disposable.Dispose();
+
+			downloadHandler.Dispose();
+			assetLoadHandler.Dispose();
+
+			errorSubject.Dispose();
+			waiterBridge.Dispose();
+
+			AssetBundle.UnloadAllAssetBundles(true);
 		}
 
 		private void Initialize()
@@ -106,17 +118,6 @@ namespace Flour.Asset
 				return Tuple.Create(manifest, sizeManifest, crcManifest);
 			}
 			return Tuple.Create<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>(manifest, sizeManifest, null);
-		}
-
-		public void Dispose()
-		{
-			downloadHandler.Dispose();
-			assetLoadHandler.Dispose();
-
-			errorSubject.Dispose();
-			waiterBridge.Dispose();
-
-			AssetBundle.UnloadAllAssetBundles(true);
 		}
 
 		public Tuple<int, int> GetRequestCount()
