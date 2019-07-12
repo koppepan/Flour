@@ -11,6 +11,8 @@ namespace Example
 {
 	public static class AssetHelper
 	{
+		static readonly string EncryptAssetFolderNameFormat = "E{0}";
+
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
 		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
 
@@ -40,7 +42,7 @@ namespace Example
 
 		public static string GetEncryptAssetBundleFolderName(BuildTarget buildTarget)
 		{
-			return "E" + GetAssetBundleFolderName(buildTarget);
+			return string.Format(EncryptAssetFolderNameFormat, GetAssetBundleFolderName(buildTarget));
 		}
 #endif
 
@@ -69,7 +71,7 @@ namespace Example
 
 		public static string GetEncryptAssetBundleFolderName(RuntimePlatform platform)
 		{
-			return "E" + GetAssetBundleFolderName(platform);
+			return string.Format(EncryptAssetFolderNameFormat, GetAssetBundleFolderName(platform));
 		}
 
 		public static async UniTask<SecureString> GetPasswordAsync()
