@@ -3,7 +3,7 @@ using UniRx;
 
 namespace Flour.Asset
 {
-	public interface IAssetRequest
+	internal interface IAssetRequest
 	{
 		Type Type { get; }
 		string[] AssetBundleNames { get; }
@@ -12,16 +12,15 @@ namespace Flour.Asset
 
 	internal class Request<T> : IAssetRequest where T : UnityEngine.Object
 	{
-		public Type Type { get; private set; }
+		public Type Type { get { return typeof(T); } }
 		public string[] AssetBundleNames { get; private set; }
 		public string AssetName { get; private set; }
 
 		public Subject<T> subject;
 
 
-		public Request(string assetBundleName, string[] dependencies, string assetName, Type type, Subject<T> subject)
+		public Request(string assetBundleName, string[] dependencies, string assetName, Subject<T> subject)
 		{
-			Type = type;
 			AssetBundleNames = new string[dependencies.Length + 1];
 			AssetBundleNames[0] = assetBundleName;
 			for (int i = 0; i < dependencies.Length; i++)

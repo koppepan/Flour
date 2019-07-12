@@ -137,23 +137,23 @@ namespace Flour.Asset
 			waiter.SetBridge(waiterBridge);
 		}
 
-		void AddRequest(string[] assetBundleNames, string assetName, Type type)
+		void AddRequest(IAssetRequest request)
 		{
-			if (assetLoadHandler.ContainsKey(assetBundleNames))
+			if (assetLoadHandler.ContainsKey(request.AssetBundleNames))
 			{
-				assetLoadHandler.AddRequest(assetBundleNames[0], assetName, type);
+				assetLoadHandler.AddRequest(request.AssetBundleNames[0], request.AssetName, request.Type);
 				return;
 			}
 
-			for (int i = 0; i < assetBundleNames.Length; i++)
+			for (int i = 0; i < request.AssetBundleNames.Length; i++)
 			{
-				if (assetLoadHandler.ContainsKey(assetBundleNames[i]))
+				if (assetLoadHandler.ContainsKey(request.AssetBundleNames[i]))
 				{
 					continue;
 				}
-				var hash = manifest.GetAssetBundleHash(assetBundleNames[i]);
-				var crc = crcManifest == null ? 0 : crcManifest.GetCrc(assetBundleNames[i]);
-				downloadHandler.AddRequest(CreateRequest(assetBundleNames[i], hash, crc));
+				var hash = manifest.GetAssetBundleHash(request.AssetBundleNames[i]);
+				var crc = crcManifest == null ? 0 : crcManifest.GetCrc(request.AssetBundleNames[i]);
+				downloadHandler.AddRequest(CreateRequest(request.AssetBundleNames[i], hash, crc));
 			}
 		}
 		void CleanRequest(string assetBundleName)
