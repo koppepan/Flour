@@ -157,7 +157,7 @@ namespace Flour.Build
 				}).ToList();
 		}
 
-		public static void SetDefineSynboles(BuildTargetGroup targetGroup, IEnumerable<string> addSymbols, IEnumerable<string> removeSymbols)
+		public static void SetDefineSymboles(BuildTargetGroup targetGroup, IEnumerable<string> addSymbols, IEnumerable<string> removeSymbols)
 		{
 			var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup).Split(';').Where(x => !string.IsNullOrEmpty(x));
 
@@ -169,6 +169,12 @@ namespace Flour.Build
 
 			Debug.Log($"apply define symbols => \"{joinSymbols}\"");
 			AssetDatabase.SaveAssets();
+		}
+
+		public static bool ExistsDefineSymbol(BuildTargetGroup targetGroup, string value)
+		{
+			var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup).Split(';').Where(x => !string.IsNullOrEmpty(x));
+			return symbols.Any(x => x == value);
 		}
 	}
 }

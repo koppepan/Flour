@@ -24,22 +24,33 @@ namespace Example
 		static void AddSymbol(string add)
 		{
 			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-			Flour.Build.BuildClient.SetDefineSynboles(group, new string[] { add }, Enumerable.Empty<string>());
+			Flour.Build.BuildClient.SetDefineSymboles(group, new string[] { add }, Enumerable.Empty<string>());
 		}
 		static void RemoveSymbol(string remove)
 		{
 			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-			Flour.Build.BuildClient.SetDefineSynboles(group, Enumerable.Empty<string>(), new string[] { remove });
+			Flour.Build.BuildClient.SetDefineSymboles(group, Enumerable.Empty<string>(), new string[] { remove });
+		}
+		static bool ExistsSymbol(string symbol)
+		{
+			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
+			return Flour.Build.BuildClient.ExistsDefineSymbol(group, symbol);
 		}
 
 		[MenuItem("CustomMenu/DefineSymbols/Debug/Add")] static void AddDebugSymbole() => AddSymbol(DebugSymbole);
+		[MenuItem("CustomMenu/DefineSymbols/Debug/Add", validate = true)] static bool ValidateAddDebugSymbole() => !ExistsSymbol(DebugSymbole);
 		[MenuItem("CustomMenu/DefineSymbols/Debug/Remove")] static void RemoveDebugSymbole() => RemoveSymbol(DebugSymbole);
+		[MenuItem("CustomMenu/DefineSymbols/Debug/Remove", validate = true)] static bool ValidateRemoveDebugSymbole() => ExistsSymbol(DebugSymbole);
 
 		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Add")] static void AddUseLocalAssetSymbole() => AddSymbol(UseLocalAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Add", validate = true)] static bool ValidateAddUseLocalAssetSymbole() => !ExistsSymbol(UseLocalAssetSymbol);
 		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Remove")] static void RemoveUseLocalAssetSymbole() => RemoveSymbol(UseLocalAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Remove", validate = true)] static bool ValidateRemoveUseLocalAssetSymbole() => ExistsSymbol(UseLocalAssetSymbol);
 
 		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Add")] static void AddUseSecureAssetSymbole() => AddSymbol(UseSecureAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Add", validate = true)] static bool ValidateAddUseSecureAssetSymbole() => !ExistsSymbol(UseSecureAssetSymbol);
 		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Remove")] static void RemoveUseSecureAssetSymbole() => RemoveSymbol(UseSecureAssetSymbol);
+		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Remove", validate = true)] static bool ValidateRemoveUseSecureAssetSymbole() => ExistsSymbol(UseSecureAssetSymbol);
 		#endregion
 
 
