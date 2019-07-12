@@ -137,11 +137,11 @@ namespace Flour.Asset
 			waiter.SetBridge(waiterBridge);
 		}
 
-		void AddRequest(string[] assetBundleNames, string assetName)
+		void AddRequest(string[] assetBundleNames, string assetName, Type type)
 		{
 			if (assetLoadHandler.ContainsKey(assetBundleNames))
 			{
-				assetLoadHandler.AddRequest(assetBundleNames[0], assetName);
+				assetLoadHandler.AddRequest(assetBundleNames[0], assetName, type);
 				return;
 			}
 
@@ -180,7 +180,7 @@ namespace Flour.Asset
 					}
 					else
 					{
-						assetLoadHandler.AddRequest(req.AssetBundleNames[0], req.AssetName);
+						assetLoadHandler.AddRequest(req.AssetBundleNames[0], req.AssetName, req.Type);
 					}
 				}
 			}

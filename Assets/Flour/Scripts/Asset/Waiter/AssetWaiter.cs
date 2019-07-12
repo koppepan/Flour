@@ -77,10 +77,10 @@ namespace Flour.Asset
 			{
 				return req.subject;
 			}
-			req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, new Subject<T>());
+			req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, typeof(T), new Subject<T>());
 			requests.Add(req);
 
-			bridge.AddRequest(req.AssetBundleNames, req.AssetName);
+			bridge.AddRequest(req.AssetBundleNames, req.AssetName, req.Type);
 			return req.subject;
 		}
 

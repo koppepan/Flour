@@ -83,7 +83,15 @@ namespace Flour.Asset
 					if (req.Item3.isDone)
 					{
 						requests.Remove(req);
-						loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
+
+						if (req.Item3.asset == null)
+						{
+							erroredSubject.OnNext(Tuple.Create(ErrorType.NotFoundAsset, req.Item1, req.Item2, "no asset of the type in AssetBundle."));
+						}
+						else
+						{
+							loadedSubject.OnNext(Tuple.Create(req.Item1, req.Item2, req.Item3.asset));
+						}
 
 						loadedCount++;
 						UpdateProgress(0);
@@ -143,7 +151,7 @@ namespace Flour.Asset
 			assetBundles[path] = assetBundle;
 		}
 
-		public void AddRequest(string path, string assetName)
+		public void AddRequest(string path, string assetName, Type type)
 		{
 			if (!ContainsKey(path))
 			{
@@ -158,7 +166,7 @@ namespace Flour.Asset
 				}
 				else
 				{
-					requests.Add(Tuple.Create(path, assetName, assetBundles[path].LoadAssetAsync(assetName)));
+					requests.Add(Tuple.Create(path, assetName, assetBundles[path].LoadAssetAsync(assetName, type)));
 				}
 			}
 

@@ -7,7 +7,7 @@ namespace Flour.Asset
 {
 	internal class WaiterBridge
 	{
-		internal delegate void AddRequestDelegate(string[] assetBundleNames, string assetName);
+		internal delegate void AddRequestDelegate(string[] assetBundleNames, string assetName, Type type);
 		internal delegate void CleanRequestDelegate(string assetBundleName);
 
 		internal delegate bool ContainsRequestDelegate(string assetBundleName);
@@ -52,7 +52,7 @@ namespace Flour.Asset
 			waiterDisposes.ForEach(x => x());
 		}
 
-		public void AddRequest(string[] assetBundleNames, string assetName) => addRequestDelegate(assetBundleNames, assetName);
+		public void AddRequest(string[] assetBundleNames, string assetName, Type type) => addRequestDelegate(assetBundleNames, assetName, type);
 		public void CleanRequest(string[] assetBundleNames)
 		{
 			for (int i = 0; i < assetBundleNames.Length; i++)
