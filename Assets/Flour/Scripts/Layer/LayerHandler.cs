@@ -147,9 +147,8 @@ namespace Flour.Layer
 			{
 				return;
 			}
-
-			await subLayer.OnCloseInternal(force);
 			layer.List.Remove(subLayer, true);
+			await subLayer.OnCloseInternal(force);
 		}
 	}
 }
