@@ -92,7 +92,7 @@ namespace Flour.Layer
 			Destroy(gameObject);
 			await UniTask.DelayFrame(1);
 		}
-		protected virtual void OnBack() { }
+		protected virtual void OnBack() => Close();
 		protected virtual void OnChangeSiblingIndex(int index) { }
 
 		protected void SafeAreaExpansion() => SafeAreaExpansion(GetComponent<RectTransform>());
