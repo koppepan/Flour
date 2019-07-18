@@ -52,7 +52,6 @@ namespace Flour.Asset
 		readonly SecureString password;
 
 		readonly Hash128 hash;
-		readonly uint crc;
 
 		UnityWebRequest request = null;
 		FileStream fileStream = null;
@@ -68,7 +67,6 @@ namespace Flour.Asset
 			this.password = password;
 			this.cachePath = Path.Combine(cachePath, $"{FilePath}.{hash}");
 			this.hash = hash;
-			this.crc = crc;
 		}
 
 		public void Send(string baseUrl, int timeout)
@@ -112,6 +110,10 @@ namespace Flour.Asset
 			Error = error;
 
 			currentState = State.Completed;
+
+			// errorのあったファイルを削除しておく
+			if (File.Exists(cachePath)) File.Delete(cachePath);
+
 			Dispose();
 		}
 
