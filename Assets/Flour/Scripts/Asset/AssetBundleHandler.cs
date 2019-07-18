@@ -36,16 +36,9 @@ namespace Flour.Asset
 
 		public IObservable<LoadError> ErrorObservable { get { return errorSubject; } }
 
-		public AssetBundleHandler(string baseUrl)
-		{
-			this.baseUrl = baseUrl;
+		public AssetBundleHandler(string baseUrl) : this(baseUrl, new ParallelAssetBundleDownloader(baseUrl, 5, 20)) { }
 
-			downloadHandler = new ParallelAssetBundleDownloader(baseUrl, 5, 20);
-			assetLoadHandler = new AssetLoadHandler();
-
-			Initialize();
-		}
-		protected AssetBundleHandler(string baseUrl, Net.ParallelWebRequest<AssetBundle> downloader)
+		internal AssetBundleHandler(string baseUrl, Net.ParallelWebRequest<AssetBundle> downloader)
 		{
 			this.baseUrl = baseUrl;
 			downloadHandler = downloader;
