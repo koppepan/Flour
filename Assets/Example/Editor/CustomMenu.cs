@@ -7,8 +7,10 @@ namespace Example
 {
 	public class CustomMenu
 	{
+		private const string MenuTitle = "CustomMenu";
+
 		#region Scenes
-		[MenuItem("CustomMenu/Scene/Create Scene List", priority = 30)]
+		[MenuItem(MenuTitle + "/Scene/Create Scene List", priority = 30)]
 		static void CreateSceneList()
 		{
 			SceneListCreator.Create("Example/Scenes", "Example/Editor", "CustomMenu", 0, "Example");
@@ -17,52 +19,52 @@ namespace Example
 
 
 		#region DefineSymbols
-		private static readonly string DebugSymbole = "DEBUG_BUILD";
+		private const string DefineSymbolMenuTitle = MenuTitle + "/DefineSymbols";
+
+		private static readonly string DebugSymbol = "DEBUG_BUILD";
+		private const string DebugSymbolMenu = DefineSymbolMenuTitle + "/Debug";
+
 		private static readonly string UseLocalAssetSymbol = "USE_LOCAL_ASSET";
+		private const string UseLocalAssetSymbolMenu = DefineSymbolMenuTitle + "/Use Local Asset";
+
 		private static readonly string UseSecureAssetSymbol = "USE_SECURE_ASSET";
+		private const string UseSecureAssetSymbolMenu = DefineSymbolMenuTitle + "/Use Secure Asset";
 
-		static void AddSymbol(string add)
+		[MenuItem(DebugSymbolMenu)] static void SetDebugSymbol() => SetSymbolCheked(DebugSymbolMenu, DebugSymbol);
+		[MenuItem(UseLocalAssetSymbolMenu)] static void SetUseLocalAssetSymbol() => SetSymbolCheked(UseLocalAssetSymbolMenu, UseLocalAssetSymbol);
+		[MenuItem(UseSecureAssetSymbolMenu)] static void SetSecureAssetSymbol() => SetSymbolCheked(UseSecureAssetSymbolMenu, UseSecureAssetSymbol);
+
+		static void SetSymbolCheked(string menu, string symbol)
 		{
 			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-			Flour.Build.BuildClient.SetDefineSymboles(group, new string[] { add }, Enumerable.Empty<string>());
-		}
-		static void RemoveSymbol(string remove)
-		{
-			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-			Flour.Build.BuildClient.SetDefineSymboles(group, Enumerable.Empty<string>(), new string[] { remove });
-		}
-		static bool ExistsSymbol(string symbol)
-		{
-			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-			return Flour.Build.BuildClient.ExistsDefineSymbol(group, symbol);
+			var exist = Flour.Build.BuildClient.ExistsDefineSymbol(group, symbol);
+
+			var add = !exist ? new string[] { symbol } : Enumerable.Empty<string>();
+			var remove = exist ? new string[] { symbol } : Enumerable.Empty<string>();
+
+			Flour.Build.BuildClient.SetDefineSymboles(group, add, remove);
+
+			Menu.SetChecked(menu, !exist);
 		}
 
-		[MenuItem("CustomMenu/DefineSymbols/Debug/Add")] static void AddDebugSymbole() => AddSymbol(DebugSymbole);
-		[MenuItem("CustomMenu/DefineSymbols/Debug/Add", validate = true)] static bool ValidateAddDebugSymbole() => !ExistsSymbol(DebugSymbole);
-		[MenuItem("CustomMenu/DefineSymbols/Debug/Remove")] static void RemoveDebugSymbole() => RemoveSymbol(DebugSymbole);
-		[MenuItem("CustomMenu/DefineSymbols/Debug/Remove", validate = true)] static bool ValidateRemoveDebugSymbole() => ExistsSymbol(DebugSymbole);
-
-		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Add")] static void AddUseLocalAssetSymbole() => AddSymbol(UseLocalAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Add", validate = true)] static bool ValidateAddUseLocalAssetSymbole() => !ExistsSymbol(UseLocalAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Remove")] static void RemoveUseLocalAssetSymbole() => RemoveSymbol(UseLocalAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/UseLocalAsset/Remove", validate = true)] static bool ValidateRemoveUseLocalAssetSymbole() => ExistsSymbol(UseLocalAssetSymbol);
-
-		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Add")] static void AddUseSecureAssetSymbole() => AddSymbol(UseSecureAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Add", validate = true)] static bool ValidateAddUseSecureAssetSymbole() => !ExistsSymbol(UseSecureAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Remove")] static void RemoveUseSecureAssetSymbole() => RemoveSymbol(UseSecureAssetSymbol);
-		[MenuItem("CustomMenu/DefineSymbols/UseSecureAsset/Remove", validate = true)] static bool ValidateRemoveUseSecureAssetSymbole() => ExistsSymbol(UseSecureAssetSymbol);
 		#endregion
 
 
-		[MenuItem("CustomMenu/AssetBundle Build/Windows")] public static void BuildAssetBundleForWindows() => BuildAssetBundle(BuildTarget.StandaloneWindows64);
-		[MenuItem("CustomMenu/AssetBundle Build/OSX")] public static void BuildAssetBundleForOSX() => BuildAssetBundle(BuildTarget.StandaloneOSX);
-		[MenuItem("CustomMenu/AssetBundle Build/Android")] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
-		[MenuItem("CustomMenu/AssetBundle Build/iOS")] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
+		#region AssetBundle
 
-		[MenuItem("CustomMenu/AssetBundle Build/Encrypt Windows")] public static void BuildEncryptAssetBundleForWindows() => BuildEncryptAssetBundle(BuildTarget.StandaloneWindows64);
-		[MenuItem("CustomMenu/AssetBundle Build/Encrypt OSX")] public static void BuildEncryptAssetBundleForOSX() => BuildEncryptAssetBundle(BuildTarget.StandaloneOSX);
-		[MenuItem("CustomMenu/AssetBundle Build/Encrypt Android")] public static void BuildEncryptAssetBundleForAndroid() => BuildEncryptAssetBundle(BuildTarget.Android);
-		[MenuItem("CustomMenu/AssetBundle Build/Encrypt iOS")] public static void BuildEncryptAssetBundleForiOS() => BuildEncryptAssetBundle(BuildTarget.iOS);
+		private const string AssetBundleMenuTitle = MenuTitle + "/AssetBundle Build";
+		private const string SecureAssetBundleMenuTitle = MenuTitle + "/Secure AssetBundle Build";
+			 
+
+		[MenuItem(AssetBundleMenuTitle + "/Windows")] public static void BuildAssetBundleForWindows() => BuildAssetBundle(BuildTarget.StandaloneWindows64);
+		[MenuItem(AssetBundleMenuTitle + "/OSX")] public static void BuildAssetBundleForOSX() => BuildAssetBundle(BuildTarget.StandaloneOSX);
+		[MenuItem(AssetBundleMenuTitle + "/Android")] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
+		[MenuItem(AssetBundleMenuTitle + "/iOS")] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
+
+		[MenuItem(SecureAssetBundleMenuTitle + "/Windows")] public static void BuildSecureAssetBundleForWindows() => BuildEncryptAssetBundle(BuildTarget.StandaloneWindows64);
+		[MenuItem(SecureAssetBundleMenuTitle + "/OSX")] public static void BuildSecureAssetBundleForOSX() => BuildEncryptAssetBundle(BuildTarget.StandaloneOSX);
+		[MenuItem(SecureAssetBundleMenuTitle + "/Android")] public static void BuildSecureAssetBundleForAndroid() => BuildEncryptAssetBundle(BuildTarget.Android);
+		[MenuItem(SecureAssetBundleMenuTitle + "/iOS")] public static void BuildSecureAssetBundleForiOS() => BuildEncryptAssetBundle(BuildTarget.iOS);
 
 		static AssetBundleManifest BuildAssetBundle(BuildTarget buildTarget)
 		{
@@ -92,5 +94,6 @@ namespace Example
 			Flour.Build.BuildAssetBundle.BuildEncrypt(srcPath, cryptoPath,
 				manifestName, AssetHelper.AssetBundleSizeManifestName, AssetHelper.AssetBundleCrcManifestName, password, manifest);
 		}
+		#endregion
 	}
 }
