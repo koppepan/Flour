@@ -30,9 +30,9 @@ namespace Example
 		private static readonly string UseSecureAssetSymbol = "USE_SECURE_ASSET";
 		private const string UseSecureAssetSymbolMenu = DefineSymbolMenuTitle + "/Use Secure Asset";
 
-		[MenuItem(DebugSymbolMenu)] static void SetDebugSymbol() => SetSymbolCheked(DebugSymbolMenu, DebugSymbol);
-		[MenuItem(UseLocalAssetSymbolMenu)] static void SetUseLocalAssetSymbol() => SetSymbolCheked(UseLocalAssetSymbolMenu, UseLocalAssetSymbol);
-		[MenuItem(UseSecureAssetSymbolMenu)] static void SetSecureAssetSymbol() => SetSymbolCheked(UseSecureAssetSymbolMenu, UseSecureAssetSymbol);
+		[MenuItem(DebugSymbolMenu, priority = 100)] static void SetDebugSymbol() => SetSymbolCheked(DebugSymbolMenu, DebugSymbol);
+		[MenuItem(UseLocalAssetSymbolMenu, priority = 100)] static void SetUseLocalAssetSymbol() => SetSymbolCheked(UseLocalAssetSymbolMenu, UseLocalAssetSymbol);
+		[MenuItem(UseSecureAssetSymbolMenu, priority = 100)] static void SetSecureAssetSymbol() => SetSymbolCheked(UseSecureAssetSymbolMenu, UseSecureAssetSymbol);
 
 		static void SetSymbolCheked(string menu, string symbol)
 		{
@@ -56,15 +56,15 @@ namespace Example
 		private const string SecureAssetBundleMenuTitle = MenuTitle + "/Secure AssetBundle Build";
 			 
 
-		[MenuItem(AssetBundleMenuTitle + "/Windows")] public static void BuildAssetBundleForWindows() => BuildAssetBundle(BuildTarget.StandaloneWindows64);
-		[MenuItem(AssetBundleMenuTitle + "/OSX")] public static void BuildAssetBundleForOSX() => BuildAssetBundle(BuildTarget.StandaloneOSX);
-		[MenuItem(AssetBundleMenuTitle + "/Android")] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
-		[MenuItem(AssetBundleMenuTitle + "/iOS")] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
+		[MenuItem(AssetBundleMenuTitle + "/Windows", priority = 200)] public static void BuildAssetBundleForWindows() => BuildAssetBundle(BuildTarget.StandaloneWindows64);
+		[MenuItem(AssetBundleMenuTitle + "/OSX", priority = 200)] public static void BuildAssetBundleForOSX() => BuildAssetBundle(BuildTarget.StandaloneOSX);
+		[MenuItem(AssetBundleMenuTitle + "/Android", priority = 200)] public static void BuildAssetBundleForAndroid() => BuildAssetBundle(BuildTarget.Android);
+		[MenuItem(AssetBundleMenuTitle + "/iOS", priority = 200)] public static void BuildAssetBundleForiOS() => BuildAssetBundle(BuildTarget.iOS);
 
-		[MenuItem(SecureAssetBundleMenuTitle + "/Windows")] public static void BuildSecureAssetBundleForWindows() => BuildEncryptAssetBundle(BuildTarget.StandaloneWindows64);
-		[MenuItem(SecureAssetBundleMenuTitle + "/OSX")] public static void BuildSecureAssetBundleForOSX() => BuildEncryptAssetBundle(BuildTarget.StandaloneOSX);
-		[MenuItem(SecureAssetBundleMenuTitle + "/Android")] public static void BuildSecureAssetBundleForAndroid() => BuildEncryptAssetBundle(BuildTarget.Android);
-		[MenuItem(SecureAssetBundleMenuTitle + "/iOS")] public static void BuildSecureAssetBundleForiOS() => BuildEncryptAssetBundle(BuildTarget.iOS);
+		[MenuItem(SecureAssetBundleMenuTitle + "/Windows", priority = 201)] public static void BuildSecureAssetBundleForWindows() => BuildEncryptAssetBundle(BuildTarget.StandaloneWindows64);
+		[MenuItem(SecureAssetBundleMenuTitle + "/OSX", priority = 201)] public static void BuildSecureAssetBundleForOSX() => BuildEncryptAssetBundle(BuildTarget.StandaloneOSX);
+		[MenuItem(SecureAssetBundleMenuTitle + "/Android", priority = 201)] public static void BuildSecureAssetBundleForAndroid() => BuildEncryptAssetBundle(BuildTarget.Android);
+		[MenuItem(SecureAssetBundleMenuTitle + "/iOS", priority = 201)] public static void BuildSecureAssetBundleForiOS() => BuildEncryptAssetBundle(BuildTarget.iOS);
 
 		static AssetBundleManifest BuildAssetBundle(BuildTarget buildTarget)
 		{
