@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace Flour.Build
 {
-	public static class BuildAssetBundle
+	public static class AssetBundle
 	{
 		public static AssetBundleManifest Build(string outputPath, BuildTarget buildTarget, BuildAssetBundleOptions options = BuildAssetBundleOptions.None)
 		{

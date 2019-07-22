@@ -9,7 +9,7 @@ using Flour.Config;
 
 namespace Flour.Build
 {
-	public static class BuildClient
+	public static class Client
 	{
 		public struct PlayerBuildConfig
 		{
@@ -113,39 +113,7 @@ namespace Flour.Build
 			}
 		}
 
-		[MenuItem("Flour/Build/Production")]
-		public static void BuildProduction()
-		{
-			Build(new PlayerBuildConfig
-			{
-				productName = "production",
-				bundleVersion = "1.0.0",
-				buildNumber = 1,
-				outputPath = "Builds/Production/Production.exe",
-				targetGroup = BuildTargetGroup.Standalone,
-				buildTarget = BuildTarget.StandaloneWindows64,
-				connectInfomations = GetServerList("Production"),
-				options = BuildOptions.None,
-			});
-		}
-
-		[MenuItem("Flour/Build/Development")]
-		public static void BuildDevelopment()
-		{
-			Build(new PlayerBuildConfig
-			{
-				productName = "development",
-				bundleVersion = "1.0.0",
-				buildNumber = 1,
-				outputPath = "Builds/Development/Development.exe",
-				targetGroup = BuildTargetGroup.Standalone,
-				buildTarget = BuildTarget.StandaloneWindows64,
-				connectInfomations = GetServerList("Development"),
-				options = BuildOptions.Development,
-			});
-		}
-
-		private static List<ConnectInfomation> GetServerList(string key)
+		public static List<ConnectInfomation> GetServerList(string key)
 		{
 			var ini = new IniFile(Path.Combine(Application.dataPath, $"../BuildConfig/{key}/ConnectInformation.ini"));
 
