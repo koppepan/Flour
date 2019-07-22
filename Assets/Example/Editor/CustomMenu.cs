@@ -12,9 +12,25 @@ namespace Example
 		[InitializeOnLoad]
 		private class Startup
 		{
-			// NOTE : 起動直後だとまだLibraryの構成が完了していないので少し待ってから実行
-			// TODO : このままだとEditorでビルドが走るたびに呼ばれるのでどうにかする
-			static Startup() => EditorApplication.delayCall += ApplyMenuChecked;
+			const string StartupFile = "Temp/startup";
+
+			static Startup()
+			{
+				// NOTE : 通常だとEditorビルド毎に呼ばれてしまう 初回起動時”だけ”に実行したいので起動時に適当なファイルを作りそれで判定
+				if (File.Exists(StartupFile))
+				{
+					return;
+				}
+				File.Create(StartupFile);
+
+				// NOTE : 起動直後だとまだLibraryの構成が完了していないので少し待ってから実行
+				EditorApplication.delayCall += Initialize;
+			}
+			static void Initialize()
+			{
+				EditorApplication.delayCall -= Initialize;
+				ApplyMenuChecked();
+			}
 		}
 
 		private class ApplyChecked : UnityEditor.Build.IActiveBuildTargetChanged
@@ -25,7 +41,6 @@ namespace Example
 
 		static void ApplyMenuChecked()
 		{
-			EditorApplication.delayCall -= ApplyMenuChecked;
 			ApplySymbolMenuChecked();
 		}
 
