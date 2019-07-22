@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using UnityEngine;
 using UnityEditor;
@@ -7,6 +9,27 @@ namespace Example
 {
 	public class CustomMenu
 	{
+		[InitializeOnLoad]
+		private class Startup
+		{
+			// NOTE : 起動直後だとまだLibraryの構成が完了していないので少し待ってから実行
+			// TODO : このままだとEditorでビルドが走るたびに呼ばれるのでどうにかする
+			static Startup() => EditorApplication.delayCall += ApplyMenuChecked;
+		}
+
+		private class ApplyChecked : UnityEditor.Build.IActiveBuildTargetChanged
+		{
+			public int callbackOrder { get { return 0; } }
+			public void OnActiveBuildTargetChanged(BuildTarget previousTarget, BuildTarget newTarget) => ApplyMenuChecked();
+		}
+
+		static void ApplyMenuChecked()
+		{
+			EditorApplication.delayCall -= ApplyMenuChecked;
+			ApplySymbolMenuChecked();
+		}
+
+
 		private const string MenuTitle = "CustomMenu";
 
 		#region Scenes
@@ -45,6 +68,24 @@ namespace Example
 			Flour.Build.BuildClient.SetDefineSymboles(group, add, remove);
 
 			Menu.SetChecked(menu, !exist);
+		}
+
+		static void ApplySymbolMenuChecked()
+		{
+			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
+
+			var list = new List<Tuple<string, string>>
+			{
+				Tuple.Create(DebugSymbolMenu, DebugSymbol),
+				Tuple.Create(UseLocalAssetSymbolMenu, UseLocalAssetSymbol),
+				Tuple.Create(UseSecureAssetSymbolMenu, UseSecureAssetSymbol),
+			};
+
+			for (int i = 0; i < list.Count; i++)
+			{
+				var symbol = Flour.Build.BuildClient.ExistsDefineSymbol(group, list[i].Item2);
+				Menu.SetChecked(list[i].Item1, symbol);
+			}
 		}
 
 		#endregion
