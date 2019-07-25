@@ -94,6 +94,24 @@ namespace Flour.Scene
 			scene?.Open();
 		}
 
+		public async UniTask AddAsyncInEditor(string scenePath, T param, params object[] args)
+		{
+#if UNITY_EDITOR
+			await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(scenePath, new LoadSceneParameters(LoadSceneMode.Additive));
+
+			var sceneName = System.IO.Path.GetFileName(scenePath);
+
+			var scene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
+			if (scene != null)
+			{
+				additiveScenes.Add(scene);
+				await LoadScene(scene, sceneName, param, args);
+			}
+
+			scene?.Open();
+#endif
+		}
+
 		private async UniTask LoadScene(AbstractScene<T> scene, string sceneName, T param, params object[] args)
 		{
 			scene.SetName(sceneName);
