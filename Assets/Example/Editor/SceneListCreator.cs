@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Linq;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -49,11 +50,11 @@ namespace Example
 				foreach (var sceneGUID in sceneGUIDs)
 				{
 					string scenePath = AssetDatabase.GUIDToAssetPath(sceneGUID);
-					string[] splittedScenePath = scenePath.Split(new char[] { '/' });
-					string sceneName = splittedScenePath[splittedScenePath.Length - 1].Replace(".unity", "");
+					string sceneName = scenePath.Remove(0, ("Assets/" + sceneDirectory + "/").Length).Replace(".unity", "");// splittedScenePath[splittedScenePath.Length - 1].Replace(".unity", "");
+					int depth = sceneName.Count(x => x == '/');
 
-					sw.WriteLine(tab + $"[MenuItem(\"{menuTitle}/Scene/{sceneName}\", priority = {priority})]");
-					sw.WriteLine(tab + $"public static void OpenScene{sceneName}()");
+					sw.WriteLine(tab + $"[MenuItem(\"{menuTitle}/Scene/{sceneName}\", priority = {priority + depth})]");
+					sw.WriteLine(tab + $"public static void OpenScene{sceneName.Replace("/", "")}()");
 					sw.WriteLine(tab + "{");
 
 					AddTab(ref tab);
