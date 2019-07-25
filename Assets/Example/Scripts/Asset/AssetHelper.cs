@@ -17,6 +17,8 @@ namespace Example
 		public static readonly string AssetBundleSizeManifestName = "AssetBundleSize";
 		public static readonly string AssetBundleCrcManifestName = "AssetBundleCrc";
 
+		public static readonly string StageSceneDirectory = "Assets/Example/Scenes/Stage";
+
 		public static string CacheAssetPath { get { return Path.Combine(Application.temporaryCachePath, "assets"); } }
 
 		public static string GetAssetBundleFolderName(RuntimePlatform platform)

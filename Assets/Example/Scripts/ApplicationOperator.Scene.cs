@@ -52,9 +52,16 @@ namespace Example
 		public async UniTask AddSceneAsync(string sceneName, params object[] args)
 		{
 			InputBinder.Bind();
+#if UNITY_EDITOR && USE_LOCAL_ASSET
+			var scenePath = $"{AssetHelper.StageSceneDirectory}/{sceneName}.unity";
+			UnityEngine.Debug.Log(scenePath);
+			await sceneHandler.AddAsyncInEditor(scenePath, Tuple.Create<IOperationBundler, AssetHandler>(this, assetHandler), args);
+#else
 			await sceneHandler.AddAsync(sceneName, Tuple.Create<IOperationBundler, AssetHandler>(this, assetHandler), args);
+#endif
 			InputBinder.Unbind();
 		}
+
 		public async UniTask UnloadSceneAsync(string sceneName)
 		{
 			InputBinder.Bind();
