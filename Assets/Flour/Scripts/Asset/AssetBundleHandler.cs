@@ -14,9 +14,8 @@ namespace Flour.Asset
 		readonly Net.ParallelWebRequest<AssetBundle> downloadHandler;
 		readonly AssetLoadHandler assetLoadHandler;
 
-		AssetBundleManifest manifest;
-		AssetBundleSizeManifest sizeManifest;
-		AssetBundleCrcManifest crcManifest;
+		AssetBundleManifest manifest = default;
+		AssetBundleCrcManifest crcManifest = default;
 
 		WaiterBridge _waiterBridge;
 		WaiterBridge waiterBridge
@@ -87,11 +86,10 @@ namespace Flour.Asset
 			{
 				var result = await LoadManifestAsyncInternal(baseUrl, manifestName, sizeManifestName, crcManifestName);
 				manifest = result.Item1;
-				sizeManifest = result.Item2;
 				crcManifest = result.Item3;
 
 				Debug.Log("loaded AssetBundleManifest.");
-				waiterBridge.SetManifest(manifest, sizeManifest);
+				waiterBridge.SetManifest(manifest, result.Item2);
 			}
 			catch (Exception e)
 			{
