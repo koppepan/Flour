@@ -8,7 +8,7 @@ namespace Example
 {
 	public sealed class SubLayerSourceRepository
 	{
-		readonly IEnumerable<SubLayerType> keys;
+		readonly SubLayerType[] keys;
 		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
 
 		int cacheLimit;
@@ -27,20 +27,14 @@ namespace Example
 		public SubLayerSourceRepository(IEnumerable<SubLayerType> subLayers, int cacheLimit)
 		{
 			this.cacheLimit = cacheLimit == 0 ? 1 : cacheLimit;
-			keys = subLayers;
+			keys = subLayers.ToArray();
 		}
 
-		public bool ContainsKey(SubLayerType type)
-		{
-			return keys.Contains(type);
-		}
+		public bool ContainsKey(SubLayerType type) => keys.Contains(type);
 
 		public async UniTask LoadAllAsync()
 		{
-			foreach (var key in keys)
-			{
-				await LoadAsync<AbstractSubLayer>(key);
-			}
+			await UniTask.WhenAll(keys.Select(x => LoadAsync<AbstractSubLayer>(x)));
 		}
 
 		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
