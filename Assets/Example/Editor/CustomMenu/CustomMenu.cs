@@ -17,7 +17,7 @@ namespace Example
 		[MenuItem(MenuTitle + "/Scene/Create Scene List", priority = SceneListPriority)]
 		static void CreateSceneList()
 		{
-			SceneListCreator.Create("Example/Scenes", "Example/Editor", "CustomMenu", 0, "Example");
+			SceneListCreator.Create("Example/Scenes", "Example/Editor", MenuTitle, 0, "Example");
 		}
 
 
