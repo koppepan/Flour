@@ -19,21 +19,24 @@ namespace Example
 		private static readonly string UseSecureAssetSymbol = "USE_SECURE_ASSET";
 		private const string UseSecureAssetSymbolMenu = DefineSymbolMenuTitle + "/Use Secure Asset";
 
-		[MenuItem(DebugSymbolMenu, priority = DefineSymbolPriority)] static void SetDebugSymbol() => SetSymbolCheked(DebugSymbolMenu, DebugSymbol);
-		[MenuItem(UseLocalAssetSymbolMenu, priority = DefineSymbolPriority)] static void SetUseLocalAssetSymbol() => SetSymbolCheked(UseLocalAssetSymbolMenu, UseLocalAssetSymbol);
-		[MenuItem(UseSecureAssetSymbolMenu, priority = DefineSymbolPriority)] static void SetSecureAssetSymbol() => SetSymbolCheked(UseSecureAssetSymbolMenu, UseSecureAssetSymbol);
+		static BuildTargetGroup CurrentTarget => EditorUserBuildSettings.selectedBuildTargetGroup;
 
-		static void SetSymbolCheked(string menu, string symbol)
+		[MenuItem(DebugSymbolMenu, priority = DefineSymbolPriority)] static void SetDebugSymbol() => SwitchSymbol(DebugSymbol);
+		[MenuItem(UseLocalAssetSymbolMenu, priority = DefineSymbolPriority)] static void SetUseLocalAssetSymbol() => SwitchSymbol(UseLocalAssetSymbol, UseSecureAssetSymbol);
+		[MenuItem(UseSecureAssetSymbolMenu, priority = DefineSymbolPriority)] static void SetSecureAssetSymbol() => SwitchSymbol(UseSecureAssetSymbol, UseLocalAssetSymbol);
+
+		static void SwitchSymbol(string symbol, string remove = "")
 		{
-			var group = EditorUserBuildSettings.selectedBuildTargetGroup;
-			var exist = Client.ExistsDefineSymbol(group, symbol);
+			if (Client.ExistsDefineSymbol(CurrentTarget, symbol))
+			{
+				Client.SetDefineSymboles(CurrentTarget, Enumerable.Empty<string>(), new string[] { symbol, remove });
+			}
+			else
+			{
+				Client.SetDefineSymboles(CurrentTarget, symbol, remove);
+			}
 
-			var add = !exist ? new string[] { symbol } : Enumerable.Empty<string>();
-			var remove = exist ? new string[] { symbol } : Enumerable.Empty<string>();
-
-			Client.SetDefineSymboles(group, add, remove);
-
-			Menu.SetChecked(menu, !exist);
+			ApplySymbolMenuChecked();
 		}
 
 		static void ApplySymbolMenuChecked()

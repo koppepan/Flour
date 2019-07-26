@@ -125,12 +125,16 @@ namespace Flour.Build
 				}).ToList();
 		}
 
+		public static void SetDefineSymboles(BuildTargetGroup targetGroup, string addSymbol, string removeSymbol)
+		{
+			SetDefineSymboles(targetGroup, new string[] { addSymbol }, new string[] { removeSymbol });
+		}
 		public static void SetDefineSymboles(BuildTargetGroup targetGroup, IEnumerable<string> addSymbols, IEnumerable<string> removeSymbols)
 		{
 			var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup).Split(';').Where(x => !string.IsNullOrEmpty(x));
 
 			symbols = symbols.Where(x => !removeSymbols.Any(y => x == y));
-			symbols = symbols.Concat(addSymbols);
+			symbols = symbols.Concat(addSymbols).Where(x => !string.IsNullOrEmpty(x));
 
 			var joinSymbols = string.Join(";", symbols.OrderBy(x => x).Distinct());
 			PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, joinSymbols);
