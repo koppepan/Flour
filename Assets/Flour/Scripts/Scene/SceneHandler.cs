@@ -18,7 +18,7 @@ namespace Flour.Scene
 		{
 			if (CurrentScene != null)
 			{
-				CurrentScene.OnBack();
+				CurrentScene.OnBackInternal();
 				return true;
 			}
 			return false;
@@ -26,8 +26,8 @@ namespace Flour.Scene
 
 		public void ApplicationPause(bool pause)
 		{
-			CurrentScene?.ApplicationPause(pause);
-			additiveScenes.ForEach(x => x.ApplicationPause(pause));
+			CurrentScene?.ApplicationPauseInternal(pause);
+			additiveScenes.ForEach(x => x.ApplicationPauseInternal(pause));
 		}
 
 		private AbstractScene<T> Find(string sceneName)
@@ -62,7 +62,7 @@ namespace Flour.Scene
 		{
 			if (CurrentScene != null)
 			{
-				await CurrentScene.Unload();
+				await CurrentScene.UnloadInternal();
 			}
 			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
@@ -77,7 +77,7 @@ namespace Flour.Scene
 
 			await awaitFunc();
 
-			CurrentScene?.Open();
+			CurrentScene?.OpenInternal();
 		}
 
 		public async UniTask AddAsync(string sceneName, T param, params object[] args)
@@ -91,7 +91,7 @@ namespace Flour.Scene
 				await LoadScene(scene, sceneName, param, args);
 			}
 
-			scene?.Open();
+			scene?.OpenInternal();
 		}
 
 		public async UniTask AddAsyncInEditor(string scenePath, T param, params object[] args)
@@ -108,15 +108,15 @@ namespace Flour.Scene
 				await LoadScene(scene, sceneName, param, args);
 			}
 
-			scene?.Open();
+			scene?.OpenInternal();
 #endif
 		}
 
 		private async UniTask LoadScene(AbstractScene<T> scene, string sceneName, T param, params object[] args)
 		{
-			scene.SetName(sceneName);
-			scene.SetParameter(param);
-			await scene.Load(args);
+			scene.SceneName = sceneName;
+			scene.SetParameterInternal(param);
+			await scene.LoadInternal(args);
 		}
 
 		public async UniTask UnloadAsync(string sceneName)
@@ -126,7 +126,7 @@ namespace Flour.Scene
 				UnityEngine.Debug.LogWarning("can not unload current scene.");
 				return;
 			}
-			Find(sceneName)?.Unload();
+			Find(sceneName)?.UnloadInternal();
 			await SceneManager.UnloadSceneAsync(sceneName);
 		}
 	}
