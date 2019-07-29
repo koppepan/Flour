@@ -30,15 +30,6 @@ namespace Flour.Scene
 			additiveScenes.ForEach(x => x.ApplicationPauseInternal(pause));
 		}
 
-		private AbstractScene<T> Find(string sceneName)
-		{
-			if (CurrentScene.SceneName == sceneName)
-			{
-				return CurrentScene;
-			}
-			return additiveScenes.FirstOrDefault(x => x.SceneName == sceneName);
-		}
-
 		private AbstractScene<T> GetAbstractScene(UnityEngine.SceneManagement.Scene scene)
 		{
 			if (scene == default)
@@ -60,10 +51,17 @@ namespace Flour.Scene
 
 		public async UniTask LoadAsync(string sceneName, T param, Func<UniTask> awaitFunc, params object[] args)
 		{
+			if (additiveScenes.Count != 0)
+			{
+				await UniTask.WhenAll(additiveScenes.Select(x => x.UnloadInternal()));
+				additiveScenes.Clear();
+			}
+
 			if (CurrentScene != null)
 			{
 				await CurrentScene.UnloadInternal();
 			}
+
 			await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
 			var scene = GetAbstractScene(SceneManager.GetSceneByName(sceneName));
@@ -126,7 +124,10 @@ namespace Flour.Scene
 				UnityEngine.Debug.LogWarning("can not unload current scene.");
 				return;
 			}
-			Find(sceneName)?.UnloadInternal();
+
+			var scene = additiveScenes.FirstOrDefault(x => x.SceneName == sceneName);
+			if (scene != null) await scene.UnloadInternal();
+
 			await SceneManager.UnloadSceneAsync(sceneName);
 		}
 	}
