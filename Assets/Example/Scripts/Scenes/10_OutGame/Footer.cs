@@ -4,8 +4,8 @@ namespace Example
 {
 	public class Footer
 	{
-		IInputBinder inputBinder;
-		ILayerHandler layerHandler;
+		readonly IInputBinder inputBinder;
+		readonly ILayerHandler layerHandler;
 
 		FooterLayer footerLayer;
 		FooterSubLayer currentLayer;
