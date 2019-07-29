@@ -12,7 +12,7 @@ namespace Example
 		protected ISceneHandler SceneHandler { get { return AppOperator.SceneHandler; } }
 		protected ILayerHandler LayerHandler { get { return AppOperator.LayerHandler; } }
 
-		public override void SetParameter(Tuple<IOperationBundler, AssetHandler> param)
+		protected override void SetParameter(Tuple<IOperationBundler, AssetHandler> param)
 		{
 			AppOperator = param.Item1;
 			AssetHandler = param.Item2;

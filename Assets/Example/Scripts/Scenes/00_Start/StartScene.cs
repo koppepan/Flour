@@ -6,7 +6,7 @@ namespace Example
 	{
 		SplashLayer splash;
 
-		public override async UniTask Load(params object[] args)
+		protected override async UniTask Load(params object[] args)
 		{
 			splash = await LayerHandler.AddLayerAsync<SplashLayer>(LayerType.System, SubLayerType.Splash);
 			await splash.Run();
@@ -14,7 +14,7 @@ namespace Example
 			await SceneHandler.LoadSceneAsync(SceneType.Title);
 		}
 
-		public override async UniTask Unload()
+		protected override async UniTask Unload()
 		{
 			await splash.CloseWait();
 		}

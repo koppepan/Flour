@@ -6,29 +6,29 @@ namespace Example
 	{
 		TitleLayer titleLayer;
 
-		public override async UniTask Load(params object[] args)
+		protected override async UniTask Load(params object[] args)
 		{
 			titleLayer = await LayerHandler.AddLayerAsync<TitleLayer>(LayerType.Back, SubLayerType.Title);
 			titleLayer.Setup(GotoOutGame);
 		}
-		public override async void Open()
+		protected override async void Open()
 		{
 			var connectList = await AssetHelper.LoadServerListAsync();
 			AssetHandler.ChangeBaseUrl(connectList[0].assetBundle);
 
 			await AssetHandler.LoadManifestAsync();
 		}
-		public override async UniTask Unload()
+		protected override async UniTask Unload()
 		{
 			await titleLayer.CloseWait();
 		}
 
-		public override void OnBack()
+		protected override void OnBack()
 		{
 			AppOperator.ApplicationQuit();
 		}
 
-		private void GotoOutGame()
+		protected void GotoOutGame()
 		{
 			SceneHandler.LoadSceneAsync(SceneType.OutGame);
 		}
