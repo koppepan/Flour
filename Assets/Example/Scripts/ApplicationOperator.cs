@@ -82,7 +82,7 @@ namespace Example
 		{
 			assetHandler.Compress();
 			await Resources.UnloadUnusedAssets();
-			await UniTask.Run(() => GC.Collect(0, GCCollectionMode.Optimized));
+			await UniTask.Run(() => GC.Collect(GC.MaxGeneration));
 		}
 
 		private void OnAssetLoadError(Flour.Asset.LoadError error)
