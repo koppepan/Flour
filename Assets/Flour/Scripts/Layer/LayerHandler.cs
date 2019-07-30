@@ -130,11 +130,7 @@ namespace Flour.Layer
 
 		public async UniTask RemoveAll(TLayerKey layer)
 		{
-			var l = GetLayer(layer).List.SubLayers;
-			for (int i = l.Count - 1; i >= 0; i--)
-			{
-				await l[i].CloseWait(true);
-			}
+			await UniTask.WhenAll(GetLayer(layer).List.SubLayers.Select(x => x.CloseWait(true)));
 		}
 		async UniTask Remove(AbstractSubLayer<TLayerKey, TSubKey> subLayer, bool force)
 		{
