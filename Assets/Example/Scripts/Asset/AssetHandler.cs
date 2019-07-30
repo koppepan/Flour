@@ -8,8 +8,8 @@ namespace Example
 {
 	public class AssetHandler
 	{
-		readonly bool encrypt;
-		private AssetBundleHandler handler;
+		readonly string assetFolderName;
+		readonly AssetBundleHandler handler;
 
 		public AssetWaiter<UnityEngine.Object> SceneWaiter { get; private set; } = new AssetWaiter<UnityEngine.Object>("scenes/");
 		public AssetCacheWaiter<GameObject> PrefabWaiter { get; private set; } = new AssetCacheWaiter<GameObject>("prefabs/", 50);
@@ -17,23 +17,37 @@ namespace Example
 
 		public IObservable<LoadError> ErrorObservable { get { return handler.ErrorObservable; } }
 
-		public AssetHandler(string baseUrl, string cachePath = "", SecureString password = null)
+		public AssetHandler(string baseUrl)
 		{
-			encrypt = !string.IsNullOrEmpty(cachePath) && password != null;
-			handler = !encrypt ? new AssetBundleHandler(baseUrl) : new SecureAssetBundleHandler(baseUrl, cachePath, password);
+			assetFolderName = AssetHelper.GetAssetBundleFolderName(Application.platform);
+			handler = new AssetBundleHandler(baseUrl);
+
+			RegisterWaiter();
+		}
+		public AssetHandler(string baseUrl, string cachePath, SecureString pass)
+		{
+			assetFolderName = AssetHelper.GetEncryptAssetBundleFolderName(Application.platform);
+			handler = new SecureAssetBundleHandler(baseUrl, cachePath, pass);
+
+			RegisterWaiter();
 		}
 
-		public void ChangeBaseUrl(string baseUrl)
+		private void RegisterWaiter()
 		{
-			var platform = Application.platform;
-			var folder = encrypt ? AssetHelper.GetEncryptAssetBundleFolderName(platform) : AssetHelper.GetAssetBundleFolderName(platform);
-			handler.ChangeBaseUrl(System.IO.Path.Combine(baseUrl, folder));
+			handler.AddWaiter(SceneWaiter);
+			handler.AddWaiter(PrefabWaiter);
+			handler.AddWaiter(SpriteWaiter);
 		}
 
-		public void Dispose()
+		public void Compress()
 		{
-			handler.Dispose();
+			PrefabWaiter.Compress();
+			SpriteWaiter.Compress();
 		}
+
+		public void Dispose() => handler.Dispose();
+
+		public void ChangeBaseUrl(string baseUrl) => handler.ChangeBaseUrl(System.IO.Path.Combine(baseUrl, assetFolderName));
 
 		public LoadProgress GetProgress()
 		{
@@ -51,16 +65,6 @@ namespace Example
 			var sizeManifest = AssetHelper.AssetBundleSizeManifestName;
 
 			await handler.LoadManifestAsync(manifest, sizeManifest, "");
-
-			handler.AddWaiter(SceneWaiter);
-			handler.AddWaiter(PrefabWaiter);
-			handler.AddWaiter(SpriteWaiter);
-		}
-
-		public void Compress()
-		{
-			PrefabWaiter.Compress();
-			SpriteWaiter.Compress();
 		}
 	}
 }
