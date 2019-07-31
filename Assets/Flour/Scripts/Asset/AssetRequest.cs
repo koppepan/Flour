@@ -5,21 +5,21 @@ namespace Flour.Asset
 {
 	internal interface IAssetRequest
 	{
-		Type Type { get; }
+		Type AssetType { get; }
 		string[] AssetBundleNames { get; }
 		string AssetName { get; }
 	}
 
 	internal class Request<T> : IAssetRequest where T : UnityEngine.Object
 	{
-		public Type Type { get { return typeof(T); } }
+		public Type AssetType { get { return typeof(T); } }
 		public string[] AssetBundleNames { get; private set; }
 		public string AssetName { get; private set; }
 
-		public Subject<T> subject;
+		public Subject<T> Subject { get; private set; } = new Subject<T>();
 
 
-		public Request(string assetBundleName, string[] dependencies, string assetName, Subject<T> subject)
+		public Request(string assetBundleName, string[] dependencies, string assetName)
 		{
 			AssetBundleNames = new string[dependencies.Length + 1];
 			AssetBundleNames[0] = assetBundleName;
@@ -28,8 +28,6 @@ namespace Flour.Asset
 				AssetBundleNames[i + 1] = dependencies[i];
 			}
 			AssetName = assetName;
-
-			this.subject = subject;
 		}
 
 		public bool Containts(string assetBundleName)

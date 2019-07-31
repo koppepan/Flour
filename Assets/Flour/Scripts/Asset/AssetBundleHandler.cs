@@ -131,7 +131,7 @@ namespace Flour.Asset
 		{
 			if (assetLoadHandler.ContainsKey(request.AssetBundleNames))
 			{
-				assetLoadHandler.AddRequest(request.AssetBundleNames[0], request.AssetName, request.Type);
+				assetLoadHandler.AddRequest(request.AssetBundleNames[0], request.AssetName, request.AssetType);
 				return;
 			}
 
@@ -170,7 +170,7 @@ namespace Flour.Asset
 					}
 					else
 					{
-						assetLoadHandler.AddRequest(req.AssetBundleNames[0], req.AssetName, req.Type);
+						assetLoadHandler.AddRequest(req.AssetBundleNames[0], req.AssetName, req.AssetType);
 					}
 				}
 			}

@@ -75,13 +75,13 @@ namespace Flour.Asset
 			var req = FindOrDefault(assetBundleName, assetName);
 			if (req != null)
 			{
-				return req.subject;
+				return req.Subject;
 			}
-			req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName, new Subject<T>());
+			req = new Request<T>(ab, bridge.Manifest.GetAllDependencies(ab), assetName);
 			requests.Add(req);
 
 			bridge.AddRequest(req);
-			return req.subject;
+			return req.Subject;
 		}
 
 		Request<T> FindOrDefault(string assetBundleName, string assetName)
@@ -118,14 +118,14 @@ namespace Flour.Asset
 				var req = requests[i];
 				if (!req.Equals(assetBundleName, assetName)) continue;
 
-				if (req.subject.HasObservers)
+				if (req.Subject.HasObservers)
 				{
-					req.subject.OnNext(asset == null ? null : GetAsset(asset));
-					req.subject.OnCompleted();
+					req.Subject.OnNext(asset == null ? null : GetAsset(asset));
+					req.Subject.OnCompleted();
 				}
 				else
 				{
-					req.subject.Dispose();
+					req.Subject.Dispose();
 				}
 
 				requests.Remove(req);
