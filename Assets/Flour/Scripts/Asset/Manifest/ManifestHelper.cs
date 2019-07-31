@@ -19,9 +19,11 @@ namespace Flour.Asset
 			return (AssetBundleManifest)loadReq.asset;
 		}
 
-		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string url)
+		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string baseUrl, string fileName)
 		{
-			using (var request = await UnityWebRequestAssetBundle.GetAssetBundle(url).SendWebRequest())
+			if (string.IsNullOrEmpty(fileName)) return null;
+
+			using (var request = await UnityWebRequestAssetBundle.GetAssetBundle(Path.Combine(baseUrl, fileName)).SendWebRequest())
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
@@ -35,9 +37,11 @@ namespace Flour.Asset
 			}
 		}
 
-		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string url, string fileName, SecureString password)
+		internal static async UniTask<AssetBundleManifest> LoadManifestAsync(string baseUrl, string fileName, SecureString password)
 		{
-			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
+			if (string.IsNullOrEmpty(fileName)) return null;
+
+			using (var request = await UnityWebRequest.Get(Path.Combine(baseUrl, fileName)).SendWebRequest())
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
@@ -93,9 +97,11 @@ namespace Flour.Asset
 			long LongParse(string str) => long.Parse(str);
 			return new AssetBundleSizeManifest(ParseDictionary(body, LongParse));
 		}
-		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url)
+		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string baseUrl, string fileName)
 		{
-			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
+			if (string.IsNullOrEmpty(fileName)) return null;
+
+			using (var request = await UnityWebRequest.Get(Path.Combine(baseUrl, fileName)).SendWebRequest())
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
@@ -104,9 +110,11 @@ namespace Flour.Asset
 				return CreateSizeManifest(request.downloadHandler.text);
 			}
 		}
-		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string url, string fileName, SecureString password)
+		internal static async UniTask<AssetBundleSizeManifest> LoadSizeManifestAsync(string baseUrl, string fileName, SecureString password)
 		{
-			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
+			if (string.IsNullOrEmpty(fileName)) return null;
+
+			using (var request = await UnityWebRequest.Get(Path.Combine(baseUrl, fileName)).SendWebRequest())
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
@@ -123,9 +131,11 @@ namespace Flour.Asset
 			uint UintParse(string str) => uint.Parse(str);
 			return new AssetBundleCrcManifest(ParseDictionary<uint>(body, UintParse));
 		}
-		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url)
+		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string baseUrl, string fileName)
 		{
-			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
+			if (string.IsNullOrEmpty(fileName)) return null;
+
+			using (var request = await UnityWebRequest.Get(Path.Combine(baseUrl, fileName)).SendWebRequest())
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{
@@ -134,9 +144,11 @@ namespace Flour.Asset
 				return CreateCrcManifest(request.downloadHandler.text);
 			}
 		}
-		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string url, string fileName, SecureString password)
+		internal static async UniTask<AssetBundleCrcManifest> LoadCrcManifestAsync(string baseUrl, string fileName, SecureString password)
 		{
-			using (var request = await UnityWebRequest.Get(url).SendWebRequest())
+			if (string.IsNullOrEmpty(fileName)) return null;
+
+			using (var request = await UnityWebRequest.Get(Path.Combine(baseUrl, fileName)).SendWebRequest())
 			{
 				if (request.isHttpError || request.isNetworkError)
 				{

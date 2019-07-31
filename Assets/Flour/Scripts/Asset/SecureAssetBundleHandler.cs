@@ -26,16 +26,13 @@ namespace Flour.Asset
 
 		protected override async UniTask<Tuple<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>> LoadManifestAsyncInternal(string baseUrl, string manifestName, string sizeManifestName, string crcManifestName)
 		{
-			var manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName), manifestName, password);
-			var sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName), sizeManifestName, password);
+			var (result1, result2, result3) = await UniTask.WhenAll(
+				ManifestHelper.LoadManifestAsync(baseUrl, manifestName, password),
+				ManifestHelper.LoadSizeManifestAsync(baseUrl, sizeManifestName, password),
+				ManifestHelper.LoadCrcManifestAsync(baseUrl, crcManifestName, password)
+				);
 
-			if (!string.IsNullOrEmpty(crcManifestName))
-			{
-				var crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName), crcManifestName, password);
-				return Tuple.Create(manifest, sizeManifest, crcManifest);
-			}
-
-			return Tuple.Create<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>(manifest, sizeManifest, null);
+			return Tuple.Create(result1, result2, result3);
 		}
 	}
 }

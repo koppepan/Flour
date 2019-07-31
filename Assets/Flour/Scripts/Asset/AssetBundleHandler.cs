@@ -100,15 +100,13 @@ namespace Flour.Asset
 
 		protected virtual async UniTask<Tuple<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>> LoadManifestAsyncInternal(string baseUrl, string manifestName, string sizeManifestName, string crcManifestName)
 		{
-			var manifest = await ManifestHelper.LoadManifestAsync(Path.Combine(baseUrl, manifestName));
-			var sizeManifest = await ManifestHelper.LoadSizeManifestAsync(Path.Combine(baseUrl, sizeManifestName));
+			var (result1, result2, result3) = await UniTask.WhenAll(
+				ManifestHelper.LoadManifestAsync(baseUrl, manifestName),
+				ManifestHelper.LoadSizeManifestAsync(baseUrl, sizeManifestName),
+				ManifestHelper.LoadCrcManifestAsync(baseUrl, crcManifestName)
+				);
 
-			if (!string.IsNullOrEmpty(crcManifestName))
-			{
-				var crcManifest = await ManifestHelper.LoadCrcManifestAsync(Path.Combine(baseUrl, crcManifestName));
-				return Tuple.Create(manifest, sizeManifest, crcManifest);
-			}
-			return Tuple.Create<AssetBundleManifest, AssetBundleSizeManifest, AssetBundleCrcManifest>(manifest, sizeManifest, null);
+			return Tuple.Create(result1, result2, result3);
 		}
 
 		public Tuple<int, int> GetRequestCount()
