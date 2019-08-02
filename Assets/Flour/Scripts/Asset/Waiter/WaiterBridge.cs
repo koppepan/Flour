@@ -50,6 +50,7 @@ namespace Flour.Asset
 		public void Dispose()
 		{
 			waiterDisposes.ForEach(x => x());
+			SetManifest(null, null);
 		}
 
 		public void AddRequest(IAssetRequest request) => addRequestDelegate(request);

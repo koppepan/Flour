@@ -24,6 +24,12 @@ namespace Flour.Asset
 			return base.LoadAsync(assetbundleName, assetName, valiant);
 		}
 
+		internal override void Dispose()
+		{
+			base.Dispose();
+			cache.Clear();
+		}
+
 		public void Compress()
 		{
 			while (cache.Count > compressCount) cache.Remove(cache.First().Key);

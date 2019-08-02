@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UniRx;
 
 namespace Flour.Asset
 {
@@ -26,7 +25,7 @@ namespace Flour.Asset
 			this.bridge.AddWaiter(Key, ContainsRequest, FindRequests, Dispose);
 		}
 
-		internal void Dispose()
+		internal virtual void Dispose()
 		{
 			this.bridge.OnAssetLoaded -= OnLoaded;
 			this.bridge.OnDownloadedError -= OnError;
