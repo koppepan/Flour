@@ -42,7 +42,7 @@ namespace Example
 			Action onApplicationQuit,
 			AssetHandler assetHandler,
 			SceneHandler sceneHandler, LayerHandler layerHandler,
-			params SubLayerSourceRepository[] subLayerRepositories
+			SubLayerSourceRepository subLayerRepository
 			)
 		{
 			this.onApplicationQuit = onApplicationQuit;
@@ -52,7 +52,7 @@ namespace Example
 			this.sceneHandler = sceneHandler;
 			this.layerHandler = layerHandler;
 
-			this.subLayerRepositories = subLayerRepositories;
+			this.subLayerRepository = subLayerRepository;
 
 			disposable = this.assetHandler.ErrorObservable.Subscribe(OnAssetLoadError);
 		}

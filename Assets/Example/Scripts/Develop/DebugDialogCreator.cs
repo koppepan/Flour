@@ -23,7 +23,7 @@ namespace Example
 
 		private async UniTask<DebugDialog> Open(string title, Vector2 position)
 		{
-			var prefab = await repository.LoadAsync<DebugDialog>(SubLayerType.DebugDialog);
+			var prefab = await repository.GetAsync<DebugDialog>(SubLayerType.DebugDialog);
 
 			var dialog = layerHandler.Add(LayerType.Debug, SubLayerType.DebugDialog, prefab, true);
 			if (dialog != null)

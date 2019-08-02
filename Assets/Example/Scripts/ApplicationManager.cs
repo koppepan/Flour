@@ -46,10 +46,13 @@ namespace Example
 				layerHandler.AddLayer(t, t.ToOrder(), canvasRoot, referenceResolution, safeArea);
 			}
 
-			InitializeDebug(sceneHandler, layerHandler);
 
-			var fixedRepository = SubLayerSourceRepository.Create(FixedSubLayers, FixedSubLayers.Length);
-			await fixedRepository.LoadAllAsync();
+			var repository = new SubLayerSourceRepository();
+			repository.AddRepository(FixedSubLayers, FixedSubLayers.Length);
+			repository.AddRepository(EnumExtension.ToEnumerable<SubLayerType>(x => !FixedSubLayers.Contains(x)), 10);
+
+			await repository.PreLoadAsync(FixedSubLayers);
+
 
 #if !USE_LOCAL_ASSET && USE_SECURE_ASSET
 			var pass = await AssetHelper.GetPasswordAsync();
@@ -58,16 +61,10 @@ namespace Example
 			var assetHandler = new AssetHandler("");
 #endif
 
-			appOperator = new ApplicationOperator(
-				ApplicationQuit,
-				assetHandler,
-				sceneHandler,
-				layerHandler,
-				SubLayerSourceRepository.Create(EnumExtension.ToEnumerable<SubLayerType>(x => !FixedSubLayers.Contains(x)), 10),
-				fixedRepository
-				);
-
+			appOperator = new ApplicationOperator(ApplicationQuit, assetHandler, sceneHandler, layerHandler, repository);
 			await appOperator.LoadSceneAsync(SceneType.Start);
+
+			InitializeDebug(sceneHandler, layerHandler, repository);
 
 			// AndroidのBackKey対応
 			Observable.EveryUpdate()
@@ -114,13 +111,15 @@ namespace Example
 			DontDestroyObjectList.Clear();
 		}
 
-		private void InitializeDebug(SceneHandler sceneHandler, LayerHandler layerHandler)
+		private void InitializeDebug(SceneHandler sceneHandler, LayerHandler layerHandler, SubLayerSourceRepository repository)
 		{
 #if DEBUG_BUILD
 			layerHandler.AddLayer(LayerType.Debug, LayerType.Debug.ToOrder(), canvasRoot, referenceResolution, false);
 
 			var debugHandler = new GameObject("DebugHandler", typeof(DebugHandler)).GetComponent<DebugHandler>();
-			debugHandler.Initialize(new DebugDialogCreator(sceneHandler, layerHandler, SubLayerSourceRepository.CreateDebug()));
+
+			repository.AddDebugRepository();
+			debugHandler.Initialize(new DebugDialogCreator(sceneHandler, layerHandler, repository));
 
 			DontDestroyObjectList.Add<DebugHandler>(debugHandler.gameObject);
 #endif

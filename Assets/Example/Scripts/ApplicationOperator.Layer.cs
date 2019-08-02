@@ -5,19 +5,7 @@ namespace Example
 {
 	sealed partial class ApplicationOperator
 	{
-		readonly SubLayerSourceRepository[] subLayerRepositories;
-
-		private async UniTask<T> SubLayerPrefabLoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
-		{
-			for (int i = 0; i < subLayerRepositories.Length; i++)
-			{
-				if (subLayerRepositories[i].ContainsKey(type))
-				{
-					return await subLayerRepositories[i].LoadAsync<T>(type);
-				}
-			}
-			return null;
-		}
+		readonly SubLayerSourceRepository subLayerRepository;
 
 		public void AddSceneLayer(Transform sceneObj, Camera camera)
 		{
@@ -40,7 +28,7 @@ namespace Example
 			}
 			else
 			{
-				var prefab = await SubLayerPrefabLoadAsync<T>(subLayer);
+				var prefab = await subLayerRepository.GetAsync<T>(subLayer);
 				sub = layerHandler.Add(layer, subLayer, prefab, overlap);
 			}
 
