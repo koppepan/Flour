@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UniRx;
@@ -8,68 +9,56 @@ namespace Example
 {
 	public sealed class SubLayerSourceRepository
 	{
-		readonly SubLayerType[] keys;
-		Dictionary<SubLayerType, AbstractSubLayer> srcCaches = new Dictionary<SubLayerType, AbstractSubLayer>();
+		readonly List<Repository<SubLayerType, AbstractSubLayer>> repositories = new List<Repository<SubLayerType, AbstractSubLayer>>();
 
-		int cacheLimit;
-
-		public static SubLayerSourceRepository Create(IEnumerable<SubLayerType> subLayers, int cacheLimit)
+		public void AddRepository(IEnumerable<SubLayerType> types, int cacheLimit)
 		{
-			subLayers = subLayers.Where(x => !x.ToResourcePath().StartsWith("UI/Debug"));
-			return new SubLayerSourceRepository(subLayers, cacheLimit);
+			types = types.Where(x => !x.ToResourcePath().StartsWith("UI/Debug", StringComparison.OrdinalIgnoreCase));
+			repositories.Add(new Repository<SubLayerType, AbstractSubLayer>(types, cacheLimit));
 		}
-		public static SubLayerSourceRepository CreateDebug()
+		public void AddDebugRepository()
 		{
-			var debugLayers = Flour.EnumExtension.ToEnumerable<SubLayerType>(x => x.ToResourcePath().StartsWith("UI/Debug"));
-			return new SubLayerSourceRepository(debugLayers, debugLayers.Count());
+			var types = Flour.EnumExtension.ToEnumerable<SubLayerType>(x => x.ToResourcePath().StartsWith("UI/Debug", StringComparison.OrdinalIgnoreCase));
+			repositories.Add(new Repository<SubLayerType, AbstractSubLayer>(types, types.Count()));
 		}
 
-		public SubLayerSourceRepository(IEnumerable<SubLayerType> subLayers, int cacheLimit)
+		private Repository<SubLayerType, AbstractSubLayer> GetRepository(SubLayerType type)
 		{
-			this.cacheLimit = cacheLimit == 0 ? 1 : cacheLimit;
-			keys = subLayers.ToArray();
-		}
-
-		public bool ContainsKey(SubLayerType type) => keys.Contains(type);
-
-		public async UniTask LoadAllAsync()
-		{
-			await UniTask.WhenAll(keys.Select(x => LoadAsync<AbstractSubLayer>(x)));
-		}
-
-		public async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
-		{
-			if (!keys.Contains(type))
+			for (int i = 0; i < repositories.Count; i++)
 			{
-				Debug.LogWarning(type.ToString() + " : missing source path.");
-				return null;
-			}
-			if (srcCaches.ContainsKey(type))
-			{
-				var cache = srcCaches[type];
-				srcCaches.Remove(type);
-				srcCaches.Add(type, cache);
-				return (T)srcCaches[type];
+				if (repositories[i].ContainsKey(type)) return repositories[i];
 			}
 
+			Debug.LogWarning(type.ToString() + " : unregistered key.");
+			return null;
+		}
+
+		public async UniTask PreLoadAsync(params SubLayerType[] types) => await UniTask.WhenAll(types.Select(x => GetAsync<AbstractSubLayer>(x)));
+
+		public async UniTask<T> GetAsync<T>(SubLayerType type) where T : AbstractSubLayer
+		{
+			var repo = GetRepository(type);
+
+			if (repo == null) return null;
+			if (repo.TryGet(type, out var result)) return (T)result;
+
+			result = await LoadAsync<T>(type);
+			if (result == null) return null;
+
+			repo.Add(type, result);
+			return (T)result;
+		}
+
+		private async UniTask<T> LoadAsync<T>(SubLayerType type) where T : AbstractSubLayer
+		{
 			var prefab = await Resources.LoadAsync<GameObject>(type.ToResourcePath());
-
 			if (prefab == null)
 			{
 				Debug.LogWarning(type.ToString() + " : not found resource.");
 				return null;
 			}
-			srcCaches.Add(type, ((GameObject)prefab).GetComponent<AbstractSubLayer>());
-
-			if (srcCaches.Count > cacheLimit)
-			{
-				var remove = srcCaches.FirstOrDefault(x => x.Key != type);
-				srcCaches.Remove(remove.Key);
-				remove = default;
-				await Resources.UnloadUnusedAssets();
-			}
-
-			return (T)srcCaches[type];
+			return ((GameObject)prefab).GetComponent<T>();
 		}
+
 	}
 }
