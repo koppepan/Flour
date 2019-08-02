@@ -94,7 +94,9 @@ namespace Flour.Scene
 
 		public async UniTask AddAsyncInEditor(string scenePath, T param, params object[] args)
 		{
-#if UNITY_EDITOR
+#if !UNITY_EDITOR
+			await UniTask.DelayFrame(1);
+#else
 			await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(scenePath, new LoadSceneParameters(LoadSceneMode.Additive));
 
 			var sceneName = System.IO.Path.GetFileName(scenePath);
