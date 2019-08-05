@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 
-namespace Example
+namespace Flour
 {
 	public static class SceneListCreator
 	{
