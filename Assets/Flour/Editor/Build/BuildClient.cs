@@ -46,7 +46,9 @@ namespace Flour.Build
 					case BuildTarget.StandaloneWindows64: return path + ".exe";
 					case BuildTarget.StandaloneOSX: return path + ".app";
 					case BuildTarget.Android: return path + ".apk";
-					case BuildTarget.iOS: return path + ".ipa";
+
+					// iosはXcodeProjectがBuildされるためフォルダを指定
+					case BuildTarget.iOS: return outputDirectory;
 
 					default: return path;
 				}
