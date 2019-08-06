@@ -2,7 +2,7 @@
 
 namespace Example
 {
-	public class TitleScene : AbstractScene
+	public sealed class TitleScene : AbstractScene
 	{
 		TitleLayer titleLayer;
 
@@ -28,7 +28,7 @@ namespace Example
 			AppOperator.ApplicationQuit();
 		}
 
-		protected void GotoOutGame()
+		private void GotoOutGame()
 		{
 			SceneHandler.LoadSceneAsync(SceneType.OutGame);
 		}

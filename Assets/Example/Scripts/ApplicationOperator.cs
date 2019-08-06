@@ -15,7 +15,7 @@ namespace Example
 		class UIInputBinder : IInputBinder
 		{
 			int bindCount = 0;
-			EventSystem eventSystem = EventSystem.current;
+			readonly EventSystem eventSystem = EventSystem.current;
 
 			public bool Binded => bindCount != 0;
 			public void Bind() => eventSystem.enabled = (++bindCount) == 0;

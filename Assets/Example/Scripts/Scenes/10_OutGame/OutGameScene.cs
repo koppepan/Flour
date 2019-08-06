@@ -2,7 +2,7 @@
 
 namespace Example
 {
-	public class OutGameScene : AbstractScene
+	public sealed class OutGameScene : AbstractScene
 	{
 		Footer footer;
 		protected override async UniTask Load(params object[] args)

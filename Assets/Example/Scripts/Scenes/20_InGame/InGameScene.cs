@@ -2,7 +2,7 @@
 
 namespace Example
 {
-	public class InGameScene : AbstractScene
+	public sealed class InGameScene : AbstractScene
 	{
 	}
 }

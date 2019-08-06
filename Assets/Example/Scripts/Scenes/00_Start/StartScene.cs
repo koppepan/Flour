@@ -2,7 +2,7 @@
 
 namespace Example
 {
-	public class StartScene : AbstractScene
+	public sealed class StartScene : AbstractScene
 	{
 		SplashLayer splash;
 
