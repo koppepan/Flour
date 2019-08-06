@@ -152,9 +152,9 @@ namespace Flour.Build
 			return report;
 		}
 
-		public static List<ConnectInfomation> GetServerList(string key)
+		public static List<ConnectInfomation> GetServerList(string path)
 		{
-			var ini = new IniFile(Path.Combine(Application.dataPath, $"../BuildConfig/{key}/ConnectInformation.ini"));
+			var ini = new IniFile(path);
 
 			return ini.GetSections()
 				.Where(x => !string.IsNullOrEmpty(x))
