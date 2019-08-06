@@ -9,20 +9,53 @@ using Flour.Config;
 
 namespace Flour.Build
 {
-	public static class Client
+	public struct PlayerBuildConfig
 	{
-		public struct PlayerBuildConfig
+		public string productName;
+		public string bundleVersion;
+		public int buildNumber;
+		public string outputDirectory;
+		public BuildTarget buildTarget;
+		public BuildOptions options;
+		public List<ConnectInfomation> connectInfomations;
+
+		public BuildTargetGroup TargetGroup
 		{
-			public string productName;
-			public string bundleVersion;
-			public int buildNumber;
-			public string outputPath;
-			public BuildTargetGroup targetGroup;
-			public BuildTarget buildTarget;
-			public BuildOptions options;
-			public List<ConnectInfomation> connectInfomations;
+			get
+			{
+				switch (buildTarget)
+				{
+					case BuildTarget.StandaloneWindows64: return BuildTargetGroup.Standalone;
+					case BuildTarget.StandaloneOSX: return BuildTargetGroup.Standalone;
+					case BuildTarget.Android: return BuildTargetGroup.Android;
+					case BuildTarget.iOS: return BuildTargetGroup.iOS;
+
+					default: return BuildTargetGroup.Unknown;
+				}
+			}
 		}
 
+		public string OutputPath
+		{
+			get
+			{
+				var path = Path.Combine(outputDirectory, productName);
+
+				switch (buildTarget)
+				{
+					case BuildTarget.StandaloneWindows64: return path + ".exe";
+					case BuildTarget.StandaloneOSX: return path + ".app";
+					case BuildTarget.Android: return path + ".apk";
+					case BuildTarget.iOS: return path + ".ipa";
+
+					default: return path;
+				}
+			}
+		}
+	}
+
+	public static class Client
+	{
 		public static void Build()
 		{
 			var command = Environment.CommandLine;
@@ -54,12 +87,7 @@ namespace Flour.Build
 						break;
 
 					case "OutputPath":
-						config.outputPath = args[i + 1];
-						i++;
-						break;
-
-					case "TargetGroup":
-						config.targetGroup = (BuildTargetGroup)Enum.Parse(typeof(BuildTargetGroup), args[i + 1]);
+						config.outputDirectory = args[i + 1];
 						i++;
 						break;
 
@@ -69,10 +97,19 @@ namespace Flour.Build
 						break;
 				}
 			}
-			Build(config);
+			var report = Build(config);
+
+			if (report.summary.result == BuildResult.Succeeded)
+			{
+				EditorApplication.Exit(0);
+			}
+			else
+			{
+				EditorApplication.Exit(1);
+			}
 		}
 
-		public static void Build(PlayerBuildConfig config)
+		public static BuildReport Build(PlayerBuildConfig config)
 		{
 			PlayerSettings.productName = config.productName;
 			PlayerSettings.bundleVersion = config.bundleVersion;
@@ -91,26 +128,28 @@ namespace Flour.Build
 
 			if (config.buildTarget != EditorUserBuildSettings.activeBuildTarget)
 			{
-				EditorUserBuildSettings.SwitchActiveBuildTarget(config.targetGroup, config.buildTarget);
+				EditorUserBuildSettings.SwitchActiveBuildTarget(config.TargetGroup, config.buildTarget);
 			}
 
 			var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
 			{
 				scenes = EditorBuildSettings.scenes.Select(x => x.path).ToArray(),
-				locationPathName = config.outputPath,
+				locationPathName = config.OutputPath,
 				target = config.buildTarget,
-				targetGroup = config.targetGroup,
+				targetGroup = config.TargetGroup,
 				options = config.options,
 			});
 
-			if (report.summary.result == BuildResult.Succeeded)
-			{
-				Debug.Log("Build succeeded: " + report.summary.totalSize + " bytes");
-			}
-			else if (report.summary.result == BuildResult.Failed)
-			{
-				Debug.Log("Build failed");
-			}
+			Debug.Log(
+				$"[Result:{report.summary.result}] " +
+				$"[Output:{report.summary.outputPath}] " +
+				$"[TotalSize:{report.summary.totalSize}] " +
+				$"[BuildTime:{report.summary.totalTime}] " +
+				$"[Error:{report.summary.totalErrors}] " +
+				$"[Warning:{report.summary.totalWarnings}] "
+			);
+
+			return report;
 		}
 
 		public static List<ConnectInfomation> GetServerList(string key)

@@ -5,35 +5,33 @@ namespace Example
 {
 	partial class CustomMenu
 	{
-		[MenuItem(MenuTitle + "/Client Build/Production", priority = BuildClientPriority)]
+		const string ClientBuildMenu = MenuTitle + "/Client Build";
+
+		[MenuItem(ClientBuildMenu + "/Production", priority = BuildClientPriority)]
 		public static void ClientBuildProduction()
 		{
-			Client.Build(new Client.PlayerBuildConfig
-			{
-				productName = "production",
-				bundleVersion = "1.0.0",
-				buildNumber = 1,
-				outputPath = "Builds/Production/Production.exe",
-				targetGroup = BuildTargetGroup.Standalone,
-				buildTarget = BuildTarget.StandaloneWindows64,
-				connectInfomations = Client.GetServerList("Production"),
-				options = BuildOptions.None,
-			});
+			Build("production", "1.0.0", 1, BuildTarget.StandaloneWindows64, "Production", BuildOptions.None);
 		}
 
-		[MenuItem(MenuTitle + "/Client Build/Development", priority = BuildClientPriority)]
+		[MenuItem(ClientBuildMenu + "/Development", priority = BuildClientPriority)]
 		public static void ClientBuildDevelopment()
 		{
-			Client.Build(new Client.PlayerBuildConfig
+			Build("development", "1.0.0", 1, BuildTarget.StandaloneWindows64, "Development", BuildOptions.Development);
+		}
+
+		static void Build(string productName, string bundleVersion, int buildNumber, BuildTarget buildTarget, string infoKey, BuildOptions options)
+		{
+			var outputDirectory = $"Builds/{infoKey}/{buildTarget.ToString()}";
+
+			Client.Build(new PlayerBuildConfig
 			{
-				productName = "development",
-				bundleVersion = "1.0.0",
-				buildNumber = 1,
-				outputPath = "Builds/Development/Development.exe",
-				targetGroup = BuildTargetGroup.Standalone,
-				buildTarget = BuildTarget.StandaloneWindows64,
-				connectInfomations = Client.GetServerList("Development"),
-				options = BuildOptions.Development,
+				productName = productName,
+				bundleVersion = bundleVersion,
+				buildNumber = buildNumber,
+				outputDirectory = outputDirectory,
+				buildTarget = buildTarget,
+				connectInfomations = Client.GetServerList(infoKey),
+				options = options,
 			});
 		}
 	}
