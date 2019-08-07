@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UniRx;
+using Flour.Develop;
 
 namespace Example
 {
@@ -12,9 +14,22 @@ namespace Example
 		DebugDialogCreator creator;
 		readonly Dictionary<LogType, List<Tuple<string, string>>> logMap = new Dictionary<LogType, List<Tuple<string, string>>>();
 
+		bool environmentEnabled = false;
+		readonly StringBuilder stringBuilder = new StringBuilder();
+		readonly FrameCount frameCount = new FrameCount();
+		IContent<string>[] environmentContetns;
+
 		public void Initialize(DebugDialogCreator creator)
 		{
 			this.creator = creator;
+
+			environmentContetns = new IContent<string>[]
+			{
+				frameCount,
+				new SystemMemory(),
+				new UsedMemory(),
+				new GCCount(),
+			};
 
 			Observable.FromEvent(
 				h => Application.logMessageReceived += LogMessageReceived,
@@ -35,17 +50,28 @@ namespace Example
 				.SelectMany(_ => Observable.Timer(TimeSpan.FromSeconds(1)))
 				.TakeUntil(mouseUpStream)
 				.RepeatUntilDestroy(this)
-#if UNITY_ANDROID || UNITY_IOS
-				.Subscribe(_ => OpenDialog(Input.GetTouch(0).position))
-#elif UNITY_EDITOR || UNITY_STANDALONE
-				.Subscribe(_ => OpenDialog(Input.mousePosition))
-#else
-				.Subscribe()
-#endif
+				.Subscribe(_ => OpenDialog(GetInputPosition()))
 				.AddTo(this);
+
+			mouseDownStream
+				.TakeUntil(mouseUpStream)
+				.RepeatUntilDestroy(this)
+				.Where(_ => GetInputPosition().x < 100 && GetInputPosition().y > Screen.height - 100)
+				.Subscribe(_ => environmentEnabled = !environmentEnabled).AddTo(this);
 		}
 
-		public void OpenDialog(Vector2 position)
+		private Vector2 GetInputPosition()
+		{
+#if UNITY_ANDROID || UNITY_IOS
+			return Input.GetTouch(0).position;
+#elif UNITY_EDITOR || UNITY_STANDALONE
+			return Input.mousePosition;
+#else
+			return default;
+#endif
+		}
+
+		private void OpenDialog(Vector2 position)
 		{
 			creator.OpenDebugDialog(position);
 		}
@@ -66,6 +92,27 @@ namespace Example
 			{
 				logMap[logType].RemoveAt(0);
 			}
+		}
+
+		private void Update()
+		{
+			if (!environmentEnabled) return;
+			frameCount.Update();
+		}
+
+		private void OnGUI()
+		{
+			if (!environmentEnabled) return;
+
+			stringBuilder.Clear();
+
+			for (int i = 0; i < environmentContetns.Length; i++)
+			{
+				stringBuilder.Append(environmentContetns[i].GetValue());
+				stringBuilder.Append(i == environmentContetns.Length - 1 ? string.Empty : Environment.NewLine);
+			}
+
+			using (var scope = new GUILayout.HorizontalScope("box")) GUILayout.Label(stringBuilder.ToString());
 		}
 	}
 }
