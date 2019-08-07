@@ -89,9 +89,9 @@ namespace Example
 			contentHandler.AddDropdown(key, contents, defaultValue, onChanged);
 			return this;
 		}
-		public DebugDialog AddToggle(string key, string title, Action<bool> onChanged = null)
+		public DebugDialog AddToggle(string key, string title, bool value, Action<bool> onChanged = null)
 		{
-			contentHandler.AddToggle(key, title, onChanged);
+			contentHandler.AddToggle(key, title, value, onChanged);
 			return this;
 		}
 		public DebugDialog AddSlider(string key, float value, float min, float max, Action<float> onChanged = null)

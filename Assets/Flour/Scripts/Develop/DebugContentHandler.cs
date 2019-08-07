@@ -105,10 +105,10 @@ namespace Flour.Develop
 			var dropdown = AddContent<DebugDropdown>(key, dropdownPrefab);
 			dropdown?.Setup(contents, defaultValue, onChanged);
 		}
-		public void AddToggle(string key, string title, Action<bool> onChanged = null)
+		public void AddToggle(string key, string title, bool value, Action<bool> onChanged = null)
 		{
 			var toggle = AddContent<DebugToggle>(key, togglePrefab);
-			toggle?.Setup(title, onChanged);
+			toggle?.Setup(title, value, onChanged);
 		}
 		public void AddSlider(string key, float value, float min, float max, Action<float> onChanged = null)
 		{
