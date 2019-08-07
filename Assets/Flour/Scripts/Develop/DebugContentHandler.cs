@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Flour.Develop
 {
-	internal interface IContent<T>
+	public interface IContent<T>
 	{
 		T GetValue();
 	}
