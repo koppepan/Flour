@@ -67,9 +67,9 @@ namespace Flour.Layer
 
 		public bool OnBack()
 		{
-			foreach (var layer in layerOrder.Values.Reverse())
+			for (int i = layerOrder.Values.Count - 1; i >= 0; i--)
 			{
-				if (layers[layer].OnBack())
+				if (layers[layerOrder.Values[i]].OnBack())
 				{
 					return true;
 				}
