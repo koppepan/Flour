@@ -28,7 +28,7 @@ namespace Flour
 
 				using (fw.StartNamespaceScope(nameSpace))
 				{
-					using (fw.StartEnumScope(enumName))
+					using (fw.StartScope($"public enum {enumName}"))
 					{
 						foreach (var t in types)
 						{

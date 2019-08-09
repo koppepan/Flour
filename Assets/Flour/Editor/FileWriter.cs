@@ -55,30 +55,18 @@ namespace Flour
 		public void WriteBody(string body) => sw.WriteLine($"{Tab}{body}");
 		public void WriteLine() => sw.WriteLine("");
 
-
 		public IDisposable StartNamespaceScope(string name)
 		{
 			if (string.IsNullOrEmpty(name))
 			{
 				return Disposable.Empty;
 			}
-			sw.WriteLine($"{Tab}namespace {name}");
-			return StartScope();
+			return StartScope($"{Tab}namespace {name}");
 		}
 
-		public IDisposable StartClassScope(string name)
+		public IDisposable StartScope(string body)
 		{
-			sw.WriteLine($"{Tab}public class {name}");
-			return StartScope();
-		}
-		public IDisposable StartEnumScope(string name)
-		{
-			sw.WriteLine($"{Tab}public enum {name}");
-			return StartScope();
-		}
-
-		public IDisposable StartScope()
-		{
+			sw.WriteLine($"{Tab}{body}");
 			sw.WriteLine($"{Tab}{{");
 			tabCount++;
 			return Disposable.Create(() =>

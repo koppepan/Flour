@@ -39,7 +39,7 @@ namespace Flour
 
 				using (fw.StartNamespaceScope(namespaceName))
 				{
-					using (fw.StartClassScope(SceneListClass))
+					using (fw.StartScope($"public class {SceneListClass}"))
 					{
 						foreach (var sceneGUID in sceneGUIDs)
 						{
@@ -48,11 +48,9 @@ namespace Flour
 							int depth = sceneName.Count(x => x == '/');
 
 							fw.WriteBody($"[MenuItem(\"{menuTitle}/Scene/{sceneName}\", priority = {priority + depth})]");
-							fw.WriteBody($"public static void OpenScene{sceneName.Replace("/", "")}()");
-							using (fw.StartScope())
+							using (fw.StartScope($"public static void OpenScene{sceneName.Replace("/", "")}()"))
 							{
-								fw.WriteBody("if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())");
-								using (fw.StartScope())
+								using (fw.StartScope("if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())"))
 								{
 									fw.WriteBody($"EditorSceneManager.OpenScene(\"{scenePath}\");");
 								}
