@@ -1,9 +1,9 @@
 {
     "name": "Flour.Editor",
     "references": [
-        "GUID:9635b7f1c95650e4b82251d99fb65b49"
+        "GUID:9635b7f1c95650e4b82251d99fb65b49",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
