@@ -17,9 +17,8 @@ namespace Example
 		[MenuItem(MenuTitle + "/Scene/Create Scene List", priority = SceneListPriority)]
 		static void CreateSceneList()
 		{
-			Flour.SceneListCreator.Create("Example/Scenes", "Example/Editor", MenuTitle, 0, "Example");
+			Flour.SceneListCreator.Create("Assets/Example/Scenes", "Assets/Example/Editor", MenuTitle, 0, "Example");
 		}
-
 
 		[InitializeOnLoad]
 		private class Startup
